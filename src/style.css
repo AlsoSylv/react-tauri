@@ -1,0 +1,45 @@
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+div#base {
+  height: 100%;
+}
+
+div#root {
+  height: 100%;
+}
+
+div#drop-downs {
+  float: left;
+  width: 20%;
+  z-index: 1;
+  height: 87%;
+  /*position: absolute;*/
+}
+
+div.champion-popup {
+  z-index: 5;
+  background-color: white;
+  width: 100%;
+}
+
+input {
+  width: 95%;
+}
+
+select {
+  width: 100%;
+}
+
+input#champion-name {
+  width: 95%;
+}
+
+body {
+  height: 90vh;
+}

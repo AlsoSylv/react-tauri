@@ -7,8 +7,6 @@ import { Selects, Page } from "./logic";
 function Base(props) {
     const element = (
     <div id="base">
-      <h1>This is {props.prompt}!</h1>
-      <h2>{props.prompt} is very painful</h2>
       <Selects />
       <Page />
     </div>
@@ -18,5 +16,5 @@ function Base(props) {
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-const element = <Base prompt="React"/>;
+const element = <Base />;
 root.render(element)

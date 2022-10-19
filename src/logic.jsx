@@ -29,8 +29,15 @@ export function Page() {
   const [page = [["bullshit"]], setPage] = useState([[null, null, null, null], [null, null]])
   
   const element = (
-    <div>
+    <div id="get-runes">
       <button onClick={() => {
+        if (exported.champion === undefined || '' && exported.role === 'none') {
+          setPage([["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]])
+        } else if (exported.champion === undefined || '') {
+          setPage([["Please Enter A Champion Name", null, null, null], [null, null]])
+        } else if (exported.role === 'none') {
+          setPage([["Please Select a Role", null, null, null], [null, null]])
+        } else {
         console.log(exported.champion)
         console.log(exported.role)
         console.log(exported.rank)
@@ -43,7 +50,7 @@ export function Page() {
           }).then((runes) => {
             console.log(runes)
             setPage(runes)
-          })}}>Click Me</button>
+          })}}}>Click Me</button>
       <div>
       {page[0][0]} <br></br>
       {page[0][1]} <br></br>

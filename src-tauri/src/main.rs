@@ -21,6 +21,7 @@ fn main() {
 
 #[tauri::command]
 async fn rune_names(name: String, role: String, rank: String, region: String) -> [Vec<String>; 2] {
+    // TOOD: This can be none if you get data specific enough, I need to handle that 
     let (rune_names, _rune_ids, _tree_ids) = plugins::ugg::two_dimensional_rune_array(name, role, rank, region).await.unwrap();
     return rune_names;
 } 

@@ -91,12 +91,17 @@ pub async fn stats(name: String) -> Result<String, reqwest::Error> {
     let game_mode = "ranked_solo_5x5";
     let data_dragon_version = data_dragon::data_dragon_version().await.unwrap();
     let lol_version: Vec<&str> = data_dragon_version.split(".").collect();
-    let champion_id = helpers::champion_id(name).await.unwrap();
-    let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
-    let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{champion_id}/{overview_version}.json");
-    let request = reqwest::get(url).await?.text().await;
-
-    Ok(request.unwrap())
+    let champion_id = helpers::champion_id(name).await;
+    match champion_id {
+        Ok(id) => {
+            let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+            let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{id}/{overview_version}.json");
+            let request = reqwest::get(url).await?.text().await;
+        
+            Ok(request.unwrap())
+        }
+        Err(_) => panic!()
+    }
 }
 
 #[cached(result = true, size = 1)]
@@ -149,7 +154,7 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }
 
 #[cached(result = true, size = 5)]
-pub async fn two_dimensional_rune_array(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [Value; 2]), Error> {
+pub async fn two_dimensional_rune_array(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [Value; 2]), &'static str> {
     let data_dragon_runes_json = &data_dragon::runes_json().await.unwrap();
     let ugg_runes_json_read = &overiew(name, role, ranks, regions).await[match_data("perks").await];
     let rune_ids = &ugg_runes_json_read[4];
@@ -185,6 +190,7 @@ pub async fn two_dimensional_rune_array(name: String, role: String, ranks: Strin
             }
         } 
     }
+
     for y in 0..3 {
         if runes_names_2.len() == 2 {
             break;
@@ -200,6 +206,11 @@ pub async fn two_dimensional_rune_array(name: String, role: String, ranks: Strin
             runes_ids_2.remove(y);
         }
     }
+
+    if runes_ids_1[0] == 1 {
+        return Err("Error");
+    }
+
     let rune_ids = [runes_ids_1.to_vec(), runes_ids_2];
     let rune_names = [runes_names_1.to_vec(), runes_names_2];
     let tree_ids = [rune_tree_id_1.to_owned(), rune_tree_id_2.to_owned()];

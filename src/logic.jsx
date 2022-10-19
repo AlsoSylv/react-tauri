@@ -1,12 +1,13 @@
-import { Combobox, Popover } from "@headlessui/react";
+import { Combobox } from "@headlessui/react";
 import { invoke } from "@tauri-apps/api";
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useRef } from "react";
 
-var exportedRank = "platinum_plus";
-var exportedRole = "none";
-var exportedRegion = "world";
-var exportedChampion = '';
-
+const exported = {
+  rank: 'platinum_plus',
+  role: 'none',
+  region: 'world',
+  champion: '',
+}
 
 export function Selects() {
   const element = (
@@ -20,7 +21,6 @@ export function Selects() {
       <br></br>
     </div>
   );
-  console.log(exportedRank)
   return element;
 }
 
@@ -31,22 +31,24 @@ export function Page() {
   const element = (
     <div>
       <button onClick={() => {
-          invoke("rune_names", {
-    name: exportedChampion,
-    role: exportedRole,
-    rank: exportedRank,
-    region: exportedRegion
-  }).then((runes) => {
-    console.log(runes)
-    setPage(runes)
-    })
-      }
-        }>Click Me</button>
-      <text> <br></br>
+        console.log(exported.champion)
+        console.log(exported.role)
+        console.log(exported.rank)
+        console.log(exported.region)  
+        invoke("rune_names", {
+        name: exported.champion,
+        role: exported.role,
+        rank: exported.rank,
+        region: exported.region
+          }).then((runes) => {
+            console.log(runes)
+            setPage(runes)
+          })}}>Click Me</button>
+      <div>
       {page[0][0]} <br></br>
       {page[0][1]} <br></br>
       {page[0][2]} <br></br>
-      {page[0][3]} </text>
+      {page[0][3]} </div>
     </div>
   )
   return element
@@ -61,7 +63,7 @@ function RoleMenu() {
     defaultValue="none"
     onChange={(e) => {
       setRole(e.target.value);
-      exportedRole = e.target.value;
+      exported.role = e.target.value;
       }}>
       <option value="none" disabled>None</option>
       <option value="top">Top</option>
@@ -83,7 +85,7 @@ function RankMenu() {
     defaultValue="platinum_plus"
     onChange={(e) => {
       setRank(e.target.value);
-      exportedRank = e.target.value;
+      exported.rank = e.target.value;
       }}>
       <option value="challenger">Challenger</option>
       <option value="grandmaster">Grandmaster</option>
@@ -113,7 +115,7 @@ function RegionMenu() {
     defaultValue="world"
     onChange={(e) => {
       setRegion(e.target.value);
-      exportedRegion = e.target.value;
+      exported.region = e.target.value;
       }}>
       <option value="world">World</option>
       <option value="na1">North America</option>
@@ -136,9 +138,10 @@ function RegionMenu() {
 
 function ChampionOptions() {
 
-  const [champions, setChampions] = useState([null]);
-  const [selectedOptions, setSelectedOptions] = useState(champions[0])
+  const [champions, setChampions] = useState([]);
+  const [selectedChampion, setSelectedOptions] = useState()
   const [query, setQeury] = useState('')
+  const champRef = useRef()
 
   useEffect(() => {
     invoke("champion_names").then((names) => {
@@ -156,8 +159,8 @@ function ChampionOptions() {
   const filteredChampions =
   query === ''
     ? champions
-    : champions.filter((champ) => {
-    return champ.toLowerCase().includes(query.toLowerCase())
+    : champions.filter((champs) => {
+    return champs.toLowerCase().includes(query.toLowerCase())
   })
 
   let topFiveChmapions = [];
@@ -166,18 +169,21 @@ function ChampionOptions() {
       topFiveChmapions.push(filteredChampions[y])
     }
   }
+  
+  console.log(topFiveChmapions)
 
   const element = (
       <div id="champion-popup">
-        <Combobox value={selectedOptions} onChange={setSelectedOptions}>
-          <Combobox.Input className="champion-popup" onChange={(event) => {
+        <Combobox as="div" value={selectedChampion} onChange={() => {
+          setSelectedOptions()
+          //console.log(selectedChampion)
+          }}>
+          <Combobox.Input className="champion-popup" displayValue={(champ) => {exported.champion = champ; return champ}} onChange={(event) => {
             setQeury(event.target.value)
-            exportedChampion = event.target.value
-            console.log(event.target.value)
           }} />
           <Combobox.Options>
             {topFiveChmapions.map((champ) => (
-              <Combobox.Option key={champ} value={champ} {...exportedChampion = champ}>
+              <Combobox.Option key={champ} value={champ}>
                 {champ}
               </Combobox.Option>
             ))}

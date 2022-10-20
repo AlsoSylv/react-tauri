@@ -26,21 +26,7 @@ export function Selects() {
 
 export function Page() {
   const [page, setPage] = useState([[null, null, null, null], [null, null]])
-  const [champ, setChamp] = useState()
 
-  /*if (page === undefined) {
-    return (
-      <div id="get-runes">
-        <button onClick={() => {
-          runes().then((result) => setPage(result))
-        }}>Click Me</button>
-        <div>
-          loading....
-        </div>
-      </div>
-    )
-  }*/
-  
   const element = (
     <div id="get-runes">
       <button onClick={() => {
@@ -61,7 +47,6 @@ export function Page() {
 
 
 async function runes() {
-  var runePage;
   if (exported.champion === undefined || '' && exported.role === 'none') {
     return [["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]]
   } else if (exported.champion === undefined || '') {
@@ -69,19 +54,16 @@ async function runes() {
   } else if (exported.role === 'none') {
     return [["Please Select a Role", null, null, null], [null, null]]
   } else {
-    await invoke("rune_names", {
+    return await invoke("rune_names", {
       name: exported.champion,
       role: exported.role,
       rank: exported.rank,
       region: exported.region
-    }).then((runes) => {
-      console.log(runes)
-      runePage = runes
     }).catch(() => {
       runePage = [["No Data Exists!", null, null, null], [null, null]]
     })
   }
-  return runePage
+
 }
 
 //This whole section should be auto generated somehow!

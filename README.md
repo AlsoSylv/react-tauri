@@ -1,4 +1,4 @@
-#Rune Manager
+# Rune Manager
 Rune manager is a React Tauri based app for managing runes with LoL
 
 Currently Support for sites and features is limited, but will continue to expand

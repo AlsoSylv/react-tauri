@@ -1,60 +1,63 @@
 use cached::proc_macro::cached;
 use reqwest::Error;
 use serde_json::Value;
+use phf::phf_map;
 
 use crate::shared;
 use shared::{data_dragon, helpers};
 
-//Move this to a constant HashMap, or an auto generated HashMap
+static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
+    "na1" => "1",
+    "euw1" => "2",
+    "kr" => "3",
+    "eun1" => "4",
+    "br1" => "5",
+    "la1" => "6",
+    "la2" => "7",
+    "oc1" => "8",
+    "ru" => "9",
+    "tr1" => "10",
+    "jp1" => "11",
+    "world" => "12"
+};
+
+static TIERS: phf::Map<&'static str, &'static str> = phf_map! {
+    "challenger" => "1",
+    "master" => "2",
+    "diamond" => "3",
+    "platinum" => "4",
+    "gold" => "5",
+    "silver" => "6",
+    "bronze" => "7",
+    "overall" => "8",
+    "platinum_plus" => "10",
+    "diamond_plus" => "11",
+    "diamond_2_plus" => "12",
+    "grandmaster" => "13",
+    "master_plus" => "14",
+    "iron" => "15",
+};
+
+static POSITIONS: phf::Map<&'static str, &'static str> = phf_map! {
+    "jungle" => "1",
+    "support" => "2",
+    "adc" => "3",
+    "top" => "4",
+    "mid" => "5",
+    "none" => "6"
+};
+
 async fn match_region(region: &str) -> &str {
-    //Vertify these are the correct names in the Riot API enpoints
-    match region {
-        "na1" => "1",
-        "euw1" => "2",
-        "kr" => "3",
-        "eun1" => "4",
-        "br1" => "5",
-        "la1" => "6",
-        "la2" => "7",
-        "oc1" => "8",
-        "ru" => "9",
-        "tr1" => "10",
-        "jp1" => "11",
-        "world" => "12",
-        _ => "12"
-    }
+    return REGIONS[region];
 }
 
 async fn match_tiers(ranks: &str) -> &str {
-    match ranks {
-        "challenger" => "1",
-        "master" => "2",
-        "diamond" => "3",
-        "platinum" => "4",
-        "gold" => "5",
-        "silver" => "6",
-        "bronze" => "7",
-        "overall" => "8",
-        "platinum_plus" => "10",
-        "diamnond_plus" => "11",
-        "diamond_2_plus" => "12",
-        "grandmaster" => "13",
-        "master_plus" => "14",
-        "iron" => "15",
-        _ => "10"
-    }
+    return TIERS[ranks];
 }
 
+// Better defaulting logic should be used by wrapping https://stats2.u.gg/lol/1.5/primary_roles/12_20/1.5.0.json
 async fn match_positions(role: &str) -> &str {
-    match role {
-        "jungle" => "1",
-        "support" => "2",
-        "adc" => "3",
-        "top" => "4",
-        "mid" => "5",
-        "none" => "6",
-        _ => "6"
-    }
+    return POSITIONS[role];
 }
 
 async fn match_data(data: &str) -> usize {
@@ -83,6 +86,8 @@ async fn match_stats(stats: &str) -> usize {
     }
 }
 
+
+// Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
 #[cached(result = true, size = 1)]
 pub async fn stats(name: String) -> Result<String, reqwest::Error> {
     let stats_version = "1.1";
@@ -139,19 +144,22 @@ async fn overiew(name: String, role: String, ranks: String, regions: String) -> 
 
 //The format is used here to get an exact result from the floating point math
 pub async fn winrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let win_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("wins").await].as_f64().unwrap() / &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
+    let win_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("wins").await].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
     return format!("{:.1$}%", win_rate * 100.0, 1)
 }
 
-pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("bans").await].as_f64().unwrap() / &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
+/*pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> String {
+    let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("bans").await].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
     return format!("{:.1$}%", ban_rate * 100.0, 1)
 }
 
 pub async fn pickrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let pick_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("matches").await].as_f64().unwrap() / &json_read_cache(name, role, ranks, regions).await[match_stats("total_matches").await].as_f64().unwrap();
+    let pick_rate: f64 =&json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("matches").await].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[match_stats("total_matches").await].as_f64().unwrap();
     return format!("{:.1$}%", pick_rate * 100.0, 1)
-}
+}*/
 
 #[cached(result = true, size = 5)]
 pub async fn two_dimensional_rune_array(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [Value; 2]), &'static str> {
@@ -243,11 +251,4 @@ pub async fn shard_ids(name: String, role: String, ranks: String, regions: Strin
         stat_shard_ids.push(y.as_str().unwrap().parse::<i64>().unwrap());
     }
     Ok(stat_shard_ids)
-}
-
-pub async fn selected_perks_ids_ugg(name: String, role: String, ranks: String, regions: String) -> Result<[i64; 9], Error> {
-    let (_names, ids, _treenames) = two_dimensional_rune_array(name.clone(), role.clone(), ranks.clone(), regions.clone()).await.unwrap();
-    let shard_id_array = shard_ids(name, role, ranks, regions).await.unwrap();
-    let selected_perk_ids = [ids[0][0], ids[0][1], ids[0][2], ids[0][3], ids[1][0], ids[1][1], shard_id_array[0], shard_id_array[1], shard_id_array[2]];
-    Ok(selected_perk_ids)
 }

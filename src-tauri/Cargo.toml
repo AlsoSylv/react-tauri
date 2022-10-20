@@ -20,6 +20,7 @@ tauri = { version = "1.1", features = ["api-all"] }
 reqwest = { version = "0.11.12", features = ["json"] }
 cached = { version = "0.39.0" }
 tokio = { version = "1.21.2", features = ["full"] }
+phf = { version = "0.11", features = ["macros"] }
 
 [features]
 # by default Tauri runs in production mode

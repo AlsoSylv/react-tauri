@@ -1,6 +1,6 @@
 import { Combobox } from "@headlessui/react";
 import { invoke } from "@tauri-apps/api";
-import { React, useState, useEffect, useRef } from "react";
+import { React, useState, useEffect } from "react";
 
 const exported = {
   rank: 'platinum_plus',
@@ -24,43 +24,47 @@ export function Selects() {
   return element;
 }
 
-
 export function Page() {
-  const [page = [["bullshit"]], setPage] = useState([[null, null, null, null], [null, null]])
+  const [page, setPage] = useState([[null, null, null, null], [null, null]])
   
   const element = (
     <div id="get-runes">
       <button onClick={() => {
-        if (exported.champion === undefined || '' && exported.role === 'none') {
-          setPage([["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]])
-        } else if (exported.champion === undefined || '') {
-          setPage([["Please Enter A Champion Name", null, null, null], [null, null]])
-        } else if (exported.role === 'none') {
-          setPage([["Please Select a Role", null, null, null], [null, null]])
-        } else {
-        console.log(exported.champion)
-        console.log(exported.role)
-        console.log(exported.rank)
-        console.log(exported.region)  
-        invoke("rune_names", {
-        name: exported.champion,
-        role: exported.role,
-        rank: exported.rank,
-        region: exported.region
-          }).then((runes) => {
-            console.log(runes)
-            setPage(runes)
-          })}}}>Click Me</button>
+        runes(setPage)
+      }}>Click Me</button>
       <div>
-      {page[0][0]} <br></br>
-      {page[0][1]} <br></br>
-      {page[0][2]} <br></br>
-      {page[0][3]} </div>
+        {page[0][0]} <br></br>
+        {page[0][1]} <br></br>
+        {page[0][2]} <br></br>
+        {page[0][3]} 
+      </div>
     </div>
   )
   return element
 }
 
+
+function runes(arg) {
+  if (exported.champion === undefined || '' && exported.role === 'none') {
+    arg([["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]])
+  } else if (exported.champion === undefined || '') {
+    arg([["Please Enter A Champion Name", null, null, null], [null, null]])
+  } else if (exported.role === 'none') {
+    arg([["Please Select a Role", null, null, null], [null, null]])
+  } else {
+    invoke("rune_names", {
+      name: exported.champion,
+      role: exported.role,
+      rank: exported.rank,
+      region: exported.region
+    }).then((runes) => {
+      console.log(runes)
+      arg(runes)
+    }).catch(() => {
+      arg([["No Data Exists!", null, null, null], [null, null]])
+    })
+  }
+}
 
 //This whole section should be auto generated somehow!
 function RoleMenu() {
@@ -148,7 +152,6 @@ function ChampionOptions() {
   const [champions, setChampions] = useState([]);
   const [selectedChampion, setSelectedOptions] = useState()
   const [query, setQeury] = useState('')
-  const champRef = useRef()
 
   useEffect(() => {
     invoke("champion_names").then((names) => {

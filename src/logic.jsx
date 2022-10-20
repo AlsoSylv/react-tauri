@@ -6,7 +6,7 @@ const exported = {
   rank: 'platinum_plus',
   role: 'none',
   region: 'world',
-  champion: 'Ashe ',
+  champion: '',
 }
 
 export function Selects() {

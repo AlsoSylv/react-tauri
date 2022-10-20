@@ -6,7 +6,7 @@ const exported = {
   rank: 'platinum_plus',
   role: 'none',
   region: 'world',
-  champion: '',
+  champion: 'Ashe ',
 }
 
 export function Selects() {
@@ -26,11 +26,27 @@ export function Selects() {
 
 export function Page() {
   const [page, setPage] = useState([[null, null, null, null], [null, null]])
+  const [champ, setChamp] = useState()
+
+  /*if (page === undefined) {
+    return (
+      <div id="get-runes">
+        <button onClick={() => {
+          runes().then((result) => setPage(result))
+        }}>Click Me</button>
+        <div>
+          loading....
+        </div>
+      </div>
+    )
+  }*/
   
   const element = (
     <div id="get-runes">
       <button onClick={() => {
-        runes(setPage)
+        runes().then((runePage) => {
+          setPage(runePage)
+        })
       }}>Click Me</button>
       <div>
         {page[0][0]} <br></br>
@@ -44,26 +60,28 @@ export function Page() {
 }
 
 
-function runes(arg) {
+async function runes() {
+  var runePage;
   if (exported.champion === undefined || '' && exported.role === 'none') {
-    arg([["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]])
+    return [["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]]
   } else if (exported.champion === undefined || '') {
-    arg([["Please Enter A Champion Name", null, null, null], [null, null]])
+    return [["Please Enter A Champion Name", null, null, null], [null, null]]
   } else if (exported.role === 'none') {
-    arg([["Please Select a Role", null, null, null], [null, null]])
+    return [["Please Select a Role", null, null, null], [null, null]]
   } else {
-    invoke("rune_names", {
+    await invoke("rune_names", {
       name: exported.champion,
       role: exported.role,
       rank: exported.rank,
       region: exported.region
     }).then((runes) => {
       console.log(runes)
-      arg(runes)
+      runePage = runes
     }).catch(() => {
-      arg([["No Data Exists!", null, null, null], [null, null]])
+      runePage = [["No Data Exists!", null, null, null], [null, null]]
     })
   }
+  return runePage
 }
 
 //This whole section should be auto generated somehow!

@@ -38,6 +38,7 @@ static TIERS: phf::Map<&'static str, &'static str> = phf_map! {
     "iron" => "15",
 };
 
+// Better defaulting logic should be used by wrapping https://stats2.u.gg/lol/1.5/primary_roles/12_20/1.5.0.json
 static POSITIONS: phf::Map<&'static str, &'static str> = phf_map! {
     "jungle" => "1",
     "support" => "2",
@@ -47,49 +48,29 @@ static POSITIONS: phf::Map<&'static str, &'static str> = phf_map! {
     "none" => "6"
 };
 
-async fn match_region(region: &str) -> &str {
-    return REGIONS[region];
-}
+static DATA: phf::Map<&'static str, usize> = phf_map! {
+    "perks" => 0,
+    "summoner_spells" => 1,
+    "starting_items" => 2,
+    "mythic_and_core" => 3,
+    "abilities" => 4,
+    "other_items" => 5,
+    "shards" => 8,
+};
 
-async fn match_tiers(ranks: &str) -> &str {
-    return TIERS[ranks];
-}
-
-// Better defaulting logic should be used by wrapping https://stats2.u.gg/lol/1.5/primary_roles/12_20/1.5.0.json
-async fn match_positions(role: &str) -> &str {
-    return POSITIONS[role];
-}
-
-async fn match_data(data: &str) -> usize {
-    match data {
-        "perks" => 0,
-        "summoner_spells" => 1,
-        "starting_items" => 2,
-        "mythic_and_core" => 3,
-        "abilities" => 4,
-        "other_items" => 5,
-        "shards" => 8,
-        _ => unreachable!()
-    }
-}
-
-async fn match_stats(stats: &str) -> usize {
-    match stats {
-        "wins" => 0,
-        "matches" => 1,
-        "rank" => 2,
-        "total_rank" => 3,
-        "bans" => 10,
-        "total_matches" => 11,
-        "real_matches" => 13,
-        _ => unreachable!()
-    }
-}
-
+static STATS: phf::Map<&'static str, usize> = phf_map! {
+    "wins" => 0,
+    "matches" => 1,
+    "rank" => 2,
+    "total_rank" => 3,
+    "bans" => 10,
+    "total_matches" => 11,
+    "real_matches" => 13,
+};
 
 // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
 #[cached(result = true, size = 1)]
-pub async fn stats(name: String) -> Result<String, reqwest::Error> {
+pub async fn overiew_json(name: String) -> Result<String, reqwest::Error> {
     let stats_version = "1.1";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
@@ -131,40 +112,40 @@ async fn ranking(name: String) -> Result<String, reqwest::Error> {
 async fn json_read_cache(name: String, role: String, ranks: String, regions: String) -> Value {
     let ranking = ranking(name.to_string()).await.unwrap();
     let json: Value = serde_json::from_str(&ranking).unwrap();
-    let json_read = &json[match_region(&regions.to_lowercase()).await][match_tiers(&ranks.to_lowercase()).await][match_positions(&role.to_lowercase()).await];
+    let json_read = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
     return json_read.to_owned()
 }
 
 #[cached(size = 1)]
 async fn overiew(name: String, role: String, ranks: String, regions: String) -> Value {
-    let json: Value = serde_json::from_str(&stats(name.to_string()).await.unwrap()).unwrap();
-    let ugg_stats = &json[match_region(&regions.to_lowercase()).await][match_tiers(&ranks.to_lowercase()).await][match_positions(&role.to_lowercase()).await][0];
+    let json: Value = serde_json::from_str(&overiew_json(name.to_string()).await.unwrap()).unwrap();
+    let ugg_stats = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
     return ugg_stats.to_owned()
 }
 
 //The format is used here to get an exact result from the floating point math
 pub async fn winrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let win_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("wins").await].as_f64().unwrap() /
-                        &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
+    let win_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["wins"]].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[STATS["matches"]].as_f64().unwrap();
     return format!("{:.1$}%", win_rate * 100.0, 1)
 }
 
 /*pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("bans").await].as_f64().unwrap() /
-                        &json_read_cache(name, role, ranks, regions).await[match_stats("matches").await].as_f64().unwrap();
+    let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["bans"]].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[STATS["matches"]].as_f64().unwrap();
     return format!("{:.1$}%", ban_rate * 100.0, 1)
 }
 
 pub async fn pickrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let pick_rate: f64 =&json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[match_stats("matches").await].as_f64().unwrap() /
-                        &json_read_cache(name, role, ranks, regions).await[match_stats("total_matches").await].as_f64().unwrap();
+    let pick_rate: f64 =&json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["matches"]].as_f64().unwrap() /
+                        &json_read_cache(name, role, ranks, regions).await[STATS["total_matches"]].as_f64().unwrap();
     return format!("{:.1$}%", pick_rate * 100.0, 1)
 }*/
 
 #[cached(result = true, size = 5)]
 pub async fn two_dimensional_rune_array(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [Value; 2]), &'static str> {
     let data_dragon_runes_json = &data_dragon::runes_json().await.unwrap();
-    let ugg_runes_json_read = &overiew(name, role, ranks, regions).await[match_data("perks").await];
+    let ugg_runes_json_read = &overiew(name, role, ranks, regions).await[DATA["perks"]];
     let rune_ids = &ugg_runes_json_read[4];
     let rune_tree_id_1 = &ugg_runes_json_read[2];
     let rune_tree_id_2 = &ugg_runes_json_read[3];
@@ -226,7 +207,7 @@ pub async fn two_dimensional_rune_array(name: String, role: String, ranks: Strin
 }
 
 pub async fn shard_names(name: String, role: String, ranks: String, regions: String) -> Result<[String; 3], Error> {
-    let ugg_shards_json_read = &overiew(name, role, ranks, regions).await[match_data("shards").await][2];
+    let ugg_shards_json_read = &overiew(name, role, ranks, regions).await[DATA["shards"]][2];
     let mut stat_shard_names: [String; 3] = ["1".to_owned(), "2".to_owned(), "3".to_owned()];
     for (position, name) in ugg_shards_json_read.as_array().unwrap().iter().enumerate() {
         //This really needs some sort of localization system
@@ -244,8 +225,8 @@ pub async fn shard_names(name: String, role: String, ranks: String, regions: Str
 }
 
 pub async fn shard_ids(name: String, role: String, ranks: String, regions: String) -> Result<Vec<i64>, Error> {
-    let ugg_shards_json: Value = serde_json::from_str(&stats(name).await.unwrap()).unwrap();
-    let ugg_shards_json_read = &ugg_shards_json[match_region(&regions.to_lowercase()).await][match_tiers(&ranks.to_lowercase()).await][match_positions(&role.to_lowercase()).await][0][match_data("shards").await][2];
+    //let ugg_shards_json: Value = serde_json::from_str(&overiew_json(name).await.unwrap()).unwrap();
+    let ugg_shards_json_read = &overiew(name, role, ranks, regions).await[DATA["shards"]][2];
     let mut stat_shard_ids: Vec<i64> = vec![];
     for y in ugg_shards_json_read.as_array().unwrap().iter() {
         stat_shard_ids.push(y.as_str().unwrap().parse::<i64>().unwrap());

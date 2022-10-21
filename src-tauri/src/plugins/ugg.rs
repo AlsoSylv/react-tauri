@@ -75,18 +75,27 @@ pub async fn overiew_json(name: String) -> Result<String, reqwest::Error> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
-    let data_dragon_version = data_dragon::data_dragon_version().await.unwrap();
-    let lol_version: Vec<&str> = data_dragon_version.split(".").collect();
-    let champion_id = helpers::champion_id(name).await;
-    match champion_id {
-        Ok(id) => {
-            let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
-            let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{id}/{overview_version}.json");
-            let request = reqwest::get(url).await?.text().await;
-        
-            Ok(request.unwrap())
+    let data_dragon_version = data_dragon::data_dragon_version().await;
+    match data_dragon_version {
+        Ok(version) => {
+            let lol_version: Vec<&str> = version.split(".").collect();
+            let champion_id = helpers::champion_id(name).await;
+            match champion_id {
+                Ok(id) => {
+                    let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+                    let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{id}/{overview_version}.json");
+                    let request = reqwest::get(url).await;
+                    match request {
+                        Ok(json) => {
+                            Ok(json.text().await.unwrap())
+                        }
+                        Err(err) => panic!("{}", err)
+                    }
+                }
+                Err(err) => panic!("{}", err)
+            }
         }
-        Err(_) => panic!()
+        Err(err) => panic!("{}", err)
     }
 }
 
@@ -96,13 +105,28 @@ async fn ranking(name: String) -> Result<String, reqwest::Error> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
-    let data_dragon_version = data_dragon::data_dragon_version().await.unwrap();
-    let lol_version: Vec<&str> = data_dragon_version.split(".").collect();
-    let champion_id = helpers::champion_id(name).await.unwrap();
-    let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
-    let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{champion_id}/{overview_version}.json");
-    let request = reqwest::get(url).await?.text().await;
-    Ok(request.unwrap())
+    let data_dragon_version = data_dragon::data_dragon_version().await;
+    match data_dragon_version {
+        Ok(version) => {
+            let lol_version: Vec<&str> = version.split(".").collect();
+            let champion_id = helpers::champion_id(name).await;
+            match champion_id {
+                Ok(id) => {
+                    let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+                    let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{id}/{overview_version}.json");
+                    let request = reqwest::get(url).await;
+                    match request {
+                        Ok(json) => {
+                            Ok(json.text().await.unwrap())
+                        }
+                        Err(err) => panic!("{}", err)
+                    }
+                }
+                Err(err) => panic!("{}", err)
+            }
+        }
+        Err(err) => panic!("{}", err)
+    }
 }
 
 //U.GG uses the structure REGION - RANK - ROLE

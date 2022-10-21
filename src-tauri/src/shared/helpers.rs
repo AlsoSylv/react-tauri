@@ -26,10 +26,9 @@ pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
 
 #[cached(size = 25, result = true)]
 pub async fn champion_id(name: String) -> Result<i64, reqwest::Error> { 
-    let champion_name = champion_name_sanitizer(name.clone(), true).await;
-    //let champion_name = capitalize_first_letter(&name.clone()).await;
-    let champion_json: Value = data_dragon::champion_json().await;
-    let champion_id: &i64 = &champion_json["data"][format!("{champion_name}")]["key"].as_str().unwrap().parse().unwrap();
+    let champion_name = format!("{}", champion_name_sanitizer(name.clone(), true).await);
+    let champion_json = data_dragon::champion_json().await;
+    let champion_id: &i64 = &champion_json.data[&champion_name].key.parse().unwrap();
     Ok(champion_id.to_owned())
 }
 
@@ -46,9 +45,9 @@ pub async fn create_rune_page(name: String, primary_id: String, secondary_id: St
 #[cached]
 pub async fn all_champion_names() -> Vec<String> {
     let mut champions = Vec::new();
-    let champion_json: Value = data_dragon::champion_json().await;
-    for (_xy, y) in champion_json["data"].as_object().unwrap() {
-        champions.push(y["name"].to_string());
+    let champion_json = data_dragon::champion_json().await;
+    for (_xy, y) in champion_json.data.iter() {
+        champions.push(y.clone().name);
     }
     return champions;
 }

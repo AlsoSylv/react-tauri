@@ -34,9 +34,14 @@ async fn win_rate(name: String, role: String, rank: String, region: String) -> R
 }
 
 #[tauri::command]
-async fn champion_names() -> Vec<String> {
-    let champion_names = shared::helpers::all_champion_names();
-    champion_names.await
+async fn champion_names() -> Result<Vec<String>, i64> {
+    let request = shared::helpers::all_champion_names().await;
+    match request {
+        Ok(names) => {
+            Ok(names)
+        }
+        Err(err) => Err(err)
+    }
 }
 
 #[tauri::command]

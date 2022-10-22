@@ -1,18 +1,24 @@
 import { invoke } from '@tauri-apps/api';
 
-import { RunesRequestResponse, State } from 'interfaces';
+import { ChampionInfoResponse, State } from 'interfaces';
 import ValidatedStateResponse from 'interfaces/ValidatedStateResponse';
 
-async function getRunes(state: State): Promise<RunesRequestResponse> {
+async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
   try {
-    const runes: Array<Array<string>> = await invoke('rune_names', {
+    const requestArgs = {
       name: state.champion,
       role: state.role,
       rank: state.rank,
       region: state.region,
-    });
+    };
 
-    return { runes, completedSuccessfully: true };
+    const [runes, shards, winRate] = await Promise.all([
+      invoke<string[][]>('rune_names', requestArgs),
+      invoke<string[]>('shard_names', requestArgs),
+      invoke<string>('win_rate', requestArgs),
+    ]);
+
+    return { runes, shards, winRate, completedSuccessfully: true };
   } catch (exception) {
     console.error('Got an error while trying to fetch the runes for state %o: %o', state, exception);
     return { message: 'No Data Exists!', completedSuccessfully: false };
@@ -43,4 +49,4 @@ const validateState = (state: State): ValidatedStateResponse => {
   return { isValid: true, message: '' };
 };
 
-export { getRunes, getChampionNames, validateState };
+export { getChampionInfo, getChampionNames, validateState };

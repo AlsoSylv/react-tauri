@@ -6,7 +6,7 @@ import State from './State';
 
 interface Context {
   state: State;
-  setState: Dispatch<GlobalActions>;
+  dispatch: Dispatch<GlobalActions>;
 }
 
 export default Context;

@@ -1,10 +1,10 @@
 import { Box, Unstable_Grid2 as Grid } from '@mui/material';
 
+import ChampionInformationDisplay from 'components/ChampionInformationDisplay';
 import ChampionOptions from 'components/ChampionSelection';
 import RankMenu from 'components/RankMenu';
 import RegionMenu from 'components/RegionMenu';
 import RoleMenu from 'components/RoleMenu';
-import Runes from 'components/Runes';
 
 function MainPage() {
   return (
@@ -23,7 +23,7 @@ function MainPage() {
           <RankMenu />
         </Grid>
         <Grid xs={12}>
-          <Runes />
+          <ChampionInformationDisplay />
         </Grid>
       </Grid>
     </Box>

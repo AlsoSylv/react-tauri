@@ -1,14 +1,19 @@
-import React from 'react';
+import { Container, CssBaseline } from '@mui/material';
 
-import { Selects, Page } from './logic';
+import { GlobalStateProvider } from 'context/global';
+import MainPage from 'pages/MainPage';
 
-import './style.css';
-
-function App (
-  <div id="base">
-    <Selects />
-    <Page />
-  </div>
-);
+function App() {
+  return (
+    <>
+      <CssBaseline enableColorScheme />
+      <Container sx={{ height: '100%' }}>
+        <GlobalStateProvider>
+          <MainPage />
+        </GlobalStateProvider>
+      </Container>
+    </>
+  );
+}
 
 export default App;

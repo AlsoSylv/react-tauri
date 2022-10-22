@@ -1,35 +1,54 @@
+import { SyntheticEvent } from 'react';
+
+import { Autocomplete, Box, TextField } from '@mui/material';
+
 import { useGlobalContext } from 'context/global';
-import React, { useState } from 'react';
+import { Actions } from 'context/global/actions';
+import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+
+const ranks: AutoCompleteOption[] = [
+  { label: 'Challenger', value: 'challenger' },
+  { label: 'Grandmaster', value: 'grandmaster' },
+  { label: 'Master', value: 'master' },
+  { label: 'Diamond', value: 'diamond' },
+  { label: 'Platinum', value: 'platinum' },
+  { label: 'Gold', value: 'gold' },
+  { label: 'Silver', value: 'silver' },
+  { label: 'Bronze', value: 'bronze' },
+  { label: 'Iron', value: 'iron' },
+  { label: 'All Ranks', value: 'overall' },
+  { label: 'Master +', value: 'master_plus' },
+  { label: 'Diamond +', value: 'diamond_plus' },
+  { label: 'Diamond 2 +', value: 'diamond_2_plus0' },
+  { label: 'Platinum +', value: 'platinum_plus' },
+];
 
 function RankMenu() {
   const {
     state: { rank },
-    setState,
+    dispatch,
   } = useGlobalContext();
 
+  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption | null) => {
+    const newValue = value?.value || '';
+
+    dispatch({ type: Actions.UPDATE_RANK, payload: newValue });
+  };
+
   return (
-    <select
-      id="rank"
-      defaultValue="platinum_plus"
-      onChange={(e) => {
-        setRank(e.target.value);
-        exported.rank = e.target.value;
-      }}
-    >
-      <option value="challenger">Challenger</option>
-      <option value="grandmaster">Grandmaster</option>
-      <option value="master">Master</option>
-      <option value="diamond">Diamond</option>
-      <option value="platinum">Platinum</option>
-      <option value="gold">Gold</option>
-      <option value="silver">Silver</option>
-      <option value="bronze">Bronze</option>
-      <option value="iron">Iron</option>
-      <option value="overall">All Ranks</option>
-      <option value="master_plus">Master +</option>
-      <option value="diamond_plus">Diamond +</option>
-      <option value="diamond_2_plus0">Diamond 2 +</option>
-      <option value="platinum_plus">Platinum +</option>
-    </select>
+    <Box>
+      <Autocomplete
+        disablePortal
+        disableClearable
+        id="rank-select"
+        value={ranks.find(({ value }) => value === rank)}
+        isOptionEqualToValue={(option, value) => option.value === value.value}
+        options={ranks}
+        onChange={handleChangeRank}
+        renderInput={(params) => <TextField {...params} label="Select a rank" />}
+      />
+    </Box>
   );
 }
+
+export default RankMenu;

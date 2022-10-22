@@ -1,28 +1,52 @@
+import { SyntheticEvent } from 'react';
+
+import { Autocomplete, Box, TextField } from '@mui/material';
+
+import { useGlobalContext } from 'context/global';
+import { Actions } from 'context/global/actions';
+import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+
+const regions: AutoCompleteOption[] = [
+  { label: 'World', value: 'world' },
+  { label: 'North America', value: 'na1' },
+  { label: 'EU West', value: 'euw1' },
+  { label: 'Korea', value: 'kr' },
+  { label: 'Brazil', value: 'br1' },
+  { label: 'EU North', value: 'eun1' },
+  { label: 'Japan', value: 'jp1' },
+  { label: 'LA North', value: 'la1' },
+  { label: 'LA South', value: 'la2' },
+  { label: 'OCE', value: 'oc1' },
+  { label: 'Russia', value: 'ru' },
+  { label: 'Turkey', value: 'tr1' },
+];
+
 function RegionMenu() {
-  const [region, setRegion] = useState<string>('world');
-  const element = (
-    <select
-      id="region"
-      defaultValue="world"
-      onChange={(e) => {
-        setRegion(e.target.value);
-        exported.region = e.target.value;
-      }}
-    >
-      <option value="world">World</option>
-      <option value="na1">North America</option>
-      <option value="euw1">EU West</option>
-      <option value="kr">Korea</option>
-      <option value="br1">Brazil</option>
-      <option value="eun1">EU North</option>
-      <option value="jp1">Japan</option>
-      <option value="la1">LA North</option>
-      <option value="la2">LA South</option>
-      <option value="oc1">OCE</option>
-      <option value="ru">Russia</option>
-      <option value="tr1">Turkey</option>
-    </select>
+  const {
+    state: { region },
+    dispatch,
+  } = useGlobalContext();
+
+  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption | null) => {
+    const newValue = value?.value || '';
+
+    dispatch({ type: Actions.UPDATE_REGION, payload: newValue });
+  };
+
+  return (
+    <Box>
+      <Autocomplete
+        disablePortal
+        id="region-select"
+        value={regions.find(({ value }) => value === region)}
+        isOptionEqualToValue={(option, value) => option.value === value.value}
+        disableClearable
+        options={regions}
+        onChange={handleChangeRank}
+        renderInput={(params) => <TextField {...params} label="Select a region" />}
+      />
+    </Box>
   );
-  console.log(region);
-  return element;
 }
+
+export default RegionMenu;

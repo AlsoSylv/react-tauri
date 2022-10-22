@@ -70,7 +70,7 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
 
 // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
 #[cached(result = true, size = 1)]
-pub async fn overiew_json(name: String) -> Result<String, reqwest::Error> {
+pub async fn overiew_json(name: String) -> Result<String, i64> {
     let stats_version = "1.1";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
@@ -87,20 +87,48 @@ pub async fn overiew_json(name: String) -> Result<String, reqwest::Error> {
                     let request = reqwest::get(url).await;
                     match request {
                         Ok(json) => {
-                            Ok(json.text().await.unwrap())
+                            let overview = json.text().await;
+                            match overview {
+                                Ok(valid) => {
+                                    Ok(valid)
+                                }
+                                Err(_) => {
+                                    Err(201)
+                                }
+                            }
                         }
-                        Err(err) => panic!("{}", err)
+                        Err(err) => {
+                            if err.is_body() {
+                                Err(202)
+                            } else if err.is_request() {
+                                Err(201)
+                            } else {
+                                panic!()
+                            }
+                        }
                     }
                 }
-                Err(err) => panic!("{}", err)
+                Err(err) => {
+                    if err.is_connect() {
+                        Err(104)
+                    } else {
+                        Err(103)
+                    }
+                }
             }
         }
-        Err(err) => panic!("{}", err)
+        Err(err) => {
+            if err.is_connect() {
+                Err(104)
+            } else {
+                panic!()
+            }
+        }
     }
 }
 
 #[cached(result = true, size = 1)]
-async fn ranking(name: String) -> Result<String, reqwest::Error> {
+async fn ranking(name: String) -> Result<String, i64> {
     let stats_version = "1.1";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
@@ -119,13 +147,31 @@ async fn ranking(name: String) -> Result<String, reqwest::Error> {
                         Ok(json) => {
                             Ok(json.text().await.unwrap())
                         }
-                        Err(err) => panic!("{}", err)
+                        Err(err) => {
+                            if err.is_connect() {
+                                Err(202)
+                            } else {
+                                panic!()
+                            }
+                        }
                     }
                 }
-                Err(err) => panic!("{}", err)
+                Err(err) => {
+                    if err.is_connect() {
+                        Err(104)
+                    } else {
+                        Err(103)
+                    }
+                }
             }
         }
-        Err(err) => panic!("{}", err)
+        Err(err) => {
+            if err.is_connect() {
+                Err(104)
+            } else {
+                panic!()
+            }
+        }
     }
 }
 

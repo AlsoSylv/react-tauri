@@ -1,26 +1,23 @@
 use cached::proc_macro::cached;
-use tauri::regex::{Regex};
+use tauri::regex::Regex;
 use serde_json::{Value, json};
 
 use super::data_dragon::{self};
 
-async fn remove_whitespace(s: &mut String) {
-    s.retain(|c| !c.is_whitespace());
-}
-
-async fn capitalize_first_letter(s: &str) -> String {
-    s[0..1].to_uppercase() + &s[1..]
-}
-
 pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
-        let re = Regex::new(r"\W").unwrap();
-        let mut champion_name = re.replace_all(&name, r"").to_lowercase();
-        remove_whitespace(&mut champion_name).await;
-        if title == true {
-            let champion_name = capitalize_first_letter(&champion_name).await;
-            return champion_name
-        } else {
-            return champion_name
+    let mut champ_name = name.clone();
+    champ_name = champ_name.split("&").collect::<Vec<&str>>()[0].to_owned();
+    let champ_split = champ_name.split(" ").collect::<Vec<&str>>();
+    if champ_split.len() > 1 {
+        champ_name = champ_name.split(" ").collect::<Vec<&str>>()[0].to_owned() + champ_name.split(" ").collect::<Vec<&str>>().to_owned()[1];
+    }
+    println!("{:?}", champ_name.split(" ").collect::<Vec<&str>>());
+    champ_name = Regex::new(r"\W").unwrap().replace_all(&champ_name, r"").to_string();
+    champ_name.retain(|c| !c.is_whitespace());
+    if title == true {
+        return champ_name
+    } else {
+        return champ_name.to_lowercase();
     }
 }
 

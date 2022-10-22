@@ -1,35 +1,31 @@
 use cached::proc_macro::cached;
-use tauri::regex::{Regex};
+use tauri::regex::Regex;
 use serde_json::{Value, json};
 
 use super::data_dragon::{self};
 
-async fn remove_whitespace(s: &mut String) {
-    s.retain(|c| !c.is_whitespace());
-}
-
-async fn capitalize_first_letter(s: &str) -> String {
-    s[0..1].to_uppercase() + &s[1..]
-}
-
 pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
-        let re = Regex::new(r"\W").unwrap();
-        let mut champion_name = re.replace_all(&name, r"").to_lowercase();
-        remove_whitespace(&mut champion_name).await;
-        if title == true {
-            let champion_name = capitalize_first_letter(&champion_name).await;
-            return champion_name
-        } else {
-            return champion_name
+    let mut champ_name = name.clone();
+    champ_name = champ_name.split("&").collect::<Vec<&str>>()[0].to_owned();
+    let champ_split = champ_name.split(" ").collect::<Vec<&str>>();
+    if champ_split.len() > 1 {
+        champ_name = champ_name.split(" ").collect::<Vec<&str>>()[0].to_owned() + champ_name.split(" ").collect::<Vec<&str>>().to_owned()[1];
+    }
+    println!("{:?}", champ_name.split(" ").collect::<Vec<&str>>());
+    champ_name = Regex::new(r"\W").unwrap().replace_all(&champ_name, r"").to_string();
+    champ_name.retain(|c| !c.is_whitespace());
+    if title == true {
+        return champ_name
+    } else {
+        return champ_name.to_lowercase();
     }
 }
 
 #[cached(size = 25, result = true)]
 pub async fn champion_id(name: String) -> Result<i64, reqwest::Error> { 
-    let champion_name = champion_name_sanitizer(name.clone(), true).await;
-    //let champion_name = capitalize_first_letter(&name.clone()).await;
-    let champion_json: Value = data_dragon::champion_json().await;
-    let champion_id: &i64 = &champion_json["data"][format!("{champion_name}")]["key"].as_str().unwrap().parse().unwrap();
+    let champion_name = format!("{}", champion_name_sanitizer(name.clone(), true).await);
+    let champion_json = data_dragon::champion_json().await;
+    let champion_id: &i64 = &champion_json.data[&champion_name].key.parse().unwrap();
     Ok(champion_id.to_owned())
 }
 
@@ -46,9 +42,9 @@ pub async fn create_rune_page(name: String, primary_id: String, secondary_id: St
 #[cached]
 pub async fn all_champion_names() -> Vec<String> {
     let mut champions = Vec::new();
-    let champion_json: Value = data_dragon::champion_json().await;
-    for (_xy, y) in champion_json["data"].as_object().unwrap() {
-        champions.push(y["name"].to_string());
+    let champion_json = data_dragon::champion_json().await;
+    for (_xy, y) in champion_json.data.iter() {
+        champions.push(y.clone().name);
     }
     return champions;
 }

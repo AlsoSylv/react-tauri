@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api';
 
 import { RunesRequestResponse, State } from 'interfaces';
+import ValidatedStateResponse from 'interfaces/ValidatedStateResponse';
 
 async function getRunes(state: State): Promise<RunesRequestResponse> {
   try {
@@ -24,4 +25,22 @@ async function getChampionNames() {
   return championNames.map((name) => name.replace(/['"]+/g, ''));
 }
 
-export { getRunes, getChampionNames };
+const validateState = (state: State): ValidatedStateResponse => {
+  const { champion, role } = state;
+
+  if (champion === '' && role === 'none') {
+    return { isValid: false, message: 'Please Enter A Champion Name And Select A Role' };
+  }
+
+  if (champion === '') {
+    return { isValid: false, message: 'Please Enter A Champion Name' };
+  }
+
+  if (role === 'none' || role === '') {
+    return { isValid: false, message: 'Please Select a Role' };
+  }
+
+  return { isValid: true, message: '' };
+};
+
+export { getRunes, getChampionNames, validateState };

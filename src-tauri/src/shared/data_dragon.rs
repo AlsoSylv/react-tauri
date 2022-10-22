@@ -10,17 +10,23 @@ pub async fn data_dragon_version() -> Result<String, reqwest::Error> {
     Ok(version.to_string())
 }
 
-#[cached(result = true)]
-pub async fn runes_json() -> Result<Root, reqwest::Error> {
+#[cached]
+pub async fn runes_json() -> Runes {
     let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json", data_dragon_version().await.unwrap());
-    let request: Result<Root, reqwest::Error> = reqwest::get(&url).await?.json().await;
-    Ok(request.unwrap())
+    let request = reqwest::get(&url).await;
+    match request {
+        Ok(response) => {
+            let rune_json: Runes = response.json().await.unwrap();
+            return rune_json
+        }
+        Err(_) => panic!()
+    }
 }
 
-type Root = Vec<Root2>;
+type Runes = Vec<Root>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Root2 {
+pub struct Root {
     pub id: i64,
     pub key: String,
     pub icon: String,
@@ -47,8 +53,14 @@ pub struct Rune {
 pub async fn champion_json() -> ChampJson {
     let data_dragon_version = data_dragon_version().await.unwrap();
     let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json", data_dragon_version);
-    let request: Result<ChampJson, reqwest::Error> = reqwest::get(url).await.unwrap().json().await;
-    request.unwrap()
+    let request = reqwest::get(url).await;
+    match request{ 
+        Ok(response) => {
+            let champ_json: ChampJson = response.json().await.unwrap();
+            return champ_json;
+        }
+        Err(err) => panic!("{}", err)
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

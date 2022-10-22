@@ -136,14 +136,14 @@ async fn ranking(name: String) -> Result<String, reqwest::Error> {
 async fn json_read_cache(name: String, role: String, ranks: String, regions: String) -> Value {
     let ranking = ranking(name.to_string()).await.unwrap();
     let json: Value = serde_json::from_str(&ranking).unwrap();
-    let json_read = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
+    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
     return json_read.to_owned()
 }
 
 #[cached(size = 1)]
 async fn overiew(name: String, role: String, ranks: String, regions: String) -> Value {
     let json: Value = serde_json::from_str(&overiew_json(name.to_string()).await.unwrap()).unwrap();
-    let ugg_stats = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
+    let ugg_stats: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
     return ugg_stats.to_owned()
 }
 
@@ -167,12 +167,12 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }*/
 
 #[cached(result = true, size = 5)]
-pub async fn two_dimensional_rune_array(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [Value; 2]), &'static str> {
-    let data_dragon_runes_json = &data_dragon::runes_json().await.unwrap();
+pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2]), &'static str> {
+    let data_dragon_runes_json = &data_dragon::runes_json().await;
     let ugg_runes_json_read = &overiew(name, role, ranks, regions).await[DATA["perks"]];
     let rune_ids = &ugg_runes_json_read[4];
-    let rune_tree_id_1 = &ugg_runes_json_read[2];
-    let rune_tree_id_2 = &ugg_runes_json_read[3];
+    let rune_tree_id_1: &i64 = &ugg_runes_json_read[2].as_i64().unwrap();
+    let rune_tree_id_2: &i64 = &ugg_runes_json_read[3].as_i64().unwrap();
     let mut runes_names_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
     let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
     let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
@@ -230,30 +230,21 @@ pub async fn two_dimensional_rune_array(name: String, role: String, ranks: Strin
     Ok((rune_names, rune_ids, tree_ids))
 }
 
-pub async fn shard_names(name: String, role: String, ranks: String, regions: String) -> Result<[String; 3], Error> {
+pub async fn shard_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([String; 3], Vec<i64>), Error> {
     let ugg_shards_json_read = &overiew(name, role, ranks, regions).await[DATA["shards"]][2];
+    let mut stat_shard_ids: Vec<i64> = vec![1, 2, 3];
     let mut stat_shard_names: [String; 3] = ["1".to_owned(), "2".to_owned(), "3".to_owned()];
     for (position, name) in ugg_shards_json_read.as_array().unwrap().iter().enumerate() {
         //This really needs some sort of localization system
         match name.as_str().unwrap() {
-            "5001" => stat_shard_names[position] = "Health".to_owned(),
-            "5008" => stat_shard_names[position] = "Adaptive Force".to_owned(),
-            "5007" => stat_shard_names[position] = "Ability Haste".to_owned(),
-            "5002" => stat_shard_names[position] = "Armor".to_owned(),
-            "5005" => stat_shard_names[position] = "Attack Speed".to_owned(),
-            "5003" => stat_shard_names[position] = "Magic Resist".to_owned(),
+            "5001" => {stat_shard_names[position] = "Health".to_owned(); stat_shard_ids[position] = 5001},
+            "5008" => {stat_shard_names[position] = "Adaptive Force".to_owned(); stat_shard_ids[position] = 5008},
+            "5007" => {stat_shard_names[position] = "Ability Haste".to_owned(); stat_shard_ids[position] = 5007},
+            "5002" => {stat_shard_names[position] = "Armor".to_owned(); stat_shard_ids[position] = 5002},
+            "5005" => {stat_shard_names[position] = "Attack Speed".to_owned(); stat_shard_ids[position] = 5005},
+            "5003" => {stat_shard_names[position] = "Magic Resist".to_owned(); stat_shard_ids[position] = 5003},
             _ => unreachable!()
         }
     }
-    Ok(stat_shard_names)
-}
-
-pub async fn shard_ids(name: String, role: String, ranks: String, regions: String) -> Result<Vec<i64>, Error> {
-    //let ugg_shards_json: Value = serde_json::from_str(&overiew_json(name).await.unwrap()).unwrap();
-    let ugg_shards_json_read = &overiew(name, role, ranks, regions).await[DATA["shards"]][2];
-    let mut stat_shard_ids: Vec<i64> = vec![];
-    for y in ugg_shards_json_read.as_array().unwrap().iter() {
-        stat_shard_ids.push(y.as_str().unwrap().parse::<i64>().unwrap());
-    }
-    Ok(stat_shard_ids)
+    Ok((stat_shard_names, stat_shard_ids)) 
 }

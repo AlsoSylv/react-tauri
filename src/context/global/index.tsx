@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useContext, useMemo, useReducer } from 'react';
+import { createContext, PropsWithChildren, useContext, useMemo, useReducer } from 'react';
 
 import { Context } from 'interfaces';
 
@@ -7,7 +7,7 @@ import initialGlobalState from './state';
 
 const GlobalState = createContext<Context>({
   state: initialGlobalState,
-  setState: () => null,
+  dispatch: () => null,
 });
 
 function useGlobalContext() {
@@ -21,12 +21,12 @@ function useGlobalContext() {
 }
 
 function GlobalStateProvider({ children }: PropsWithChildren) {
-  const [state, setState] = useReducer(ContextReducer, initialGlobalState);
+  const [state, dispatch] = useReducer(ContextReducer, initialGlobalState);
 
   const contextValue: Context = useMemo(
     () => ({
       state,
-      setState,
+      dispatch,
     }),
     [state]
   );

@@ -2305,6 +2305,7 @@ version = "0.0.0"
 dependencies = [
  "cached",
  "linked-hash-map",
+ "once_cell",
  "phf 0.11.1",
  "reqwest",
  "serde",

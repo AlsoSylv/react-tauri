@@ -2,7 +2,7 @@
   "compilerOptions": {
     "useDefineForClassFields": true,
     "target": "es2021",
-    "types": ["node", "vite/client"],
+    "types": ["vite/client"],
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -17,10 +17,10 @@
     "baseUrl": "src/",
     "paths": {
       "*": ["*", "src/*"],
-      "@components": ["src/components"],
-      "@context": ["src/context"],
-      "@pages": ["src/pages"],
-      "@utils": ["src/utils"]
+      "components": ["src/components/*"],
+      "context": ["src/context/*"],
+      "pages": ["src/pages/*"],
+      "utils": ["src/utils/*"]
     }
   },
   "include": ["src", "vite.config.ts"]

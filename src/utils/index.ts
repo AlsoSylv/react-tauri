@@ -1,40 +1,20 @@
 import { invoke } from '@tauri-apps/api';
 
-async function getRunes(exported: { champion: string; role: string; rank: string; region: string }) {
-  if ((exported.champion === undefined || exported.champion === '') && exported.role === 'none') {
-    return [
-      ['Please Enter A Champion Name And Select A Role', null, null, null],
-      [null, null],
-    ];
-  }
+import { RunesRequestResponse, State } from 'interfaces';
 
-  if (exported.champion === undefined || exported.champion === '') {
-    return [
-      ['Please Enter A Champion Name', null, null, null],
-      [null, null],
-    ];
-  }
-  if (exported.role === 'none') {
-    return [
-      ['Please Select a Role', null, null, null],
-      [null, null],
-    ];
-  }
-
+async function getRunes(state: State): Promise<RunesRequestResponse> {
   try {
-    const runes: Array<Array<string | null>> = await invoke('rune_names', {
-      name: exported.champion,
-      role: exported.role,
-      rank: exported.rank,
-      region: exported.region,
+    const runes: Array<Array<string>> = await invoke('rune_names', {
+      name: state.champion,
+      role: state.role,
+      rank: state.rank,
+      region: state.region,
     });
 
-    return runes;
-  } catch (_) {
-    return [
-      ['No Data Exists!', null, null, null],
-      [null, null],
-    ];
+    return { runes, completedSuccessfully: true };
+  } catch (exception) {
+    console.error('Got an error while trying to fetch the runes for state %o: %o', state, exception);
+    return { message: 'No Data Exists!', completedSuccessfully: false };
   }
 }
 

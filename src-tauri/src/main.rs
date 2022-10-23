@@ -20,7 +20,9 @@ async fn rune_names(name: String, role: String, rank: String, region: String) ->
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
     match rune_match {
-        Ok((rune_names, _rune_ids, _tree_ids)) => {
+        Ok((rune_names, _rune_ids, tree_ids)) => {
+            let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
+
             Ok(rune_names)
         },
         Err(err) => Err(err)

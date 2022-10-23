@@ -70,3 +70,32 @@ pub async fn all_champion_names() -> Result<Vec<String>, i64> {
         Err(err) => Err(err)
     }
 }
+
+pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64) -> Result<[Vec<String>; 2], i64> {
+    let request = data_dragon::runes_json().await;
+    let mut tree_one_urls = Vec::new();
+    let mut tree_two_urls = Vec::new();
+    match request {
+        Ok(json) => {
+            for rune in json.iter() {
+                if &rune.id == &tree_id_one {
+                    for slots in &rune.slots {
+                        for runes in &slots.runes {
+                            tree_one_urls.push("http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone())
+                        }
+                    }
+                } else if &rune.id == &tree_id_two {
+                    for i in 1..3 {
+                        let slots = &rune.slots[i];
+                        for runes in &slots.runes {
+                            tree_two_urls.push("http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone())
+                        }
+                    }
+                }
+            }
+            let rune_urls: [Vec<String>; 2] = [tree_one_urls, tree_two_urls];
+            Ok(rune_urls)
+        }
+        Err(err) => Err(err)
+    }
+}

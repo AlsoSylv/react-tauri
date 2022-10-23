@@ -47,23 +47,17 @@ export function Page() {
 
 
 async function runes() {
-  if (exported.champion === undefined || '' && exported.role === 'none') {
-    return [["Please Enter A Champion Name And Select A Role", null, null, null], [null, null]]
-  } else if (exported.champion === undefined || '') {
-    return [["Please Enter A Champion Name", null, null, null], [null, null]]
-  } else if (exported.role === 'none') {
-    return [["Please Select a Role", null, null, null], [null, null]]
-  } else {
-    return await invoke("rune_names", {
+  var runePage;
+    await invoke("rune_names", {
       name: exported.champion,
       role: exported.role,
       rank: exported.rank,
       region: exported.region
-    }).catch(() => {
+    }).then((runes) => runePage = runes).catch((err) => {
+      console.log(err)
       runePage = [["No Data Exists!", null, null, null], [null, null]]
     })
-  }
-
+    return runePage
 }
 
 //This whole section should be auto generated somehow!

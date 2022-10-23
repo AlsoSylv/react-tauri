@@ -4,22 +4,34 @@ use serde::Serialize;
 use linked_hash_map::LinkedHashMap;
 
 #[cached(result = true)]
-pub async fn data_dragon_version() -> Result<String, reqwest::Error> {
-    let request: Result<Vec<String>, reqwest::Error> = reqwest::get("https://static.u.gg/assets/lol/riot_patch_update/prod/versions.json").await?.json().await;
-    let version = &request.unwrap()[0];
-    Ok(version.to_string())
+pub async fn data_dragon_version() -> Result<String, i64> {
+    let request = reqwest::get("https://static.u.gg/assets/lol/riot_patch_update/prod/versions.json").await;
+    match request {
+        Ok(response) => {
+            let json: Result<Vec<String>, reqwest::Error> = response.json().await;
+            match json {
+                Ok(json) => {
+                    Ok(json[0].clone())
+                }
+                Err(_) => panic!()
+            }
+        }
+        Err(_) => {
+            Err(104)
+        }
+    }
 }
 
 #[cached]
-pub async fn runes_json() -> Runes {
+pub async fn runes_json() -> Result<Runes, i64> {
     let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json", data_dragon_version().await.unwrap());
     let request = reqwest::get(&url).await;
     match request {
         Ok(response) => {
             let rune_json: Runes = response.json().await.unwrap();
-            return rune_json
+            Ok(rune_json)
         }
-        Err(_) => panic!()
+        Err(_) => Err(104)
     }
 }
 
@@ -50,16 +62,22 @@ pub struct Rune {
 }
 
 #[cached]
-pub async fn champion_json() -> ChampJson {
+pub async fn champion_json() -> Result<ChampJson, i64> {
     let data_dragon_version = data_dragon_version().await.unwrap();
     let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json", data_dragon_version);
     let request = reqwest::get(url).await;
     match request{ 
         Ok(response) => {
             let champ_json: ChampJson = response.json().await.unwrap();
-            return champ_json;
+            Ok(champ_json)
         }
-        Err(err) => panic!("{}", err)
+        Err(err) => {
+            if err.is_body() {
+                Err(104)
+            } else {
+                Err(103)
+            }
+        }
     }
 }
 

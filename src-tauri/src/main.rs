@@ -16,14 +16,18 @@ fn main() {
 }
 
 #[tauri::command]
-async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<[Vec<String>; 2], i64> {
+async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<([Vec<String>; 2], [[String; 4]; 2], [Vec<String>; 2]), i64> {
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
     match rune_match {
-        Ok((rune_names, _rune_ids, tree_ids)) => {
+        Ok((rune_names, _rune_ids, tree_ids, urls)) => {
             let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
-
-            Ok(rune_names)
+            match request {
+                Ok(response) => {
+                    Ok((rune_names, urls, response))
+                }
+                Err(err) => Err(err)
+            }
         },
         Err(err) => Err(err)
     }

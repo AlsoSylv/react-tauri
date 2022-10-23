@@ -206,7 +206,7 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }*/
 
 #[cached(result = true, size = 5)]
-pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2]), i64> {
+pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2], [[String; 4]; 2]), i64> {
     let request = data_dragon::runes_json().await;
     match request {
         Ok(data_dragon_runes_json) => {
@@ -225,6 +225,8 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
                         let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
                         let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
+                        let mut runes_urls_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
+                        let mut runes_urls_2 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                     
                         for tree in data_dragon_runes_json {
                             if &tree.id == rune_tree_id_1 {
@@ -234,6 +236,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                             if rune_ids[y] == rune_data.id {
                                                 runes_names_1[slot_position] = rune_data.clone().name;
                                                 runes_ids_1[slot_position] = rune_data.id;
+                                                runes_urls_1[slot_position] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
                                             }
                                         }
                                     }
@@ -245,6 +248,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                             if rune_ids[y] == rune_data.id {
                                                 runes_names_2[slot_position - 1] = rune_data.clone().name;
                                                 runes_ids_2[slot_position - 1] = rune_data.id;
+                                                runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
                                             }
                                         }
                                     }
@@ -271,7 +275,8 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let rune_ids = [runes_ids_1.to_vec(), runes_ids_2];
                         let rune_names = [runes_names_1.to_vec(), runes_names_2];
                         let tree_ids = [rune_tree_id_1.to_owned(), rune_tree_id_2.to_owned()];
-                        Ok((rune_names, rune_ids, tree_ids))
+                        let urls = [runes_urls_1, runes_urls_2];
+                        Ok((rune_names, rune_ids, tree_ids, urls))
             
                     }
                     Err(err) => Err(err)

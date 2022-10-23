@@ -58,7 +58,7 @@ function ChampionInformationDisplay() {
         </Grid>
         <Grid xs={12}>
           <Grid container spacing={2}>
-            {championInfo?.runes.map((runeRow) =>
+            {championInfo?.runes[0].map((runeRow) =>
               runeRow.map((rune) => (
                 <Grid key={rune}>
                   <Chip label={rune} />

@@ -1,5 +1,5 @@
 interface ChampionInfo {
-  runes: string[][];
+  runes: [string[][], string[][], string[][]];
   shards: string[];
   winRate: string;
 }

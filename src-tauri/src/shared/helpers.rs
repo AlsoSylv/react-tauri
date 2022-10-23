@@ -85,7 +85,7 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64) -> Result<[Vec<
                         }
                     }
                 } else if &rune.id == &tree_id_two {
-                    for i in 1..3 {
+                    for i in 1..4 {
                         let slots = &rune.slots[i];
                         for runes in &slots.runes {
                             tree_two_urls.push("http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone())

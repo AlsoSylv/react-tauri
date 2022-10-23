@@ -13,7 +13,7 @@ async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
     };
 
     const [runes, shards, winRate] = await Promise.all([
-      invoke<string[][]>('rune_names', requestArgs),
+      invoke<[string[][], string[][], string[][]]>('rune_names', requestArgs),
       invoke<string[]>('shard_names', requestArgs),
       invoke<string>('win_rate', requestArgs),
     ]);

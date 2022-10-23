@@ -217,7 +217,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                 let request = overiew(name, role, ranks, regions).await;
                 match request {
                     Ok(json) => {
-
+                        let json = &json[DATA["perks"]];
                         let rune_ids = &json[4];
                         let rune_tree_id_1: &i64 = &json[2].as_i64().unwrap();
                         let rune_tree_id_2: &i64 = &json[3].as_i64().unwrap();

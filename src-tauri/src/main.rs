@@ -48,12 +48,12 @@ async fn champion_names() -> Result<Vec<String>, i64> {
 }
 
 #[tauri::command]
-async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<[String; 3], String> {
+async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<[String; 3], i64> {
     let shards = plugins::ugg::shard_tuple(name, role, rank, region).await;
     match shards {
         Ok((names, _ids)) => {
             Ok(names)
         }
-        Err(_) => Err("Data does not exist".to_owned())
+        Err(err) => Err(err)
     }
 }

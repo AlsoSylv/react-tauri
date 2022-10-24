@@ -16,5 +16,7 @@ The follow is a table of errors, codes, and their meanings:
 | Overview Body Error | 202 | UGG Overview URL changed | 
 | Ranking Missing | 203 | UGG Ranking JSON is missing | 
 | Ranking Body Error | 204 | UGG Ranking URL changed | 
+| Rate Error | 205 | The Corrosponding rate has no data |
+| Matches error | 206 | There are no matches for the selected combo | 
 *Note that well Community Dragon is not yet used, fallbacks will likely be implemented for it in the future
 

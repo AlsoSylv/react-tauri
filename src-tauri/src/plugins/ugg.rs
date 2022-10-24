@@ -184,10 +184,20 @@ pub async fn winrate(name: String, role: String, ranks: String, regions: String)
     let request = ranking(name, role, ranks, regions).await;
     match request {
         Ok(json) => {
-            let wins = json[STATS["wins"]].as_f64().unwrap();
-            let matches = json[STATS["matches"]].as_f64().unwrap();
-            let win_rate = wins / matches;
-            Ok(format!("{:.1$}%", win_rate * 100.0, 1))
+            let wins = json[STATS["wins"]].as_f64();
+            match wins {
+                Some(wins) => {
+                    let matches = json[STATS["matches"]].as_f64();
+                    match matches {
+                        Some(matches) => {
+                            let win_rate = wins / matches;
+                            Ok(format!("{:.1$}%", win_rate * 100.0, 1))
+                        }
+                        None => Err(206)
+                    }
+                }
+                None => Err(205)
+            }
         }
         Err(err) => Err(err)
     }
@@ -223,25 +233,31 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let rune_tree_id_2: &i64 = &json[3].as_i64().unwrap();
                         let mut runes_names_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                         let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
-                        let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
+                        let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4]; //
                         let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
                         let mut runes_urls_1 = vec!["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                         let mut runes_urls_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "4".to_owned()];
                     
                         for tree in data_dragon_runes_json {
-                            if &tree.id == rune_tree_id_1 {
+                            if &tree.id == rune_tree_id_1 || &tree.id == rune_tree_id_2 {
                                 for (slot_position, slots) in tree.slots.iter().enumerate() {
                                     for rune_data in slots.runes.iter() {
                                         for y in 0..6 {
-                                            if rune_ids[y] == rune_data.id {
-                                                runes_names_1[slot_position] = rune_data.clone().name;
-                                                runes_ids_1[slot_position] = rune_data.id;
-                                                runes_urls_1[slot_position] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
+                                            if &tree.id == rune_tree_id_1 {
+                                                if rune_ids[y] == rune_data.id {
+                                                    runes_names_1[slot_position] = rune_data.clone().name;
+                                                    runes_ids_1[slot_position] = rune_data.id;
+                                                    runes_urls_1[slot_position] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
+                                                }
+                                            } else if &tree.id == rune_tree_id_2 && slot_position != 0 {
+                                                runes_names_2[slot_position - 1] = rune_data.clone().name;
+                                                runes_ids_2[slot_position - 1] = rune_data.id;
+                                                runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
                                             }
                                         }
                                     }
                                 }
-                            } else if &tree.id == rune_tree_id_2 {
+                            } /*else if &tree.id == rune_tree_id_2 {
                                 for (slot_position, slots) in tree.slots.iter().enumerate() {
                                     for rune_data in slots.runes.iter() {
                                         for y in 0..6 {
@@ -253,7 +269,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                         }
                                     }
                                 }
-                            } 
+                            }*/
                         }
                     
                         for y in 0..3 {

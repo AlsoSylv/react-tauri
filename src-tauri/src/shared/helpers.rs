@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use cached::proc_macro::cached;
 use tauri::regex::Regex;
 use serde_json::{Value, json};
@@ -8,7 +6,6 @@ use once_cell::sync::Lazy;
 use super::data_dragon::{self};
 
 pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
-    let now = Instant::now();
     static CHARACTER_NAME_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\W").unwrap());
     
     let champ_name = name;
@@ -24,10 +21,9 @@ pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
     // Renata Glasc
     let champ_name = champ_name.split_once(" ")
         .map(|(f, s)| f.to_string() + s)
-        .unwrap_or_else(|| champ_name.to_string());
+        .unwrap_or_else(|| champ_name[0..1].to_uppercase() + &champ_name[1..].to_lowercase());
     
     if title == true {
-        println!("{}", now.elapsed().as_millis());
         return champ_name
     } else {
         return champ_name.to_lowercase();
@@ -37,6 +33,7 @@ pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
 #[cached(size = 25, result = true)]
 pub async fn champion_id(name: String) -> Result<i64, i64> { 
     let champion_name = format!("{}", champion_name_sanitizer(name.clone(), true).await);
+    println!("{}", champion_name);
     let request = data_dragon::champion_json().await; //: &i64 
     match request {
         Ok(json) => {

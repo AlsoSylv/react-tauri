@@ -206,7 +206,7 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }*/
 
 #[cached(result = true, size = 5)]
-pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2], [[String; 4]; 2]), i64> {
+pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2], [Vec<String>; 2]), i64> {
     let request = data_dragon::runes_json().await;
     match request {
         Ok(data_dragon_runes_json) => {
@@ -225,8 +225,8 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
                         let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
                         let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
-                        let mut runes_urls_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
-                        let mut runes_urls_2 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
+                        let mut runes_urls_1 = vec!["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
+                        let mut runes_urls_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "4".to_owned()];
                     
                         for tree in data_dragon_runes_json {
                             if &tree.id == rune_tree_id_1 {
@@ -261,6 +261,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                 break;
                             } else if runes_names_2[y] == (y + 1).to_string() {
                                 runes_names_2.remove(y);
+                                runes_urls_2.remove(y);
                             }
                         }
                     

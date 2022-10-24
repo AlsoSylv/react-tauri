@@ -58,13 +58,11 @@ function ChampionInformationDisplay() {
         </Grid>
         <Grid xs={12}>
           <Grid container spacing={2}>
-            {championInfo?.runes[0].map((runeRow) =>
-              runeRow.map((rune) => (
-                <Grid key={rune}>
-                  <Chip label={rune} />
-                </Grid>
-              ))
-            )}
+            {championInfo?.runes[0].map((runeRow) => (
+              <Grid key={runeRow.name}>
+                <Chip label={runeRow.name} />
+              </Grid>
+            ))}
             {championInfo?.shards.map((shard) => (
               <Grid key={shard}>
                 <Chip label={shard} />

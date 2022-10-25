@@ -2,7 +2,7 @@ use cached::proc_macro::cached;
 use serde_json::Value;
 use phf::phf_map;
 
-use crate::shared;
+use crate::{shared, Active};
 use shared::{data_dragon, helpers};
 
 static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
@@ -216,7 +216,7 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }*/
 
 #[cached(result = true, size = 5)]
-pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<String>; 2], [Vec<i64>; 2], [i64; 2], [Vec<String>; 2]), i64> {
+pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<Active>; 2], [Vec<i64>; 2], [i64; 2]), i64> {
     let request = data_dragon::runes_json().await;
     match request {
         Ok(data_dragon_runes_json) => {
@@ -250,9 +250,11 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                                     runes_urls_1[slot_position] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
                                                 }
                                             } else if &tree.id == rune_tree_id_2 && slot_position != 0 {
-                                                runes_names_2[slot_position - 1] = rune_data.clone().name;
-                                                runes_ids_2[slot_position - 1] = rune_data.id;
-                                                runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
+                                                if rune_ids[y] == rune_data.id {
+                                                    runes_names_2[slot_position - 1] = rune_data.clone().name;
+                                                    runes_ids_2[slot_position - 1] = rune_data.id;
+                                                    runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
+                                                }
                                             }
                                         }
                                     }
@@ -288,12 +290,22 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                 runes_ids_2.remove(y);
                             }
                         }
-                    
+
+                        let mut rune_names_one: Vec<Active> = Vec::new();
+                        let mut rune_names_two: Vec<Active> = Vec::new();
+
+                        for (position, name) in runes_names_1.iter().enumerate() {
+                            rune_names_one.push(Active { name: name.to_string(), image: runes_urls_1[position].clone(), active: true })
+                        }
+
+                        for (position, name) in runes_names_2.iter().enumerate() {
+                            rune_names_two.push(Active { name: name.to_string(), image: runes_urls_2[position].clone(), active: true })
+                        }
+
                         let rune_ids = [runes_ids_1.to_vec(), runes_ids_2];
-                        let rune_names = [runes_names_1.to_vec(), runes_names_2];
+                        let rune_names = [rune_names_one, rune_names_two];
                         let tree_ids = [rune_tree_id_1.to_owned(), rune_tree_id_2.to_owned()];
-                        let urls = [runes_urls_1, runes_urls_2];
-                        Ok((rune_names, rune_ids, tree_ids, urls))
+                        Ok((rune_names, rune_ids, tree_ids))
             
                     }
                     Err(err) => Err(err)

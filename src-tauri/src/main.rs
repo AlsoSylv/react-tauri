@@ -18,49 +18,39 @@ fn main() {
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct RuneImages {
-    primary_runes: Runes,
-    secondary_runes: Runes
+    primary_runes: Vec<Active>,
+    secondary_runes: Vec<Active>
 }
 
-type Runes = Vec<Active>;
-
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-struct Active  {
-    name: String,
-    image: String,
-    active: bool,
+pub struct Active  {
+    pub name: String,
+    pub image: String,
+    pub active: bool,
 }
 
 #[tauri::command]
 async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<RuneImages, i64> {
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
-    let mut rune_images_tree_one: Runes = vec![];
-    let mut rune_iamges_tree_two: Runes = vec![];
     match rune_match {
-        Ok((rune_names, _rune_ids, tree_ids, urls)) => {
+        Ok((rune_names, _rune_ids, tree_ids)) => {
             let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
             match request {
-                Ok((all_urls, names)) => {
-                    println!("{:#?}", names);
-                    println!("{:#?}", rune_names);
-                    for (name_position, name) in names.iter().enumerate() {
-                        for (string_position, string) in name.iter().enumerate() {
-                            for y in &rune_names[name_position] {
-                                if y == string {
-                                    rune_images_tree_one.push(Active { name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: true });
-                                } else {
-                                    let active = Active {name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: true};
-                                    let inactive = Active {name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: false};
-                                    if !rune_images_tree_one.contains(&active) && !rune_images_tree_one.contains(&inactive) {
-                                        rune_images_tree_one.push(Active { name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: false })
-                                    }
+                Ok(all_runes) => {
+                    let mut rune_images: [Vec<Active>; 2] = all_runes.clone();
+
+                    for y in 0..2 {
+                        for (position, name) in all_runes[y].iter().enumerate() {
+                            for x in rune_names[y].iter() {
+                                if x.name == name.name {
+                                    rune_images[y][position] = x.to_owned().clone();
                                 }
                             }
                         }
                     }
-                    println!("{:?}", rune_images_tree_one);
-                    Ok(RuneImages { primary_runes: rune_images_tree_one, secondary_runes: rune_iamges_tree_two })
+                    
+                    Ok(RuneImages { primary_runes: rune_images[0].clone(), secondary_runes: rune_images[1].clone() })
                 }
                 Err(err) => Err(err)
             }

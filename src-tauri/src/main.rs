@@ -15,10 +15,16 @@ fn main() {
     .expect("error while running tauri application");
 }
 
-type RuneImages = Vec<Active>;
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RuneImages {
+    primary_runes: Runes,
+    secondary_runes: Runes
+}
+
+type Runes = Vec<Active>;
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-
 struct Active  {
     name: String,
     image: String,
@@ -26,42 +32,35 @@ struct Active  {
 }
 
 #[tauri::command]
-async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<(RuneImages, RuneImages), i64> {
+async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<RuneImages, i64> {
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
-    let mut rune_images_tree_one: RuneImages = vec![];
-    let mut rune_iamges_tree_two: RuneImages = vec![];
+    let mut rune_images_tree_one: Runes = vec![];
+    let mut rune_iamges_tree_two: Runes = vec![];
     match rune_match {
         Ok((rune_names, _rune_ids, tree_ids, urls)) => {
             let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
             match request {
                 Ok((all_urls, names)) => {
-                    for (working_tree, tree_urls) in all_urls.iter().enumerate() {
-                        for (position, rune) in tree_urls.iter().enumerate() {
-                            if working_tree == 0 {
-
-                                    if urls[0].contains(&rune) {
-                                        for (position, _names) in urls[0].iter().enumerate() {
-                                            rune_images_tree_one.push(Active { name: rune_names[0][position].clone(), image: rune.clone(), active: true })
-                                        }
-                                    } else {
-                                        rune_images_tree_one.push(Active { name: names[0][position].clone(), image: rune.clone(), active: false })
+                    println!("{:#?}", names);
+                    println!("{:#?}", rune_names);
+                    for (name_position, name) in names.iter().enumerate() {
+                        for (string_position, string) in name.iter().enumerate() {
+                            for y in &rune_names[name_position] {
+                                if y == string {
+                                    rune_images_tree_one.push(Active { name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: true });
+                                } else {
+                                    let active = Active {name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: true};
+                                    let inactive = Active {name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: false};
+                                    if !rune_images_tree_one.contains(&active) && !rune_images_tree_one.contains(&inactive) {
+                                        rune_images_tree_one.push(Active { name: names[name_position][string_position].clone(), image: all_urls[name_position][string_position].clone(), active: false })
                                     }
-                                
-                            } else {
-
-                                    if urls[1].contains(&rune) {
-                                        for (position, _names) in urls[1].iter().enumerate() {
-                                            rune_iamges_tree_two.push(Active { name: rune_names[1][position].clone(), image: rune.clone(), active: true })
-                                        }
-                                    } else {
-                                        rune_iamges_tree_two.push(Active { name: names[1][position].clone(), image: rune.clone(), active: false })
-                                    }   
-                                
+                                }
                             }
                         }
                     }
-                    Ok((rune_images_tree_one, rune_iamges_tree_two))
+                    println!("{:?}", rune_images_tree_one);
+                    Ok(RuneImages { primary_runes: rune_images_tree_one, secondary_runes: rune_iamges_tree_two })
                 }
                 Err(err) => Err(err)
             }

@@ -313,23 +313,23 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct Shards {
-    row_one: [Shard; 3],
-    row_two: [Shard; 3],
-    row_three: [Shard; 3]
+pub struct Shards {
+    pub row_one: [Shard; 3],
+    pub row_two: [Shard; 3],
+    pub row_three: [Shard; 3]
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-struct Shard {
-    name: String,
-    id: i64,
-    image: String,
-    active: bool
+pub struct Shard {
+    pub name: String,
+    pub id: i64,
+    pub image: String,
+    pub active: bool
 }
 
 // This needs to be moved to a new structure for returning this data
 // And should follow the structure runes do
-pub async fn shard_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([String; 3], Vec<i64>), i64> {
+pub async fn shard_tuple(name: String, role: String, ranks: String, regions: String) -> Result<Shards, i64> {
     let armor = Shard { 
         name: "Amror".to_owned(), 
         id: 5002, 
@@ -373,18 +373,43 @@ pub async fn shard_tuple(name: String, role: String, ranks: String, regions: Str
     };
 
 
-    let shards: Shards = Shards { 
+    let shards: Shards = Shards {
         row_one: [ adaptive_force.clone(), attack_speed, ability_haste ],
         row_two: [ adaptive_force, armor.clone(), magic_resist.clone() ],
-        row_three: [ health, armor, magic_resist ] 
+        row_three: [ health, armor, magic_resist ]
     };
+
+    let mut mutable_shards = shards.clone();
 
     let request = overiew(name, role, ranks, regions).await;
     match request {
         Ok(json) => {
-            let mut stat_shard_ids: Vec<i64> = vec![1, 2, 3];
-            let mut stat_shard_names: [String; 3] = ["1".to_owned(), "2".to_owned(), "3".to_owned()];
-            for (position, name) in json[DATA["shards"]][2].as_array().unwrap().iter().enumerate() {
+            let active_shards = json[DATA["shards"]][2].as_array();
+            match active_shards {
+                Some(active_shards) => {
+                    for (y, shard) in shards.row_one.iter().enumerate() {
+                        if shard.id.to_string() == active_shards[0] {
+                            mutable_shards.row_one[y] = Shard { name: shard.name.clone(), id: shard.id, image: shard.image.clone(), active: true }
+                        }
+                    }
+
+                    for (y, shard) in shards.row_two.iter().enumerate() {
+                        if shard.id.to_string() == active_shards[1] {
+                            mutable_shards.row_two[y] = Shard { name: shard.name.clone(), id: shard.id, image: shard.image.clone(), active: true }
+                        }
+                    }
+
+                    for (y, shard) in shards.row_three.iter().enumerate() {
+                        if shard.id.to_string() == active_shards[2] {
+                            mutable_shards.row_three[y] = Shard { name: shard.name.clone(), id: shard.id, image: shard.image.clone(), active: true }
+                        }
+                    }
+
+                    Ok(mutable_shards)
+                },
+                None => Err(202)
+            }
+            /*for (position, name) in json[DATA["shards"]][2].as_array().unwrap().iter().enumerate() {
                 //This really needs some sort of localization system
                 match name.as_str().unwrap() {
                     "5001" => {stat_shard_names[position] = "Health".to_owned(); stat_shard_ids[position] = 5001},
@@ -396,7 +421,7 @@ pub async fn shard_tuple(name: String, role: String, ranks: String, regions: Str
                     _ => unreachable!()
                 }
             }
-            Ok((stat_shard_names, stat_shard_ids)) 
+            Ok((stat_shard_names, stat_shard_ids)) */
         }
         Err(err) => Err(err)
     }

@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api';
 
 import { ChampionInfoResponse, State } from 'interfaces';
-import { Trees } from 'interfaces/ChampionInfo';
+import { Trees, Shards } from 'interfaces/ChampionInfo';
 import ValidatedStateResponse from 'interfaces/ValidatedStateResponse';
 
 async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
@@ -15,7 +15,7 @@ async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
 
     const [runes, shards, winRate] = await Promise.all([
       invoke<Trees>('rune_names', requestArgs),
-      invoke<string[]>('shard_names', requestArgs),
+      invoke<Shards>('shard_names', requestArgs),
       invoke<string>('win_rate', requestArgs),
     ]);
 

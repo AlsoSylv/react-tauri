@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use plugins::ugg::Shards;
+
 
 mod plugins;
 mod shared;
@@ -80,11 +82,12 @@ async fn champion_names() -> Result<Vec<String>, i64> {
 }
 
 #[tauri::command]
-async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<[String; 3], i64> {
+async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<Shards, i64> {
     let shards = plugins::ugg::shard_tuple(name, role, rank, region).await;
     match shards {
-        Ok((names, _ids)) => {
-            Ok(names)
+        Ok(shards) => {
+            println!("{:#?}", shards);
+            Ok(shards)
         }
         Err(err) => Err(err)
     }

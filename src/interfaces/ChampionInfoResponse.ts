@@ -1,4 +1,4 @@
-import ChampionInfo from './ChampionInfo';
+import { ChampionInfo } from './ChampionInfo';
 
 type ChampionInfoResponse =
   | ({

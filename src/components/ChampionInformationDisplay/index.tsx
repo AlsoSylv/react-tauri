@@ -63,9 +63,9 @@ function ChampionInformationDisplay() {
                 <Chip label={runeRow.name} />
               </Grid>
             ))}
-            {championInfo?.shards.map((shard) => (
-              <Grid key={shard}>
-                <Chip label={shard} />
+            {championInfo?.shards.rowOne.map((shard) => (
+              <Grid key={shard.name}>
+                <Chip label={shard.name} />
               </Grid>
             ))}
           </Grid>

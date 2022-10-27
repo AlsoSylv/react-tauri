@@ -68,6 +68,8 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
 };
 
 // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
+// UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champiosn.
+// Further investigation is needed into finding out which champs this is offered for automatically
 #[cached(result = true, size = 1)]
 pub async fn overiew_json(name: String) -> Result<String, i64> {
     let stats_version = "1.1";
@@ -203,6 +205,7 @@ pub async fn winrate(name: String, role: String, ranks: String, regions: String)
     }
 }
 
+// These are currently commented out, but should be exposed to the front end eventually
 /*pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> String {
     let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["bans"]].as_f64().unwrap() /
                         &json_read_cache(name, role, ranks, regions).await[STATS["matches"]].as_f64().unwrap();
@@ -229,12 +232,16 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                     Ok(json) => {
                         let json = &json[DATA["perks"]];
                         let rune_ids = &json[4];
+
                         let rune_tree_id_1: &i64 = &json[2].as_i64().unwrap();
                         let rune_tree_id_2: &i64 = &json[3].as_i64().unwrap();
+
                         let mut runes_names_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                         let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
+
                         let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4]; //
                         let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
+
                         let mut runes_urls_1 = vec!["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                         let mut runes_urls_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "4".to_owned()];
                     
@@ -259,19 +266,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                                         }
                                     }
                                 }
-                            } /*else if &tree.id == rune_tree_id_2 {
-                                for (slot_position, slots) in tree.slots.iter().enumerate() {
-                                    for rune_data in slots.runes.iter() {
-                                        for y in 0..6 {
-                                            if rune_ids[y] == rune_data.id {
-                                                runes_names_2[slot_position - 1] = rune_data.clone().name;
-                                                runes_ids_2[slot_position - 1] = rune_data.id;
-                                                runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
-                                            }
-                                        }
-                                    }
-                                }
-                            }*/
+                            } 
                         }
                     
                         for y in 0..3 {
@@ -316,7 +311,74 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
     }
 }
 
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Shards {
+    row_one: [Shard; 3],
+    row_two: [Shard; 3],
+    row_three: [Shard; 3]
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+struct Shard {
+    name: String,
+    id: i64,
+    image: String,
+    active: bool
+}
+
+// This needs to be moved to a new structure for returning this data
+// And should follow the structure runes do
 pub async fn shard_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([String; 3], Vec<i64>), i64> {
+    let armor = Shard { 
+        name: "Amror".to_owned(), 
+        id: 5002, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png".to_owned(), 
+        active: false 
+    };
+
+    let magic_resist = Shard { 
+        name: "Magic Resist".to_owned(), 
+        id: 5003, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png".to_owned(), 
+        active: false 
+    };
+
+    let health = Shard { 
+        name: "Health".to_owned(), 
+        id: 5001, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png".to_owned(), 
+        active: false 
+    };
+
+    let adaptive_force = Shard {
+        name: "Adaptive Force".to_owned(), 
+        id: 5008, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png".to_owned(), 
+        active: false 
+    };
+
+    let attack_speed = Shard { 
+        name: "Attack Speed".to_owned(), 
+        id: 5005, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png".to_owned(), 
+        active: false 
+    };
+
+    let ability_haste = Shard { 
+        name: "Ability Haste".to_owned(), 
+        id: 5007, 
+        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png".to_owned(), 
+        active: false 
+    };
+
+
+    let shards: Shards = Shards { 
+        row_one: [ adaptive_force.clone(), attack_speed, ability_haste ],
+        row_two: [ adaptive_force, armor.clone(), magic_resist.clone() ],
+        row_three: [ health, armor, magic_resist ] 
+    };
+
     let request = overiew(name, role, ranks, regions).await;
     match request {
         Ok(json) => {

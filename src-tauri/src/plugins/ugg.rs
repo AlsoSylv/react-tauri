@@ -134,7 +134,13 @@ async fn ranking_json(name: String) -> Result<String, i64> {
                     let request = reqwest::get(url).await;
                     match request {
                         Ok(json) => {
-                            Ok(json.text().await.unwrap())
+                            let ranking = json.text().await;
+                            match ranking {
+                                Ok(valid) => {
+                                    Ok(valid)
+                                }
+                                Err(_) => Err(201)
+                            }
                         }
                         Err(err) => {
                             if err.is_connect() {
@@ -160,9 +166,14 @@ async fn ranking(name: String, role: String, ranks: String, regions: String) -> 
     let request = ranking_json(name).await;
     match request {
         Ok(ranking) => {
-            let json: Value = serde_json::from_str(&ranking).unwrap();
-            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
-            Ok(json_read.to_owned())
+            let json: Result<Value, serde_json::Error> = serde_json::from_str(&ranking);
+            match json {
+                Ok(json) => {
+                    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
+                    Ok(json_read.to_owned())
+                }
+                Err(_) => Err(202)
+            }
         }
         Err(err) => Err(err)
     }
@@ -173,9 +184,14 @@ async fn overiew(name: String, role: String, ranks: String, regions: String) -> 
     let request = overiew_json(name).await;
     match request {
         Ok(overview) => {
-            let json: Value = serde_json::from_str(&overview).unwrap();
-            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
-            Ok(json_read.to_owned())
+            let json: Result<Value, serde_json::Error> = serde_json::from_str(&overview);
+            match json {
+                Ok(json) => {
+                    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
+                    Ok(json_read.to_owned())
+                }
+                Err(_) => Err(202)
+            }
         }
         Err(err) => Err(err)
     }
@@ -409,19 +425,6 @@ pub async fn shard_tuple(name: String, role: String, ranks: String, regions: Str
                 },
                 None => Err(202)
             }
-            /*for (position, name) in json[DATA["shards"]][2].as_array().unwrap().iter().enumerate() {
-                //This really needs some sort of localization system
-                match name.as_str().unwrap() {
-                    "5001" => {stat_shard_names[position] = "Health".to_owned(); stat_shard_ids[position] = 5001},
-                    "5008" => {stat_shard_names[position] = "Adaptive Force".to_owned(); stat_shard_ids[position] = 5008},
-                    "5007" => {stat_shard_names[position] = "Ability Haste".to_owned(); stat_shard_ids[position] = 5007},
-                    "5002" => {stat_shard_names[position] = "Armor".to_owned(); stat_shard_ids[position] = 5002},
-                    "5005" => {stat_shard_names[position] = "Attack Speed".to_owned(); stat_shard_ids[position] = 5005},
-                    "5003" => {stat_shard_names[position] = "Magic Resist".to_owned(); stat_shard_ids[position] = 5003},
-                    _ => unreachable!()
-                }
-            }
-            Ok((stat_shard_names, stat_shard_ids)) */
         }
         Err(err) => Err(err)
     }

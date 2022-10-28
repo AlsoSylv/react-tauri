@@ -1,8 +1,8 @@
 export interface Shard {
-  name: String;
-  id: Number;
-  url: String;
-  active: Boolean;
+  name: string;
+  id: number;
+  url: string;
+  active: boolean;
 }
 
 export interface Shards {

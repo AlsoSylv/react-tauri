@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use plugins::ugg::Shards;
+
 
 mod plugins;
 mod shared;
@@ -15,13 +17,45 @@ fn main() {
     .expect("error while running tauri application");
 }
 
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RuneImages {
+    primary_runes: Vec<Active>,
+    secondary_runes: Vec<Active>
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Active  {
+    pub name: String,
+    pub image: String,
+    pub active: bool,
+}
+
 #[tauri::command]
-async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<[Vec<String>; 2], i64> {
+async fn rune_names(name: String, role: String, rank: String, region: String) -> Result<RuneImages, i64> {
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
     match rune_match {
-        Ok((rune_names, _rune_ids, _tree_ids)) => {
-            Ok(rune_names)
+        Ok((rune_names, _rune_ids, tree_ids)) => {
+            let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
+            match request {
+                Ok(all_runes) => {
+                    let mut rune_images: [Vec<Active>; 2] = all_runes.clone();
+
+                    for y in 0..2 {
+                        for (position, name) in all_runes[y].iter().enumerate() {
+                            for x in rune_names[y].iter() {
+                                if x.name == name.name {
+                                    rune_images[y][position] = x.to_owned().clone();
+                                }
+                            }
+                        }
+                    }
+                    
+                    Ok(RuneImages { primary_runes: rune_images[0].clone(), secondary_runes: rune_images[1].clone() })
+                }
+                Err(err) => Err(err)
+            }
         },
         Err(err) => Err(err)
     }
@@ -48,11 +82,12 @@ async fn champion_names() -> Result<Vec<String>, i64> {
 }
 
 #[tauri::command]
-async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<[String; 3], i64> {
+async fn shard_names(name: String, role: String, rank: String, region: String) -> Result<Shards, i64> {
     let shards = plugins::ugg::shard_tuple(name, role, rank, region).await;
     match shards {
-        Ok((names, _ids)) => {
-            Ok(names)
+        Ok(shards) => {
+            println!("{:#?}", shards);
+            Ok(shards)
         }
         Err(err) => Err(err)
     }

@@ -63,21 +63,26 @@ pub struct Rune {
 
 #[cached]
 pub async fn champion_json() -> Result<ChampJson, i64> {
-    let data_dragon_version = data_dragon_version().await.unwrap();
-    let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json", data_dragon_version);
-    let request = reqwest::get(url).await;
-    match request{ 
-        Ok(response) => {
-            let champ_json: ChampJson = response.json().await.unwrap();
-            Ok(champ_json)
-        }
-        Err(err) => {
-            if err.is_body() {
-                Err(104)
-            } else {
-                Err(103)
+    let data_dragon_version = data_dragon_version().await;
+    match data_dragon_version {
+        Ok(version) => {
+            let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json", version);
+            let request = reqwest::get(url).await;
+            match request{ 
+                Ok(response) => {
+                    let champ_json: ChampJson = response.json().await.unwrap();
+                    Ok(champ_json)
+                }
+                Err(err) => {
+                    if err.is_body() {
+                        Err(104)
+                    } else {
+                        Err(103)
+                    }
+                }
             }
         }
+        Err(err) => Err(err)
     }
 }
 

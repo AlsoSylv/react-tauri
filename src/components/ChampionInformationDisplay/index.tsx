@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, Box, Button, Unstable_Grid2 as Grid, Chip, Typography } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
-import { ChampionInfo } from 'interfaces';
+import { ChampionInfo } from 'interfaces/ChampionInfo';
 import { getChampionInfo, validateState } from 'utils/';
 
 function ChampionInformationDisplay() {
@@ -58,16 +58,14 @@ function ChampionInformationDisplay() {
         </Grid>
         <Grid xs={12}>
           <Grid container spacing={2}>
-            {championInfo?.runes.map((runeRow) =>
-              runeRow.map((rune) => (
-                <Grid key={rune}>
-                  <Chip label={rune} />
-                </Grid>
-              ))
-            )}
-            {championInfo?.shards.map((shard) => (
-              <Grid key={shard}>
-                <Chip label={shard} />
+            {championInfo?.runes.primaryRunes.map((runeRow) => (
+              <Grid key={runeRow.name}>
+                <Chip label={runeRow.name} />
+              </Grid>
+            ))}
+            {championInfo?.shards.rowOne.map((shard) => (
+              <Grid key={shard.name}>
+                <Chip label={shard.name} />
               </Grid>
             ))}
           </Grid>

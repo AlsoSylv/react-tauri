@@ -12,7 +12,15 @@ mod shared;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 fn main() {
     tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![rune_names, champion_names, win_rate, shard_names])
+    .invoke_handler(tauri::generate_handler!
+        [
+        rune_names, 
+        champion_names, 
+        win_rate, 
+        shard_names,
+        pick_rate,
+        ban_rate
+        ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -64,6 +72,24 @@ async fn rune_names(name: String, role: String, rank: String, region: String) ->
 #[tauri::command]
 async fn win_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
     let request = plugins::ugg::winrate(name, role, rank, region).await;
+    match request {
+    Ok(winrate) => Ok(winrate),
+    Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn pick_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
+    let request = plugins::ugg::pickrate(name, role, rank, region).await;
+    match request {
+    Ok(winrate) => Ok(winrate),
+    Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn ban_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
+    let request = plugins::ugg::banrate(name, role, rank, region).await;
     match request {
     Ok(winrate) => Ok(winrate),
     Err(err) => Err(err)

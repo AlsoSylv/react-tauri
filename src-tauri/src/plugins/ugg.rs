@@ -222,17 +222,51 @@ pub async fn winrate(name: String, role: String, ranks: String, regions: String)
 }
 
 // These are currently commented out, but should be exposed to the front end eventually
-/*pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let ban_rate: f64 = &json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["bans"]].as_f64().unwrap() /
-                        &json_read_cache(name, role, ranks, regions).await[STATS["matches"]].as_f64().unwrap();
-    return format!("{:.1$}%", ban_rate * 100.0, 1)
+pub async fn banrate(name: String, role: String, ranks: String, regions: String) -> Result<String, i64> {
+    let request = ranking(name, role, ranks, regions).await;
+    match request {
+        Ok(json) => {
+            let bans = json[STATS["bans"]].as_f64();
+            match bans {
+                Some(bans) => {
+                    let matches = json[STATS["matches"]].as_f64();
+                    match matches {
+                        Some(matches) => {
+                            let ban_rate = bans / matches;
+                            Ok(format!("{:.1$}%", ban_rate * 100.0, 1))
+                        }
+                        None => Err(206)
+                    }
+                }
+                None => Err(205),
+            }
+        }
+        Err(err) => Err(err)
+    }
 }
 
-pub async fn pickrate(name: String, role: String, ranks: String, regions: String) -> String {
-    let pick_rate: f64 =&json_read_cache(name.clone(), role.clone(), ranks.clone(), regions.clone()).await[STATS["matches"]].as_f64().unwrap() /
-                        &json_read_cache(name, role, ranks, regions).await[STATS["total_matches"]].as_f64().unwrap();
-    return format!("{:.1$}%", pick_rate * 100.0, 1)
-}*/
+pub async fn pickrate(name: String, role: String, ranks: String, regions: String) -> Result<String, i64> {
+    let request = ranking(name, role, ranks, regions).await;
+    match request {
+        Ok(json) => {
+            let picks = json[STATS["matches"]].as_f64();
+            match picks {
+                Some(picks) => {
+                    let matches = json[STATS["total_matches"]].as_f64();
+                    match matches {
+                        Some(matches) => {
+                            let pick_rate = picks / matches;
+                            Ok(format!("{:.1$}%", pick_rate * 100.0, 1))
+                        }
+                        None => Err(206)
+                    }
+                }
+                None => Err(205),
+            }
+        }
+        Err(err) => Err(err)
+    }
+}
 
 #[cached(result = true, size = 5)]
 pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<Active>; 2], [Vec<i64>; 2], [i64; 2]), i64> {

@@ -24,14 +24,24 @@ pub async fn data_dragon_version() -> Result<String, i64> {
 
 #[cached]
 pub async fn runes_json() -> Result<Runes, i64> {
-    let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json", data_dragon_version().await.unwrap());
-    let request = reqwest::get(&url).await;
-    match request {
-        Ok(response) => {
-            let rune_json: Runes = response.json().await.unwrap();
-            Ok(rune_json)
+    let data_dragon_version = data_dragon_version().await;
+    match data_dragon_version {
+        Ok(data_dragon_version) => {
+            let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json", data_dragon_version);
+            let request = reqwest::get(&url).await;
+            match request {
+                Ok(response) => {
+                    let rune_json: Result<Runes, reqwest::Error> = response.json().await;
+                    match rune_json {
+                        Ok(rune_json) => Ok(rune_json),
+                        Err(_) => Err(104)
+                    }
+                    
+                }
+                Err(_) => Err(104)
+            }
         }
-        Err(_) => Err(104)
+        Err(err) => Err(err)
     }
 }
 
@@ -70,8 +80,11 @@ pub async fn champion_json() -> Result<ChampJson, i64> {
             let request = reqwest::get(url).await;
             match request{ 
                 Ok(response) => {
-                    let champ_json: ChampJson = response.json().await.unwrap();
-                    Ok(champ_json)
+                    let champ_json: Result<ChampJson, reqwest::Error> = response.json().await;
+                    match champ_json {
+                        Ok(champ_json) => Ok(champ_json),
+                        Err(_) => Err(103)
+                    }
                 }
                 Err(err) => {
                     if err.is_body() {

@@ -289,7 +289,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let mut runes_names_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
                         let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
 
-                        let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4]; //
+                        let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
                         let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
 
                         let mut runes_urls_1 = vec!["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];

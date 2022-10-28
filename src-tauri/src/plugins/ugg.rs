@@ -347,7 +347,7 @@ pub struct Shard {
 // And should follow the structure runes do
 pub async fn shard_tuple(name: String, role: String, ranks: String, regions: String) -> Result<Shards, i64> {
     let armor = Shard { 
-        name: "Amror".to_owned(), 
+        name: "Armor".to_owned(), 
         id: 5002, 
         image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png".to_owned(), 
         active: false 

@@ -3,6 +3,8 @@ use tauri::regex::Regex;
 use serde_json::{Value, json};
 use once_cell::sync::Lazy;
 
+use crate::Active;
+
 use super::data_dragon::{self};
 
 pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
@@ -63,6 +65,35 @@ pub async fn all_champion_names() -> Result<Vec<String>, i64> {
                 champions.push(y.clone().name);
             }
             Ok(champions)
+        }
+        Err(err) => Err(err)
+    }
+}
+
+pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64) -> Result<[Vec<Active>; 2], i64> {
+    let request = data_dragon::runes_json().await;
+    let mut tree_one_names = Vec::new();
+    let mut tree_two_names = Vec::new();
+    match request {
+        Ok(json) => {
+            for rune in json.iter() {
+                if &rune.id == &tree_id_one {
+                    for slots in &rune.slots {
+                        for runes in &slots.runes {
+                            tree_one_names.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false});
+                        }
+                    }
+                } else if &rune.id == &tree_id_two {
+                    for i in 1..4 {
+                        let slots = &rune.slots[i];
+                        for runes in &slots.runes {
+                            tree_two_names.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false});
+                        }
+                    }
+                }
+            }
+            let rune_names = [tree_one_names, tree_two_names];
+            Ok(rune_names)
         }
         Err(err) => Err(err)
     }

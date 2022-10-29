@@ -54,6 +54,7 @@ pub struct Active  {
     pub name: String,
     pub image: String,
     pub active: bool,
+    pub id: i64
 }
 
 #[tauri::command]
@@ -61,17 +62,7 @@ async fn rune_names(name: String, role: String, rank: String, region: String) ->
     // TOOD: This can be none if you get data specific enough, I need to handle that 
     let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
     match rune_match {
-        Ok((rune_names, _rune_ids, tree_ids)) => {
-            let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
-            match request {
-                Ok(all_runes) => {
-                    let rune_images = shared::helpers::active_runes(all_runes, rune_names).await;
-                    println!("{:#?}", rune_images);
-                    Ok(rune_images)
-                }
-                Err(err) => Err(err)
-            }
-        },
+        Ok((rune_names, _tree_ids)) => Ok(rune_names),
         Err(err) => Err(err)
     }
 }

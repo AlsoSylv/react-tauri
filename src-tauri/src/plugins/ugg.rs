@@ -2,7 +2,7 @@ use cached::proc_macro::cached;
 use serde_json::Value;
 use phf::phf_map;
 
-use crate::{shared, Active};
+use crate::{shared, Active, RuneImages};
 use shared::{data_dragon, helpers};
 
 static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
@@ -269,95 +269,69 @@ pub async fn pickrate(name: String, role: String, ranks: String, regions: String
 }
 
 #[cached(result = true, size = 5)]
-pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<([Vec<Active>; 2], [Vec<i64>; 2], [i64; 2]), i64> {
-    let request = data_dragon::runes_json().await;
-    match request {
-        Ok(data_dragon_runes_json) => {
-            if role == "none" {
-                return Err(106);
-            } else {
+pub async fn rune_tuple(name: String, role: String, ranks: String, regions: String) -> Result<(RuneImages, [i64; 2]), i64> {
+    if role == "none" {
+        return Err(106);
+    } else {
+        let request = overiew(name, role, ranks, regions).await;
+        match request {
+            Ok(json) => {
+                let json = &json[DATA["perks"]];
+                let rune_ids = &json[4];
 
-                let request = overiew(name, role, ranks, regions).await;
-                match request {
-                    Ok(json) => {
-                        let json = &json[DATA["perks"]];
-                        let rune_ids = &json[4];
+                let tree_id_one: &i64 = &json[2].as_i64().unwrap();
+                let tree_id_two: &i64 = &json[3].as_i64().unwrap();
 
-                        let rune_tree_id_1: &i64 = &json[2].as_i64().unwrap();
-                        let rune_tree_id_2: &i64 = &json[3].as_i64().unwrap();
+                let all_runes = helpers::all_rune_images(*tree_id_one, *tree_id_two).await;
 
-                        let mut runes_names_1 = ["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
-                        let mut runes_names_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "3".to_owned()];
-
-                        let mut runes_ids_1: [i64; 4] = [1, 2, 3, 4];
-                        let mut runes_ids_2: Vec<i64> = vec![1, 2, 3];
-
-                        let mut runes_urls_1 = vec!["1".to_owned(), "2".to_owned(), "3".to_owned(), "4".to_owned()];
-                        let mut runes_urls_2: Vec<String> = vec!["1".to_owned(), "2".to_owned(), "4".to_owned()];
-                    
-                        for tree in data_dragon_runes_json {
-                            if &tree.id == rune_tree_id_1 || &tree.id == rune_tree_id_2 {
-                                for (slot_position, slots) in tree.slots.iter().enumerate() {
-                                    for rune_data in slots.runes.iter() {
-                                        for y in 0..6 {
-                                            if &tree.id == rune_tree_id_1 {
-                                                if rune_ids[y] == rune_data.id {
-                                                    runes_names_1[slot_position] = rune_data.clone().name;
-                                                    runes_ids_1[slot_position] = rune_data.id;
-                                                    runes_urls_1[slot_position] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
-                                                }
-                                            } else if &tree.id == rune_tree_id_2 && slot_position != 0 {
-                                                if rune_ids[y] == rune_data.id {
-                                                    runes_names_2[slot_position - 1] = rune_data.clone().name;
-                                                    runes_ids_2[slot_position - 1] = rune_data.id;
-                                                    runes_urls_2[slot_position - 1] = "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &rune_data.icon;
-                                                }
-                                            }
-                                        }
-                                    }
+                match all_runes {
+                    Ok(immutable_all_runes) => {
+                        let mut all_runes = immutable_all_runes.clone();
+                        for y in 0..6 {
+                            for (position, rune) in immutable_all_runes.primary_runes.slot_one.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.primary_runes.slot_one[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
                                 }
-                            } 
-                        }
-                    
-                        for y in 0..3 {
-                            if runes_names_2.len() == 2 {
-                                break;
-                            } else if runes_names_2[y] == (y + 1).to_string() {
-                                runes_names_2.remove(y);
-                                runes_urls_2.remove(y);
+                            }
+                            for (position, rune) in immutable_all_runes.primary_runes.slot_two.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.primary_runes.slot_two[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
+                            }
+                            for (position, rune) in immutable_all_runes.primary_runes.slot_three.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.primary_runes.slot_three[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
+                            }
+                            for (position, rune) in immutable_all_runes.primary_runes.slot_four.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.primary_runes.slot_four[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
+                            }
+                            for (position, rune) in immutable_all_runes.secondary_runes.slot_one.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.secondary_runes.slot_one[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
+                            }
+                            for (position, rune) in immutable_all_runes.secondary_runes.slot_two.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.secondary_runes.slot_two[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
+                            }
+                            for (position, rune) in immutable_all_runes.secondary_runes.slot_three.iter().enumerate() {
+                                if rune_ids[y] == rune.id {
+                                    all_runes.secondary_runes.slot_three[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
+                                }
                             }
                         }
-                    
-                        for y in 0..3 {
-                            if runes_ids_2.len() == 2 {
-                                break;
-                            } else if runes_ids_2[y] == y as i64 + 1 {
-                                runes_ids_2.remove(y);
-                            }
-                        }
-
-                        let mut rune_names_one: Vec<Active> = Vec::new();
-                        let mut rune_names_two: Vec<Active> = Vec::new();
-
-                        for (position, name) in runes_names_1.iter().enumerate() {
-                            rune_names_one.push(Active { name: name.to_string(), image: runes_urls_1[position].clone(), active: true })
-                        }
-
-                        for (position, name) in runes_names_2.iter().enumerate() {
-                            rune_names_two.push(Active { name: name.to_string(), image: runes_urls_2[position].clone(), active: true })
-                        }
-
-                        let rune_ids = [runes_ids_1.to_vec(), runes_ids_2];
-                        let rune_names = [rune_names_one, rune_names_two];
-                        let tree_ids = [rune_tree_id_1.to_owned(), rune_tree_id_2.to_owned()];
-                        Ok((rune_names, rune_ids, tree_ids))
-
+                        println!("{:#?}", all_runes);
+                        Ok((all_runes, [*tree_id_one, *tree_id_two]))
                     }
                     Err(err) => Err(err)
                 }
             }
+            Err(err) => Err(err)
         }
-        Err(err) => Err(err) 
     }
 }
 

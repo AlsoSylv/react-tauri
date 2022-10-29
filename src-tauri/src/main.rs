@@ -27,9 +27,26 @@ fn main() {
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct RuneImages {
-    primary_runes: Vec<Active>,
-    secondary_runes: Vec<Active>
+pub struct RuneImages {
+    pub primary_runes: PrimaryTree,
+    pub secondary_runes: SecondaryTree
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimaryTree {
+    pub slot_one: Vec<Active>,
+    pub slot_two: Vec<Active>,
+    pub slot_three: Vec<Active>,
+    pub slot_four: Vec<Active>
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SecondaryTree {
+    pub slot_one: Vec<Active>,
+    pub slot_two: Vec<Active>,
+    pub slot_three: Vec<Active>
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -48,19 +65,9 @@ async fn rune_names(name: String, role: String, rank: String, region: String) ->
             let request = shared::helpers::all_rune_images(tree_ids[0], tree_ids[1]).await;
             match request {
                 Ok(all_runes) => {
-                    let mut rune_images: [Vec<Active>; 2] = all_runes.clone();
-
-                    for y in 0..2 {
-                        for (position, name) in all_runes[y].iter().enumerate() {
-                            for x in rune_names[y].iter() {
-                                if x.name == name.name {
-                                    rune_images[y][position] = x.to_owned().clone();
-                                }
-                            }
-                        }
-                    }
-                    
-                    Ok(RuneImages { primary_runes: rune_images[0].clone(), secondary_runes: rune_images[1].clone() })
+                    let rune_images = shared::helpers::active_runes(all_runes, rune_names).await;
+                    println!("{:#?}", rune_images);
+                    Ok(rune_images)
                 }
                 Err(err) => Err(err)
             }

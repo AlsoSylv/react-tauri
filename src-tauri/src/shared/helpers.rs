@@ -3,7 +3,7 @@ use tauri::regex::Regex;
 use serde_json::{Value, json};
 use once_cell::sync::Lazy;
 
-use crate::Active;
+use crate::{Active, RuneImages, PrimaryTree, SecondaryTree};
 
 use super::data_dragon::{self};
 
@@ -70,31 +70,107 @@ pub async fn all_champion_names() -> Result<Vec<String>, i64> {
     }
 }
 
-pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64) -> Result<[Vec<Active>; 2], i64> {
+pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64) -> Result<RuneImages, i64> {
     let request = data_dragon::runes_json().await;
-    let mut tree_one_names = Vec::new();
-    let mut tree_two_names = Vec::new();
+    let mut tree_one_names: PrimaryTree = PrimaryTree { slot_one: Vec::new(), slot_two: Vec::new(), slot_three: Vec::new(), slot_four: Vec::new() };
+    let mut tree_two_names: SecondaryTree = SecondaryTree { slot_one: Vec::new(), slot_two: Vec::new(), slot_three: Vec::new() };
     match request {
         Ok(json) => {
             for rune in json.iter() {
                 if &rune.id == &tree_id_one {
-                    for slots in &rune.slots {
+                    for (position, slots) in rune.slots.iter().enumerate() {
                         for runes in &slots.runes {
-                            tree_one_names.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false});
+                            match position {
+                                0 => tree_one_names.slot_one.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                1 => tree_one_names.slot_two.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                2 => tree_one_names.slot_three.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                3 => tree_one_names.slot_four.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                _ => unreachable!()
+                            }
+
                         }
                     }
                 } else if &rune.id == &tree_id_two {
                     for i in 1..4 {
                         let slots = &rune.slots[i];
                         for runes in &slots.runes {
-                            tree_two_names.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false});
+                            match i {
+                                1 => tree_two_names.slot_one.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                2 => tree_two_names.slot_two.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                3 => tree_two_names.slot_three.push(Active {name: runes.name.clone(), image: "http://ddragon.leagueoflegends.com/cdn/img/".to_string() + &runes.icon.clone(), active: false}),
+                                _ => unreachable!()
+                            }
                         }
                     }
                 }
             }
-            let rune_names = [tree_one_names, tree_two_names];
+            let rune_names = RuneImages { primary_runes: tree_one_names, secondary_runes: tree_two_names };
             Ok(rune_names)
         }
         Err(err) => Err(err)
     }
+}
+
+pub async fn active_runes(all_runes: RuneImages, rune_names: [Vec<Active>; 2]) -> RuneImages {
+    let mut rune_images = all_runes.clone();
+
+    for y in 0..2 {
+        for (position, name) in all_runes.primary_runes.slot_one.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.primary_runes.slot_one[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.primary_runes.slot_two.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.primary_runes.slot_two[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.primary_runes.slot_three.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.primary_runes.slot_three[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.primary_runes.slot_four.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.primary_runes.slot_four[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.secondary_runes.slot_one.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.secondary_runes.slot_one[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.secondary_runes.slot_two.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.secondary_runes.slot_two[position] = x.to_owned().clone();
+                }
+            }
+        }
+
+        for (position, name) in all_runes.secondary_runes.slot_three.iter().enumerate() {
+            for x in rune_names[y].iter() {
+                if x.name == name.name {
+                    rune_images.secondary_runes.slot_three[position] = x.to_owned().clone();
+                }
+            }
+        }
+    }
+
+    return rune_images
 }

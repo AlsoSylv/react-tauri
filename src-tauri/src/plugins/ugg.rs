@@ -351,7 +351,7 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                         let rune_names = [rune_names_one, rune_names_two];
                         let tree_ids = [rune_tree_id_1.to_owned(), rune_tree_id_2.to_owned()];
                         Ok((rune_names, rune_ids, tree_ids))
-            
+
                     }
                     Err(err) => Err(err)
                 }

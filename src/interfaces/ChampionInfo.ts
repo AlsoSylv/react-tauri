@@ -17,9 +17,22 @@ export interface RuneData {
   active: boolean;
 }
 
+export interface PrimaryRunes {
+  slotOne: RuneData[];
+  slotTwo: RuneData[];
+  slotThree: RuneData[];
+  slotFour: RuneData[];
+}
+
+export interface SecondaryRunes {
+  slotOne: RuneData[];
+  slotTwo: RuneData[];
+  slotThree: RuneData[];
+}
+
 export interface Trees {
-  primaryRunes: RuneData[];
-  secondaryRunes: RuneData[];
+  primaryRunes: PrimaryRunes;
+  secondaryRunes: SecondaryRunes;
 }
 
 export interface ChampionInfo {

@@ -2,7 +2,7 @@ use cached::proc_macro::cached;
 use serde_json::Value;
 use phf::phf_map;
 
-use crate::{shared, Active, RuneImages};
+use crate::{shared, Active, RuneImages, PrimaryTree, SecondaryTree};
 use shared::{data_dragon, helpers};
 
 static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
@@ -287,45 +287,46 @@ pub async fn rune_tuple(name: String, role: String, ranks: String, regions: Stri
                 match all_runes {
                     Ok(immutable_all_runes) => {
                         let mut all_runes = immutable_all_runes.clone();
-                        for y in 0..6 {
-                            for (position, rune) in immutable_all_runes.primary_runes.slot_one.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.primary_runes.slot_one[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
+                        let mut slots: [&mut Vec<Active>; 7] = [
+                                &mut all_runes.primary_runes.slot_two,
+                                &mut all_runes.primary_runes.slot_one,
+                                &mut all_runes.primary_runes.slot_three,
+                                &mut all_runes.primary_runes.slot_four,
+                                &mut all_runes.secondary_runes.slot_one,
+                                &mut all_runes.secondary_runes.slot_two,
+                                &mut all_runes.secondary_runes.slot_three
+                            ];
+                            for n in 0..6 {
+                                slots.iter_mut().for_each(|current_slot| {
+                                    current_slot.clone().iter().enumerate().for_each(|i| {
+                                        let pos = i.0;
+                                        let rune = i.1;
+                                        if rune_ids[n] == rune.id {
+                                            current_slot[pos] = Active {
+                                                name: rune.name.clone(), 
+                                                image: rune.image.clone(), 
+                                                active: true,  
+                                                id: rune.id
+                                            }
+                                        }
+                                    });
+                                });
                             }
-                            for (position, rune) in immutable_all_runes.primary_runes.slot_two.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.primary_runes.slot_two[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
+                        let rune_iamges = RuneImages {
+                            primary_runes: PrimaryTree { 
+                                slot_one: slots[0].to_vec(), 
+                                slot_two: slots[1].to_vec(), 
+                                slot_three: slots[2].to_vec(), 
+                                slot_four: slots[3].to_vec()
+                            }, 
+                            secondary_runes: SecondaryTree { 
+                                slot_one: slots[4].to_vec(),
+                                slot_two: slots[5].to_vec(),
+                                slot_three: slots[6].to_vec()
                             }
-                            for (position, rune) in immutable_all_runes.primary_runes.slot_three.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.primary_runes.slot_three[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
-                            }
-                            for (position, rune) in immutable_all_runes.primary_runes.slot_four.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.primary_runes.slot_four[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
-                            }
-                            for (position, rune) in immutable_all_runes.secondary_runes.slot_one.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.secondary_runes.slot_one[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
-                            }
-                            for (position, rune) in immutable_all_runes.secondary_runes.slot_two.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.secondary_runes.slot_two[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
-                            }
-                            for (position, rune) in immutable_all_runes.secondary_runes.slot_three.iter().enumerate() {
-                                if rune_ids[y] == rune.id {
-                                    all_runes.secondary_runes.slot_three[position] = Active {name: rune.name.clone(), image: rune.image.clone(), active: true,  id: rune.id}
-                                }
-                            }
-                        }
-                        println!("{:#?}", all_runes);
-                        Ok((all_runes, [*tree_id_one, *tree_id_two]))
+                        };
+                        println!("{:#?}", rune_iamges);
+                        Ok((rune_iamges, [*tree_id_one, *tree_id_two]))
                     }
                     Err(err) => Err(err)
                 }

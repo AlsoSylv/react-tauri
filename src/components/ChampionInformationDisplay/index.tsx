@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-import { Alert, Box, Button, Unstable_Grid2 as Grid, Chip, Typography } from '@mui/material';
+import { Alert, Box, Button, Unstable_Grid2 as Grid, Typography } from '@mui/material';
 
+import Runes from 'components/Runes';
 import { useGlobalContext } from 'context/global';
 import { ChampionInfo } from 'interfaces/ChampionInfo';
-import { getChampionInfo, validateState } from 'utils/';
+import { getChampionInfo, validateState } from 'utils/utils';
 
 function ChampionInformationDisplay() {
   const { state } = useGlobalContext();
@@ -46,11 +47,6 @@ function ChampionInformationDisplay() {
             Find runes
           </Button>
         </Grid>
-        {error && (
-          <Grid xs={12}>
-            <Alert color="error">{error}</Alert>
-          </Grid>
-        )}
         <Grid xs={4} sx={{ display: 'flex' }}>
           <Typography variant="body1" alignSelf="center">
             Champion Win Rate: {championInfo?.winRate}
@@ -58,16 +54,13 @@ function ChampionInformationDisplay() {
         </Grid>
         <Grid xs={12}>
           <Grid container spacing={2}>
-            {championInfo?.runes.primaryRunes.slotOne.map((runeRow) => (
-              <Grid key={runeRow.name}>
-                <Chip label={runeRow.name} />
+            {error ? (
+              <Grid xs={12}>
+                <Alert color="error">{error}</Alert>
               </Grid>
-            ))}
-            {championInfo?.shards.rowOne.map((shard) => (
-              <Grid key={shard.name}>
-                <Chip label={shard.name} />
-              </Grid>
-            ))}
+            ) : (
+              championInfo && <Runes runes={championInfo.runes} shards={championInfo.shards} />
+            )}
           </Grid>
         </Grid>
       </Grid>

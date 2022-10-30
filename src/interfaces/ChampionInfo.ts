@@ -1,44 +1,44 @@
-export interface Shard {
+interface Shard {
   name: string;
   id: number;
-  url: string;
+  image: string;
   active: boolean;
 }
 
-export interface Shards {
+interface Shards {
   rowOne: Shard[];
   rowTwo: Shard[];
   rowThree: Shard[];
 }
 
-export interface RuneData {
+interface RuneData {
   name: string;
   image: string;
   active: boolean;
 }
 
-export interface PrimaryRunes {
+interface PrimaryRunes {
   slotOne: RuneData[];
   slotTwo: RuneData[];
   slotThree: RuneData[];
   slotFour: RuneData[];
 }
 
-export interface SecondaryRunes {
+interface SecondaryRunes {
   slotOne: RuneData[];
   slotTwo: RuneData[];
   slotThree: RuneData[];
 }
 
-export interface Trees {
+interface Trees {
   primaryRunes: PrimaryRunes;
   secondaryRunes: SecondaryRunes;
 }
 
-export interface ChampionInfo {
+interface ChampionInfo {
   runes: Trees;
   shards: Shards;
   winRate: string;
 }
 
-// export default ChampionInfo;
+export { Shard, Shards, RuneData, PrimaryRunes, SecondaryRunes, Trees, ChampionInfo };

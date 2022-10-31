@@ -34,6 +34,7 @@ pub struct ChampionNames {
     pub key: String,
     pub url: String,
 }
+
 #[cached]
 pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();

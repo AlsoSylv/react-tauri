@@ -42,16 +42,6 @@ static TIERS: phf::Map<&'static str, &'static str> = phf_map! {
     "iron" => "15",
 };
 
-// Better defaulting logic should be used by wrapping https://stats2.u.gg/lol/1.5/primary_roles/12_20/1.5.0.json
-static POSITIONS: phf::Map<&'static str, &'static str> = phf_map! {
-    "jungle" => "1",
-    "support" => "2",
-    "adc" => "3",
-    "top" => "4",
-    "mid" => "5",
-    "none" => "6"
-};
-
 static DATA: phf::Map<&'static str, usize> = phf_map! {
     "perks" => 0,
     "summoner_spells" => 1,
@@ -237,14 +227,20 @@ async fn ranking_json(name: String) -> Result<String, i64> {
 //The equivalent match function to change riot API names to U.GG numbers
 #[cached(size = 1)]
 async fn ranking(name: String, role: String, ranks: String, regions: String) -> Result<Value, i64> {
-    let request = ranking_json(name).await;
+    let request = ranking_json(name.clone()).await;
     match request {
         Ok(ranking) => {
             let json: Result<Value, serde_json::Error> = serde_json::from_str(&ranking);
             match json {
                 Ok(json) => {
-                    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
-                    Ok(json_read.to_owned())
+                    let role = position(name, role).await;
+                    match role {
+                        Ok(role) => {
+                            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][role][0];
+                            Ok(json_read.to_owned())
+                        }
+                        Err(err) => Err(err)
+                    }
                 }
                 Err(_) => Err(202)
             }

@@ -31,7 +31,8 @@ pub async fn create_rune_page(name: String, primary_id: String, secondary_id: St
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ChampionNames {
     pub name: String,
-    pub key: String
+    pub key: String,
+    pub url: String,
 }
 #[cached]
 pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
@@ -39,10 +40,17 @@ pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
     let request = data_dragon::champion_json().await;
     match request {
         Ok(json) => {
-            for (_xy, y) in json.data.iter() {
-                champions.push(ChampionNames {name: y.clone().name, key: y.clone().id} );
+            let request = self::data_dragon::data_dragon_version().await;
+            match request {
+                Ok(version) => {
+                    for (champ_key, champ) in json.data.iter() {
+                        let key = &champ.id;
+                        champions.push(ChampionNames {name: champ.clone().name, key: champ_key.to_string(), url: format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{key}.png")} );
+                    }
+                    Ok(champions)
+                }
+                Err(err) => Err(err)
             }
-            Ok(champions)
         }
         Err(err) => Err(err)
     }

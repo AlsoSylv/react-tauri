@@ -1,40 +1,13 @@
 use cached::proc_macro::cached;
-use tauri::regex::Regex;
 use serde_json::{Value, json};
-use once_cell::sync::Lazy;
 
 use crate::{Active, RuneImages, PrimaryTree, SecondaryTree};
 
 use super::data_dragon::{self};
 
-pub async fn champion_name_sanitizer(name: String, title: bool) -> String {
-    static CHARACTER_NAME_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\W").unwrap());
-    
-    let champ_name = name;
-    
-    // Nunu & Willump
-    let champ_name = champ_name.split_once("&")
-        .map(|(f, _)| f)
-        .unwrap_or(&champ_name);
-    
-    // A-Za-z0-9_
-    let champ_name = CHARACTER_NAME_REGEX.replace_all(&champ_name, r"");
-    
-    // Renata Glasc
-    let champ_name = champ_name.split_once(" ")
-        .map(|(f, s)| f.to_string() + s)
-        .unwrap_or_else(|| champ_name[0..1].to_uppercase() + &champ_name[1..].to_lowercase());
-    
-    if title == true {
-        return champ_name
-    } else {
-        return champ_name.to_lowercase();
-    }
-}
-
 #[cached(size = 25, result = true)]
 pub async fn champion_id(name: String) -> Result<i64, i64> { 
-    let champion_name = format!("{}", champion_name_sanitizer(name.clone(), true).await);
+    let champion_name = format!("{}", name.clone());
     println!("{}", champion_name);
     let request = data_dragon::champion_json().await; //: &i64 
     match request {

@@ -1,51 +1,14 @@
-h1 {
-  text-align: center;
-}
-
-h2 {
-  text-align: center;
-}
-
-div#base {
-  height: 100%;
-}
-
-div#root {
-  height: 100%;
-}
-
-div#drop-downs {
-  float: left;
-  width: 20%;
-  z-index: 1;
-  height: 100%;
-  padding-left: 20px;
-  /*position: absolute;*/
-}
-
-div#get-runes {
-  padding-left: 20px;
-}
-
-div.champion-popup {
-  z-index: 5;
-  background-color: white;
-  width: 100%;
-  position: absolute;
-}
-
-input {
-  width: 95%;
-}
-
-select {
-  width: 100%;
-}
-
-input#champion-name {
-  width: 95%;
-}
-
+html,
 body {
-  height: 90vh;
+  min-height: 100vh;
+  display: flex;
+  flex: 1 1 0;
+}
+
+body #root {
+  height: 100%;
+  width: 100%;
+  background-image: url('./assets/background2.png');
+  background-position: center;
+  background-size: cover;
 }

@@ -8,7 +8,7 @@ import RoleMenu from 'components/RoleMenu';
 
 function MainPage() {
   return (
-    <Box sx={{ marginTop: '20px' }}>
+    <Box>
       <Grid container spacing={2}>
         <Grid xs={3}>
           <ChampionOptions />

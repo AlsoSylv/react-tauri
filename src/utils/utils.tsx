@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
+import { Unstable_Grid2 as Grid, Avatar } from '@mui/material';
 import { invoke } from '@tauri-apps/api';
 
-import { ChampionInfoResponse, State } from 'interfaces';
-import { Trees, Shards } from 'interfaces/ChampionInfo';
+import { ChampionInfoResponse, State, Trees, Shards, RuneData, Shard } from 'interfaces';
 import ValidatedStateResponse from 'interfaces/ValidatedStateResponse';
 
 async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
@@ -50,4 +52,10 @@ const validateState = (state: State): ValidatedStateResponse => {
   return { isValid: true, message: '' };
 };
 
-export { getChampionInfo, getChampionNames, validateState };
+const runeMap = ({ name, image, active }: RuneData | Shard): ReactNode => (
+  <Grid key={name} sm sx={{ display: 'flex', alignSelf: 'center', justifyContent: 'center' }}>
+    <Avatar src={image} alt={name} sx={{ ...(!active && { filter: 'grayscale(100%)', opacity: '.3' }) }} />
+  </Grid>
+);
+
+export { getChampionInfo, getChampionNames, validateState, runeMap };

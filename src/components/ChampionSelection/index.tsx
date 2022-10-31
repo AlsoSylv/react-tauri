@@ -4,7 +4,7 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import { getChampionNames } from 'utils/';
+import { getChampionNames } from 'utils/utils';
 
 function ChampionOptions() {
   const [champions, setChampions] = useState<string[]>([]);

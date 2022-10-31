@@ -55,14 +55,19 @@ pub async fn create_rune_page(name: String, primary_id: String, secondary_id: St
     return rune_page;
 }
 
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ChampionNames {
+    pub name: String,
+    pub key: String
+}
 #[cached]
-pub async fn all_champion_names() -> Result<Vec<String>, i64> {
+pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
     let request = data_dragon::champion_json().await;
     match request {
         Ok(json) => {
             for (_xy, y) in json.data.iter() {
-                champions.push(y.clone().name);
+                champions.push(ChampionNames {name: y.clone().name, key: y.clone().id} );
             }
             Ok(champions)
         }

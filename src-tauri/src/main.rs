@@ -4,6 +4,7 @@
 )]
 
 use plugins::ugg::Shards;
+use shared::helpers::ChampionNames;
 
 
 mod plugins;
@@ -16,10 +17,8 @@ fn main() {
         [
         rune_names, 
         champion_names, 
-        win_rate, 
         shard_names,
-        pick_rate,
-        ban_rate
+        champion_info,
         ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
@@ -67,35 +66,55 @@ async fn rune_names(name: String, role: String, rank: String, region: String) ->
     }
 }
 
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampionInfo {
+    url: String,
+    win_rate: String, 
+    pick_rate: String,
+    ban_rate: String,
+}
+
+
 #[tauri::command]
-async fn win_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
-    let request = plugins::ugg::winrate(name, role, rank, region).await;
+async fn champion_info(name: String, role: String, rank: String, region: String) -> Result<ChampionInfo, i64> {
+    let request = plugins::ugg::winrate(name.clone(), role.clone(), rank.clone(), region.clone()).await;
     match request {
-    Ok(winrate) => Ok(winrate),
-    Err(err) => Err(err)
+        Ok(winrate) => {
+            let request = plugins::ugg::pickrate(name.clone(), role.clone(), rank.clone(), region.clone()).await;
+            match request {
+                Ok(pickrate) => {
+                    let request = plugins::ugg::banrate(name.clone(), role.clone(), rank.clone(), region.clone()).await;
+                    match request {
+                        Ok(banrate) => {
+                            let request = shared::data_dragon::champion_json().await;
+                            match request {
+                                Ok(json) => {
+                                    let key = &json.data.get(&name).unwrap().key;
+                                    let request = shared::data_dragon::data_dragon_version().await;
+                                    match request {
+                                        Ok(version) => {
+                                            let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{key}.png");
+                                            Ok(ChampionInfo { url: url, win_rate: winrate, pick_rate: pickrate, ban_rate: banrate })
+                                        }
+                                        Err(err) => Err(err)
+                                    }
+                                }
+                                Err(err) => Err(err)
+                            }
+                        }
+                        Err(err) => Err(err)
+                    }
+                }
+                Err(err) => Err(err),
+            }
+        }
+        Err(err) => Err(err),
     }
 }
 
 #[tauri::command]
-async fn pick_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
-    let request = plugins::ugg::pickrate(name, role, rank, region).await;
-    match request {
-    Ok(winrate) => Ok(winrate),
-    Err(err) => Err(err)
-    }
-}
-
-#[tauri::command]
-async fn ban_rate(name: String, role: String, rank: String, region: String) -> Result<String, i64> {
-    let request = plugins::ugg::banrate(name, role, rank, region).await;
-    match request {
-    Ok(winrate) => Ok(winrate),
-    Err(err) => Err(err)
-    }
-}
-
-#[tauri::command]
-async fn champion_names() -> Result<Vec<String>, i64> {
+async fn champion_names() -> Result<Vec<ChampionNames>, i64> {
     let request = shared::helpers::all_champion_names().await;
     match request {
         Ok(names) => {

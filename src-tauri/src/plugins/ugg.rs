@@ -73,7 +73,6 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
 };
 
 async fn position(name: String, role: String) -> Result<String, i64> {
-    let role: String = POSITIONS[&role].to_string();
     let role = match role.as_str() {
         "jungle" => "1",
         "support" => "2",

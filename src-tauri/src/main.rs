@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use plugins::ugg::Shards;
+use plugins::ugg::{Shards, Rates};
 use shared::helpers::ChampionNames;
 
 mod plugins;
@@ -85,25 +85,37 @@ async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-    let rates = plugins::ugg::Rates {
+    let rates = Rates {
         name: name.clone(), role, rank, region
     };
-    let request = plugins::ugg::Rates::winrate(&rates).await;
-    match request {
+    let fut_winrate = Rates::winrate(&rates);
+    let fut_pickrate = Rates::pick_rate(&rates);
+    let fut_banrate = Rates::ban_rate(&rates);
+    let fut_champion_json = shared::data_dragon::champion_json();
+    let fut_version = shared::data_dragon::data_dragon_version();
+    let (
+        winrate, 
+        pickrate, 
+        banrate, 
+        champion_json, 
+        version
+    ) = futures::join!(
+        fut_winrate, 
+        fut_pickrate, 
+        fut_banrate, 
+        fut_champion_json, 
+        fut_version
+    );
+    match winrate {
         Ok(win_rate) => {
-            let request =
-                plugins::ugg::Rates::pick_rate(&rates).await;
-            match request {
+            match pickrate {
                 Ok(pick_rate) => {
-                    let request = plugins::ugg::Rates::ban_rate(&rates).await;
-                    match request {
+                    match banrate {
                         Ok(ban_rate) => {
-                            let request = shared::data_dragon::champion_json().await;
-                            match request {
+                            match champion_json {
                                 Ok(json) => {
                                     let id = &json.data.get(&name).unwrap().id;
-                                    let request = shared::data_dragon::data_dragon_version().await;
-                                    match request {
+                                    match version {
                                         Ok(version) => {
                                             let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{id}.png");
                                             Ok(ChampionInfo {

@@ -85,22 +85,17 @@ async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-    let rates = plugins::ugg::Rates {name: name.clone(), role: role.clone(), rank: rank.clone(), region: region.clone()};
+    let rates = plugins::ugg::Rates {
+        name: name.clone(), role, rank, region
+    };
     let request = plugins::ugg::Rates::winrate(&rates).await;
     match request {
         Ok(win_rate) => {
             let request =
-                plugins::ugg::pick_rate(name.clone(), role.clone(), rank.clone(), region.clone())
-                    .await;
+                plugins::ugg::Rates::pick_rate(&rates).await;
             match request {
                 Ok(pick_rate) => {
-                    let request = plugins::ugg::ban_rate(
-                        name.clone(),
-                        role.clone(),
-                        rank.clone(),
-                        region.clone(),
-                    )
-                    .await;
+                    let request = plugins::ugg::Rates::ban_rate(&rates).await;
                     match request {
                         Ok(ban_rate) => {
                             let request = shared::data_dragon::champion_json().await;

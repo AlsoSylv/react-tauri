@@ -107,7 +107,7 @@ async fn default_role(name: String) -> Result<String, i64> {
                             let json: Result<Roles, reqwest::Error> = json.json().await;
                             match json {
                                 Ok(json) => Ok(json[&id.to_string()][0].to_string()),
-                                Err(err) => Err(201),
+                                Err(_) => Err(201),
                             }
                         }
                         Err(err) => {
@@ -285,12 +285,18 @@ pub struct Rates {
 }
 
 impl Rates {
+    //The format is used here to get an exact result from the floating point math
     pub async fn winrate(&self) -> Result<String, i64> {
-        let request = ranking(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
+        let request = ranking(
+            self.name.clone(),
+            self.role.clone(),
+            self.rank.clone(),
+            self.region.clone()).await;
         match request {
             Ok(json) => {
                 let wins = json[STATS["wins"]].as_f64();
                 let matches = json[STATS["matches"]].as_f64();
+
                 if wins.is_some() && matches.is_some() {
                     let win_rate = wins.unwrap() / matches.unwrap();
                     Ok(format!("{:.1$}%", win_rate * 100.0, 1))
@@ -305,90 +311,56 @@ impl Rates {
             Err(err) => Err(err)
         }
     }
-}
-//The format is used here to get an exact result from the floating point math
-pub async fn win_rate(
-    name: String,
-    role: String,
-    ranks: String,
-    regions: String,
-) -> Result<String, i64> {
-    let request = ranking(name, role, ranks, regions).await;
-    match request {
-        Ok(json) => {
-            let wins = json[STATS["wins"]].as_f64();
-            match wins {
-                Some(wins) => {
-                    let matches = json[STATS["matches"]].as_f64();
-                    match matches {
-                        Some(matches) => {
-                            let win_rate = wins / matches;
-                            Ok(format!("{:.1$}%", win_rate * 100.0, 1))
-                        }
-                        None => Err(206),
-                    }
-                }
-                None => Err(205),
-            }
-        }
-        Err(err) => Err(err),
-    }
-}
+    
+    pub async fn ban_rate(&self) -> Result<String, i64> {
+        let request = ranking(
+            self.name.clone(),
+            self.role.clone(),
+            self.rank.clone(),
+            self.region.clone()).await;
+        match request {
+            Ok(json) => {
+                let bans = json[STATS["bans"]].as_f64();
+                let matches = json[STATS["total_matches"]].as_f64();
 
-// These are currently commented out, but should be exposed to the front end eventually
-pub async fn ban_rate(
-    name: String,
-    role: String,
-    ranks: String,
-    regions: String,
-) -> Result<String, i64> {
-    let request = ranking(name, role, ranks, regions).await;
-    match request {
-        Ok(json) => {
-            let bans = json[STATS["bans"]].as_f64();
-            match bans {
-                Some(bans) => {
-                    let matches = json[STATS["total_matches"]].as_f64();
-                    match matches {
-                        Some(matches) => {
-                            let ban_rate = bans / matches;
-                            Ok(format!("{:.1$}%", ban_rate * 100.0, 1))
-                        }
-                        None => Err(206),
+                if bans.is_some() && matches.is_some() {
+                    let ban_rate = bans.unwrap() / matches.unwrap();
+                    Ok(format!("{:.1$}%", ban_rate * 100.0, 1))
+                } else {
+                    if matches.is_none() {
+                        Err(206)
+                    } else {
+                        Err(205)
                     }
                 }
-                None => Err(205),
             }
+            Err(err) => Err(err)
         }
-        Err(err) => Err(err),
     }
-}
 
-pub async fn pick_rate(
-    name: String,
-    role: String,
-    ranks: String,
-    regions: String,
-) -> Result<String, i64> {
-    let request = ranking(name, role, ranks, regions).await;
-    match request {
-        Ok(json) => {
-            let picks = json[STATS["matches"]].as_f64();
-            match picks {
-                Some(picks) => {
-                    let matches = json[STATS["total_matches"]].as_f64();
-                    match matches {
-                        Some(matches) => {
-                            let pick_rate = picks / matches;
-                            Ok(format!("{:.1$}%", pick_rate * 100.0, 1))
-                        }
-                        None => Err(206),
+    pub async fn pick_rate(&self) -> Result<String, i64> {
+        let request = ranking (
+            self.name.clone(),
+            self.role.clone(),
+            self.rank.clone(),
+            self.region.clone()).await;    
+        match request {
+            Ok(json) => {
+                let picks = json[STATS["matches"]].as_f64();
+                let matches = json[STATS["total_matches"]].as_f64();
+                if picks.is_some() && matches.is_some() {
+                    let pick_rate = picks.unwrap() / matches.unwrap();
+                    Ok(format!("{:.1$}%", pick_rate * 100.0, 1))
+                } else {
+                    if matches.is_none() {
+                        Err(206)
+                    } else {
+                        Err(205)
                     }
                 }
-                None => Err(205),
             }
+            Err(err) => Err(err)
         }
-        Err(err) => Err(err),
     }
 }
 

@@ -4,10 +4,11 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
+import { AutoCompleteOptions } from 'interfaces';
 import { getChampionNames } from 'utils/utils';
 
 function ChampionOptions() {
-  const [champions, setChampions] = useState<string[]>([]);
+  const [champions, setChampions] = useState<AutoCompleteOptions[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
     state: { champion },
@@ -25,21 +26,22 @@ function ChampionOptions() {
     getChampions();
   }, []);
 
-  const changeSelectedChampion = (_: unknown, value: string | null) => {
-    const newChampionSelection = value || '';
+  const changeSelectedChampion = (_: unknown, value: AutoCompleteOptions | null) => {
+    const newChampionSelection = value?.value || '';
 
     dispatch({ type: Actions.UPDATE_CHAMPION, payload: newChampionSelection });
   };
 
   return (
     <Box>
-      <Autocomplete<string>
+      <Autocomplete<AutoCompleteOptions>
         disablePortal
-        value={champion || null}
+        value={champions.find(({ value }) => value === champion) || null}
         onChange={changeSelectedChampion}
         loading={isLoading}
         id="champions-select"
         options={champions}
+        getOptionLabel={({ label }) => label}
         renderInput={(params) => <TextField {...params} label="Select a champion" />}
       />
     </Box>

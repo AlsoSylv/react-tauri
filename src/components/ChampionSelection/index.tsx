@@ -4,11 +4,11 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import { AutoCompleteOptions } from 'interfaces';
+import { ChampionOptions as IChampionOptions } from 'interfaces';
 import { getChampionNames } from 'utils/utils';
 
 function ChampionOptions() {
-  const [champions, setChampions] = useState<AutoCompleteOptions[]>([]);
+  const [champions, setChampions] = useState<IChampionOptions[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
     state: { champion },
@@ -26,7 +26,7 @@ function ChampionOptions() {
     getChampions();
   }, []);
 
-  const changeSelectedChampion = (_: unknown, value: AutoCompleteOptions | null) => {
+  const changeSelectedChampion = (_: unknown, value: IChampionOptions | null) => {
     const newChampionSelection = value?.value || '';
 
     dispatch({ type: Actions.UPDATE_CHAMPION, payload: newChampionSelection });
@@ -34,15 +34,20 @@ function ChampionOptions() {
 
   return (
     <Box>
-      <Autocomplete<AutoCompleteOptions>
+      <Autocomplete<IChampionOptions>
         disablePortal
         value={champions.find(({ value }) => value === champion) || null}
         onChange={changeSelectedChampion}
         loading={isLoading}
         id="champions-select"
         options={champions}
-        getOptionLabel={({ label }) => label}
         renderInput={(params) => <TextField {...params} label="Select a champion" />}
+        renderOption={(props, option) => (
+          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+            <img loading="lazy" width="20" src={option.url} srcSet={`${option.url} 2x`} alt="" />
+            {option.label}
+          </Box>
+        )}
       />
     </Box>
   );

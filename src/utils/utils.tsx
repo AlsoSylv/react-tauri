@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api';
 
-import { ChampionInfoResponse, State, RuneTrees, Shards, AutoCompleteOptions, ChampionInfo } from 'interfaces';
+import { ChampionInfoResponse, State, RuneTrees, Shards, ChampionOptions, ChampionInfo } from 'interfaces';
 import ValidatedStateResponse from 'interfaces/ValidatedStateResponse';
 
 async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
@@ -20,27 +20,24 @@ async function getChampionInfo(state: State): Promise<ChampionInfoResponse> {
 
     return { ...championInfo, runes, shards, completedSuccessfully: true };
   } catch (exception) {
-    console.error('Got an error while trying to fetch the runes for state %o: %o', state, exception);
+    console.error('Got an error while trying to fetch the runes for state %o', state);
+    console.error(exception);
     return { message: 'No Data Exists!', completedSuccessfully: false };
   }
 }
 
 function getChampionNames() {
-  return invoke<AutoCompleteOptions[]>('champion_names');
+  return invoke<ChampionOptions[]>('champion_names');
 }
 
 const validateState = (state: State): ValidatedStateResponse => {
   const { champion, role } = state;
 
-  if (champion === '' && role === 'none') {
-    return { isValid: false, message: 'Please Enter A Champion Name And Select A Role' };
-  }
-
   if (champion === '') {
     return { isValid: false, message: 'Please Enter A Champion Name' };
   }
 
-  if (role === 'none' || role === '') {
+  if (role !== 'default' && role === '') {
     return { isValid: false, message: 'Please Select a Role' };
   }
 

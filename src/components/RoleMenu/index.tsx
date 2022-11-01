@@ -4,7 +4,7 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+import type { AutoCompleteOption } from 'interfaces';
 
 const roles: AutoCompleteOption[] = [
   { label: 'Default', value: 'default' },
@@ -33,7 +33,6 @@ function RoleMenu() {
         disablePortal
         id="roles-select"
         defaultValue={roles[0]}
-        getOptionDisabled={(options) => options.value === 'none'}
         value={roles.find(({ value }) => value === role)}
         options={roles}
         onChange={handleChangeRank}

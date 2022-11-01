@@ -4,7 +4,7 @@ use cached::proc_macro::cached;
 use phf::phf_map;
 use serde_json::Value;
 
-use crate::{shared, Active, PrimaryTree, RuneImages, SecondaryTree};
+use crate::{shared, Active, RuneImages};
 use shared::{data_dragon, helpers};
 
 // These are used in the U.GG JSON to map the value to the human readable name
@@ -86,6 +86,7 @@ async fn position(name: String, role: String) -> Result<String, i64> {
 //#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 type Roles = HashMap<String, Vec<i64>>;
 
+#[cached(size = 1, result = true)]
 async fn default_role(name: String) -> Result<String, i64> {
     let stat_version = "1.5";
     let base_role_url = "https://stats2.u.gg/lol";

@@ -1,7 +1,8 @@
 import { Unstable_Grid2 as Grid } from '@mui/material';
 
 import { SecondaryRunes as ISecondaryRunes } from 'interfaces';
-import { runeMap } from 'utils/utils';
+
+import Rune from './Rune';
 
 interface SecondaryRunesProps {
   secondaryRunes: ISecondaryRunes;
@@ -15,13 +16,13 @@ function SecondaryRunes(props: SecondaryRunesProps) {
   return (
     <Grid container>
       <Grid container sm={12}>
-        {slotOne.map(runeMap)}
+        {slotOne.map(Rune)}
       </Grid>
       <Grid container sm={12}>
-        {slotTwo.map(runeMap)}
+        {slotTwo.map(Rune)}
       </Grid>
       <Grid container sm={12}>
-        {slotThree.map(runeMap)}
+        {slotThree.map(Rune)}
       </Grid>
     </Grid>
   );

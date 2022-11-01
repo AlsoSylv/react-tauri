@@ -1,7 +1,8 @@
 import { Divider, Unstable_Grid2 as Grid } from '@mui/material';
 
 import { PrimaryRunes as IPrimaryRunes } from 'interfaces';
-import { runeMap } from 'utils/utils';
+
+import Rune from './Rune';
 
 interface PrimaryRunesProps {
   primaryRunes: IPrimaryRunes;
@@ -15,17 +16,19 @@ function PrimaryRunes(props: PrimaryRunesProps) {
   return (
     <Grid container sm={6}>
       <Grid container sm={12} justifyContent="center">
-        {slotOne.map(runeMap)}
+        {slotOne.map(Rune)}
       </Grid>
-      <Divider />
-      <Grid container sm={12}>
-        {slotTwo.map(runeMap)}
-      </Grid>
-      <Grid container sm={12}>
-        {slotThree.map(runeMap)}
+      <Grid sm={12}>
+        <Divider />
       </Grid>
       <Grid container sm={12}>
-        {slotFour.map(runeMap)}
+        {slotTwo.map(Rune)}
+      </Grid>
+      <Grid container sm={12}>
+        {slotThree.map(Rune)}
+      </Grid>
+      <Grid container sm={12}>
+        {slotFour.map(Rune)}
       </Grid>
     </Grid>
   );

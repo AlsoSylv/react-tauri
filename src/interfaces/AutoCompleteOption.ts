@@ -1,3 +1,10 @@
-type AutoCompleteOption = { label: string; value: string };
+interface AutoCompleteOption {
+  label: string;
+  value: string;
+}
 
-export default AutoCompleteOption;
+interface ChampionOptions extends AutoCompleteOption {
+  url: string;
+}
+
+export { ChampionOptions, AutoCompleteOption };

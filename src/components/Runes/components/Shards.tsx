@@ -1,7 +1,8 @@
 import { Unstable_Grid2 as Grid } from '@mui/material';
 
 import { Shards as IShards } from 'interfaces';
-import { runeMap } from 'utils/utils';
+
+import Rune from './Rune';
 
 interface ShardsProps {
   shards: IShards;
@@ -15,13 +16,13 @@ function Shards(props: ShardsProps) {
   return (
     <Grid container>
       <Grid container sm={12}>
-        {rowOne.map(runeMap)}
+        {rowOne.map(Rune)}
       </Grid>
       <Grid container sm={12}>
-        {rowTwo.map(runeMap)}
+        {rowTwo.map(Rune)}
       </Grid>
       <Grid container sm={12}>
-        {rowThree.map(runeMap)}
+        {rowThree.map(Rune)}
       </Grid>
     </Grid>
   );

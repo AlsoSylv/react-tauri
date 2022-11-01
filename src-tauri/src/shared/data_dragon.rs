@@ -24,10 +24,7 @@ pub async fn runes_json() -> Result<Runes, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
         Ok(data_dragon_version) => {
-            let url = format!(
-                "https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json",
-                data_dragon_version
-            );
+            let url = format!("https://ddragon.leagueoflegends.com/cdn/{data_dragon_version}/data/en_US/runesReforged.json");
             let request = reqwest::get(&url).await;
             match request {
                 Ok(response) => {
@@ -44,10 +41,10 @@ pub async fn runes_json() -> Result<Runes, i64> {
     }
 }
 
-type Runes = Vec<Root>;
+type Runes = Vec<RuneTree>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Root {
+pub struct RuneTree {
     pub id: i64,
     pub key: String,
     pub icon: String,

@@ -9,7 +9,7 @@ use super::data_dragon::{self};
 pub async fn champion_id(name: String) -> Result<i64, i64> {
     let champion_name = format!("{}", name.clone());
 
-    let request = data_dragon::champion_json().await; //: &i64
+    let request = data_dragon::champion_json().await;
     match request {
         Ok(json) => Ok(json.data[&champion_name].key.parse().unwrap()),
         Err(err) => Err(err),

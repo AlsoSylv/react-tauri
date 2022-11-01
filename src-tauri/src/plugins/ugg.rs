@@ -91,10 +91,17 @@ async fn default_role(name: String) -> Result<String, i64> {
     let stat_version = "1.5";
     let base_role_url = "https://stats2.u.gg/lol";
     let role_version = "1.5.0";
+
     let future_data_dragon_version = data_dragon::data_dragon_version();
     let future_champion_id = helpers::champion_id(name);
-    let (data_dragon_version, champion_id) =
-        futures::join!(future_data_dragon_version, future_champion_id);
+    let (
+        data_dragon_version, 
+        champion_id
+    ) = futures::join!(
+        future_data_dragon_version, 
+        future_champion_id
+    );
+
     match data_dragon_version {
         Ok(version) => {
             let lol_version: Vec<&str> = version.split(".").collect();
@@ -138,10 +145,17 @@ async fn overview_json(name: String) -> Result<String, i64> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
+
     let future_data_dragon_version = data_dragon::data_dragon_version();
     let future_champion_id = helpers::champion_id(name);
-    let (data_dragon_version, champion_id) =
-        futures::join!(future_data_dragon_version, future_champion_id);
+    let (
+        data_dragon_version, 
+        champion_id
+    ) = futures::join!(
+        future_data_dragon_version, 
+        future_champion_id
+    );
+
     match data_dragon_version {
         Ok(version) => {
             let lol_version: Vec<&str> = version.split(".").collect();
@@ -182,10 +196,17 @@ async fn ranking_json(name: String) -> Result<String, i64> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
+
     let future_data_dragon_version = data_dragon::data_dragon_version();
     let future_champion_id = helpers::champion_id(name);
-    let (data_dragon_version, champion_id) =
-        futures::join!(future_data_dragon_version, future_champion_id);
+    let (
+        data_dragon_version, 
+        champion_id
+    ) = futures::join!(
+        future_data_dragon_version, 
+        future_champion_id
+    );
+
     match data_dragon_version {
         Ok(version) => {
             let lol_version: Vec<&str> = version.split(".").collect();
@@ -222,7 +243,12 @@ async fn ranking_json(name: String) -> Result<String, i64> {
 //For storing things in json, this does the same thing, and uses
 //The equivalent match function to change riot API names to U.GG numbers
 #[cached(size = 1)]
-async fn ranking(name: String, role: String, ranks: String, regions: String) -> Result<Value, i64> {
+async fn ranking(
+    name: String, 
+    role: String, 
+    ranks: String, 
+    regions: String
+) -> Result<Value, i64> {
     let request = ranking_json(name.clone()).await;
     match request {
         Ok(ranking) => {
@@ -252,8 +278,8 @@ async fn ranking(name: String, role: String, ranks: String, regions: String) -> 
 async fn overview(
     name: String,
     role: String,
-    ranks: String,
-    regions: String,
+    rank: String,
+    region: String,
 ) -> Result<Value, i64> {
     let request = overview_json(name.clone()).await;
     match request {
@@ -264,8 +290,8 @@ async fn overview(
                     let role = position(name, role).await;
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]]
-                                [TIERS[&ranks.to_lowercase()]][role][0];
+                            let json_read: &Value = &json[REGIONS[&region.to_lowercase()]]
+                                [TIERS[&rank.to_lowercase()]][role][0];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -278,14 +304,32 @@ async fn overview(
     }
 }
 
-pub struct Rates {
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Shards {
+    pub row_one: [Shard; 3],
+    pub row_two: [Shard; 3],
+    pub row_three: [Shard; 3],
+}
+
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Shard {
+    pub name: String,
+    pub id: i64,
+    pub image: String,
+    pub active: bool,
+}
+
+pub struct Data {
     pub name: String,
     pub role: String,
     pub rank: String,
     pub region: String,
 }
 
-impl Rates {
+impl Data {
     //The format is used here to get an exact result from the floating point math
     pub async fn winrate(&self) -> Result<String, i64> {
         let request = ranking(
@@ -363,29 +407,16 @@ impl Rates {
             Err(err) => Err(err)
         }
     }
-}
 
-#[cached(result = true, size = 5)]
-pub async fn rune_tuple(
-    name: String,
-    role: String,
-    ranks: String,
-    regions: String,
-) -> Result<(RuneImages, [i64; 2]), i64> {
-    if role == "none" {
-        return Err(106);
-    } else {
-        let request = overview(name, role, ranks, regions).await;
+    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2]), i64>{
+        let request = overview(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
         match request {
             Ok(json) => {
                 let json = &json[DATA["perks"]];
                 let rune_ids = &json[4];
-
                 let tree_id_one: &i64 = &json[2].as_i64().unwrap();
                 let tree_id_two: &i64 = &json[3].as_i64().unwrap();
-
                 let all_runes = helpers::all_rune_images(*tree_id_one, *tree_id_two).await;
-
                 match all_runes {
                     Ok(immutable_all_runes) => {
                         let mut all_runes = immutable_all_runes.clone();
@@ -398,6 +429,7 @@ pub async fn rune_tuple(
                             &mut all_runes.secondary_runes.slot_two,
                             &mut all_runes.secondary_runes.slot_three,
                         ];
+                        
                         for n in 0..6 {
                             slots.iter_mut().for_each(|current_slot| {
                                 current_slot.clone().iter().enumerate().for_each(|i| {
@@ -420,130 +452,107 @@ pub async fn rune_tuple(
                 }
             }
             Err(err) => Err(err),
-        }
+        }    
     }
-}
 
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Shards {
-    pub row_one: [Shard; 3],
-    pub row_two: [Shard; 3],
-    pub row_three: [Shard; 3],
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Shard {
-    pub name: String,
-    pub id: i64,
-    pub image: String,
-    pub active: bool,
-}
-
-// This needs to be moved to a new structure for returning this data
-// And should follow the structure runes do
-pub async fn shard_tuple(
-    name: String,
-    role: String,
-    ranks: String,
-    regions: String,
-) -> Result<Shards, i64> {
-    let armor = Shard {
-        name: "Armor".to_owned(),
-        id: 5002,
-        image:
-            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png"
-                .to_owned(),
-        active: false,
-    };
-
-    let magic_resist = Shard {
-        name: "Magic Resist".to_owned(),
-        id: 5003,
-        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png".to_owned(),
-        active: false
-    };
-
-    let health = Shard {
-        name: "Health".to_owned(),
-        id: 5001,
-        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png".to_owned(),
-        active: false
-    };
-
-    let adaptive_force = Shard {
-        name: "Adaptive Force".to_owned(),
-        id: 5008,
-        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png".to_owned(),
-        active: false
-    };
-
-    let attack_speed = Shard {
-        name: "Attack Speed".to_owned(),
-        id: 5005,
-        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png".to_owned(),
-        active: false
-    };
-
-    let ability_haste = Shard {
-        name: "Ability Haste".to_owned(),
-        id: 5007,
-        image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png".to_owned(),
-        active: false
-    };
-
-    let shards: Shards = Shards {
-        row_one: [adaptive_force.clone(), attack_speed, ability_haste],
-        row_two: [adaptive_force, armor.clone(), magic_resist.clone()],
-        row_three: [health, armor, magic_resist],
-    };
-
-    let mut mutable_shards = shards.clone();
-
-    let request = overview(name, role, ranks, regions).await;
-    match request {
-        Ok(json) => {
-            let active_shards = json[DATA["shards"]][2].as_array();
-            match active_shards {
-                Some(active_shards) => {
-                    for (y, shard) in shards.row_one.iter().enumerate() {
-                        if shard.id.to_string() == active_shards[0] {
-                            mutable_shards.row_one[y] = Shard {
-                                name: shard.name.clone(),
-                                id: shard.id,
-                                image: shard.image.clone(),
-                                active: true,
+    pub async fn shard_tuple(&self) -> Result<Shards, i64> {
+        let armor = Shard {
+            name: "Armor".to_owned(),
+            id: 5002,
+            image:
+                "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png"
+                    .to_owned(),
+            active: false,
+        };
+    
+        let magic_resist = Shard {
+            name: "Magic Resist".to_owned(),
+            id: 5003,
+            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png".to_owned(),
+            active: false
+        };
+    
+        let health = Shard {
+            name: "Health".to_owned(),
+            id: 5001,
+            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png".to_owned(),
+            active: false
+        };
+    
+        let adaptive_force = Shard {
+            name: "Adaptive Force".to_owned(),
+            id: 5008,
+            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png".to_owned(),
+            active: false
+        };
+    
+        let attack_speed = Shard {
+            name: "Attack Speed".to_owned(),
+            id: 5005,
+            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png".to_owned(),
+            active: false
+        };
+    
+        let ability_haste = Shard {
+            name: "Ability Haste".to_owned(),
+            id: 5007,
+            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png".to_owned(),
+            active: false
+        };
+    
+        let shards: Shards = Shards {
+            row_one: [adaptive_force.clone(), attack_speed, ability_haste],
+            row_two: [adaptive_force, armor.clone(), magic_resist.clone()],
+            row_three: [health, armor, magic_resist],
+        };
+    
+        let mut mutable_shards = shards.clone();
+    
+        let request = overview(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
+        match request {
+            Ok(json) => {
+                let active_shards = json[DATA["shards"]][2].as_array();
+                match active_shards {
+                    Some(active_shards) => {
+                        for (y, shard) in shards.row_one.iter().enumerate() {
+                            if shard.id.to_string() == active_shards[0] {
+                                mutable_shards.row_one[y] = Shard {
+                                    name: shard.name.clone(),
+                                    id: shard.id,
+                                    image: shard.image.clone(),
+                                    active: true,
+                                }
                             }
                         }
-                    }
-
-                    for (y, shard) in shards.row_two.iter().enumerate() {
-                        if shard.id.to_string() == active_shards[1] {
-                            mutable_shards.row_two[y] = Shard {
-                                name: shard.name.clone(),
-                                id: shard.id,
-                                image: shard.image.clone(),
-                                active: true,
+    
+                        for (y, shard) in shards.row_two.iter().enumerate() {
+                            if shard.id.to_string() == active_shards[1] {
+                                mutable_shards.row_two[y] = Shard {
+                                    name: shard.name.clone(),
+                                    id: shard.id,
+                                    image: shard.image.clone(),
+                                    active: true,
+                                }
                             }
                         }
-                    }
-
-                    for (y, shard) in shards.row_three.iter().enumerate() {
-                        if shard.id.to_string() == active_shards[2] {
-                            mutable_shards.row_three[y] = Shard {
-                                name: shard.name.clone(),
-                                id: shard.id,
-                                image: shard.image.clone(),
-                                active: true,
+    
+                        for (y, shard) in shards.row_three.iter().enumerate() {
+                            if shard.id.to_string() == active_shards[2] {
+                                mutable_shards.row_three[y] = Shard {
+                                    name: shard.name.clone(),
+                                    id: shard.id,
+                                    image: shard.image.clone(),
+                                    active: true,
+                                }
                             }
                         }
+    
+                        Ok(mutable_shards)
                     }
-
-                    Ok(mutable_shards)
+                    None => Err(202),
                 }
-                None => Err(202),
             }
+            Err(err) => Err(err),
         }
-        Err(err) => Err(err),
     }
 }

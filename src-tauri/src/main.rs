@@ -3,7 +3,8 @@
     windows_subsystem = "windows"
 )]
 
-use plugins::ugg::{Shards, Rates};
+use cached::proc_macro::cached;
+use plugins::ugg::{Shards, Data};
 use shared::helpers::ChampionNames;
 
 mod plugins;
@@ -55,14 +56,17 @@ pub struct Active {
 }
 
 #[tauri::command]
+#[cached(result = true, size = 5)]
 async fn rune_names(
     name: String,
     role: String,
     rank: String,
     region: String,
 ) -> Result<RuneImages, i64> {
-    // TODO: This can be none if you get data specific enough, I need to handle that
-    let rune_match = plugins::ugg::rune_tuple(name, role, rank, region).await;
+    let data = Data {
+        name: name.clone(), role, rank, region
+    };
+    let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
         Ok((rune_names, _tree_ids)) => Ok(rune_names),
         Err(err) => Err(err),
@@ -85,12 +89,12 @@ async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-    let rates = Rates {
+    let rates = Data {
         name: name.clone(), role, rank, region
     };
-    let fut_winrate = Rates::winrate(&rates);
-    let fut_pickrate = Rates::pick_rate(&rates);
-    let fut_banrate = Rates::ban_rate(&rates);
+    let fut_winrate = Data::winrate(&rates);
+    let fut_pickrate = Data::pick_rate(&rates);
+    let fut_banrate = Data::ban_rate(&rates);
     let fut_champion_json = shared::data_dragon::champion_json();
     let fut_version = shared::data_dragon::data_dragon_version();
     let (
@@ -106,6 +110,7 @@ async fn champion_info(
         fut_champion_json, 
         fut_version
     );
+
     match winrate {
         Ok(win_rate) => {
             match pickrate {
@@ -157,7 +162,11 @@ async fn shard_names(
     rank: String,
     region: String,
 ) -> Result<Shards, i64> {
-    let shards = plugins::ugg::shard_tuple(name, role, rank, region).await;
+    let data = Data {
+        name: name.clone(), role, rank, region
+    };
+    
+    let shards = Data::shard_tuple(&data).await;
     match shards {
         Ok(shards) => Ok(shards),
         Err(err) => Err(err),

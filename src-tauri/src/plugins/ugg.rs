@@ -413,21 +413,7 @@ pub async fn rune_tuple(
                                 });
                             });
                         }
-                        let rune_images = RuneImages {
-                            primary_runes: PrimaryTree {
-                                slot_one: slots[0].to_vec(),
-                                slot_two: slots[1].to_vec(),
-                                slot_three: slots[2].to_vec(),
-                                slot_four: slots[3].to_vec(),
-                            },
-                            secondary_runes: SecondaryTree {
-                                slot_one: slots[4].to_vec(),
-                                slot_two: slots[5].to_vec(),
-                                slot_three: slots[6].to_vec(),
-                            },
-                        };
-
-                        Ok((rune_images, [*tree_id_one, *tree_id_two]))
+                        Ok((all_runes, [*tree_id_one, *tree_id_two]))
                     }
                     Err(err) => Err(err),
                 }

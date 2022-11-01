@@ -30,15 +30,20 @@ interface SecondaryRunes {
   slotThree: RuneData[];
 }
 
-interface Trees {
+interface RuneTrees {
   primaryRunes: PrimaryRunes;
   secondaryRunes: SecondaryRunes;
 }
 
 interface ChampionInfo {
-  runes: Trees;
-  shards: Shards;
+  url: string;
   winRate: string;
+  pickRate: string;
+  banRate: string;
+}
+interface CompleteChampionInfo extends ChampionInfo {
+  runes: RuneTrees;
+  shards: Shards;
 }
 
-export { Shard, Shards, RuneData, PrimaryRunes, SecondaryRunes, Trees, ChampionInfo };
+export { Shard, Shards, RuneData, PrimaryRunes, SecondaryRunes, RuneTrees, ChampionInfo, CompleteChampionInfo };

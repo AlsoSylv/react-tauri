@@ -1,9 +1,9 @@
-import { ChampionInfo } from './ChampionInfo';
+import { CompleteChampionInfo } from './ChampionInfo';
 
 type ChampionInfoResponse =
   | ({
       completedSuccessfully: true;
-    } & ChampionInfo)
+    } & CompleteChampionInfo)
   | {
       message: string;
       completedSuccessfully: false;

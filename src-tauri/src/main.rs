@@ -90,7 +90,7 @@ async fn champion_info(name: String, role: String, rank: String, region: String)
                             let request = shared::data_dragon::champion_json().await;
                             match request {
                                 Ok(json) => {
-                                    let key = &json.data.get(&name).unwrap().key;
+                                    let key = &json.data.get(&name).unwrap().id;
                                     let request = shared::data_dragon::data_dragon_version().await;
                                     match request {
                                         Ok(version) => {

@@ -7,7 +7,7 @@ import { Actions } from 'context/global/actions';
 import AutoCompleteOption from 'interfaces/AutoCompleteOption';
 
 const roles: AutoCompleteOption[] = [
-  { label: 'None', value: 'none' },
+  { label: 'Default', value: 'default' },
   { label: 'Top', value: 'top' },
   { label: 'Jungle', value: 'jungle' },
   { label: 'Mid', value: 'mid' },

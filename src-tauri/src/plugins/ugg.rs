@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use cached::proc_macro::cached;
 use serde_json::Value;
 use phf::phf_map;
@@ -5,6 +7,9 @@ use phf::phf_map;
 use crate::{shared, Active, RuneImages, PrimaryTree, SecondaryTree};
 use shared::{data_dragon, helpers};
 
+
+// These are used in the U.GG JSON to map the value to the human readable name
+// This is done for the purpose of code readability, as well as sanity.
 static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
     "na1" => "1",
     "euw1" => "2",
@@ -37,16 +42,6 @@ static TIERS: phf::Map<&'static str, &'static str> = phf_map! {
     "iron" => "15",
 };
 
-// Better defaulting logic should be used by wrapping https://stats2.u.gg/lol/1.5/primary_roles/12_20/1.5.0.json
-static POSITIONS: phf::Map<&'static str, &'static str> = phf_map! {
-    "jungle" => "1",
-    "support" => "2",
-    "adc" => "3",
-    "top" => "4",
-    "mid" => "5",
-    "none" => "6"
-};
-
 static DATA: phf::Map<&'static str, usize> = phf_map! {
     "perks" => 0,
     "summoner_spells" => 1,
@@ -67,11 +62,80 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
     "real_matches" => 13,
 };
 
+async fn position(name: String, role: String) -> Result<String, i64> {
+    let role = match role.as_str() {
+        "jungle" => "1",
+        "support" => "2",
+        "adc" => "3",
+        "top" => "4",
+        "mid" => "5",
+        "default" => "6",
+        _ => unreachable!()
+    }.to_owned();
+    if role == "6" {
+        let role = default_role(name).await;
+        match role {
+            Ok(role) => Ok(role),
+            Err(err) => Err(err)
+        }
+    } else {
+        Ok(role)
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Roles {
+    pub role: HashMap<String, Vec<i64>>
+}
+
+async fn default_role(name: String) -> Result<String, i64> {
+    let stat_version = "1.5";
+    let base_role_url = "https://stats2.u.gg/lol";
+    let role_version = "1.5.0";
+    let future_data_dragon_version = data_dragon::data_dragon_version();
+    let future_champion_id = helpers::champion_id(name);
+    let (data_dragon_version, champion_id) = futures::join!(future_data_dragon_version, future_champion_id);
+    match data_dragon_version {
+        Ok(version) => {
+            let lol_version: Vec<&str> = version.split(".").collect();
+            match champion_id {
+                Ok(id) => {
+                    let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+                    let url = format!("{base_role_url}/{stat_version}/primary_roles/{ugg_lol_version}/{role_version}.json");
+                    let request = reqwest::get(url).await;
+                    match request {
+                        Ok(json) => {
+                            let json: Result<Roles, reqwest::Error> = json.json().await;
+                            match json {
+                                Ok(json) => {
+                                    Ok(json.role[&id.to_string()][0].to_string())
+                                }
+                                Err(_) => Err(201)
+                            }
+                        }
+                        Err(err) => {
+                            if err.is_body() {
+                                Err(202)
+                            } else if err.is_request() {
+                                Err(201)
+                            } else {
+                                panic!()
+                            }
+                        } 
+                    }
+                }
+                Err(err) => Err(err),
+            }
+        }
+        Err(err) => Err(err)
+    }
+}
+
 // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
 // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champiosn.
 // Further investigation is needed into finding out which champs this is offered for automatically
 #[cached(result = true, size = 1)]
-pub async fn overiew_json(name: String) -> Result<String, i64> {
+async fn overiew_json(name: String) -> Result<String, i64> {
     let stats_version = "1.1";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
@@ -163,14 +227,20 @@ async fn ranking_json(name: String) -> Result<String, i64> {
 //The equivalent match function to change riot API names to U.GG numbers
 #[cached(size = 1)]
 async fn ranking(name: String, role: String, ranks: String, regions: String) -> Result<Value, i64> {
-    let request = ranking_json(name).await;
+    let request = ranking_json(name.clone()).await;
     match request {
         Ok(ranking) => {
             let json: Result<Value, serde_json::Error> = serde_json::from_str(&ranking);
             match json {
                 Ok(json) => {
-                    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]];
-                    Ok(json_read.to_owned())
+                    let role = position(name, role).await;
+                    match role {
+                        Ok(role) => {
+                            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][role][0];
+                            Ok(json_read.to_owned())
+                        }
+                        Err(err) => Err(err)
+                    }
                 }
                 Err(_) => Err(202)
             }
@@ -181,14 +251,20 @@ async fn ranking(name: String, role: String, ranks: String, regions: String) -> 
 
 #[cached(size = 1)]
 async fn overiew(name: String, role: String, ranks: String, regions: String) -> Result<Value, i64> {
-    let request = overiew_json(name).await;
+    let request = overiew_json(name.clone()).await;
     match request {
         Ok(overview) => {
             let json: Result<Value, serde_json::Error> = serde_json::from_str(&overview);
             match json {
                 Ok(json) => {
-                    let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][POSITIONS[&role.to_lowercase()]][0];
-                    Ok(json_read.to_owned())
+                    let role = position(name, role).await;
+                    match role {
+                        Ok(role) => {
+                            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]][TIERS[&ranks.to_lowercase()]][role][0];
+                            Ok(json_read.to_owned())
+                        }
+                        Err(err) => Err(err)
+                    }
                 }
                 Err(_) => Err(202)
             }

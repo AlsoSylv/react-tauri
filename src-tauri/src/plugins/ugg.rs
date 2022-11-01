@@ -273,6 +273,35 @@ async fn overiew(name: String, role: String, ranks: String, regions: String) -> 
     }
 }
 
+pub struct Rates {
+    pub name: String,
+    pub role: String,
+    pub rank: String,
+    pub region: String,
+}
+
+impl Rates {
+    pub async fn winrate(&self) -> Result<String, i64> {
+        let request = ranking(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
+        match request {
+            Ok(json) => {
+                let wins = json[STATS["wins"]].as_f64();
+                let matches = json[STATS["matches"]].as_f64();
+                if wins.is_some() && matches.is_some() {
+                    let win_rate = wins.unwrap() / matches.unwrap();
+                    Ok(format!("{:.1$}%", win_rate * 100.0, 1))
+                } else {
+                    if matches.is_none() {
+                        Err(206)
+                    } else {
+                        Err(205)
+                    }
+                }
+            }
+            Err(err) => Err(err)
+        }
+    }
+}
 //The format is used here to get an exact result from the floating point math
 pub async fn winrate(name: String, role: String, ranks: String, regions: String) -> Result<String, i64> {
     let request = ranking(name, role, ranks, regions).await;

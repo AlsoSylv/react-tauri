@@ -78,7 +78,8 @@ pub struct ChampionInfo {
 
 #[tauri::command]
 async fn champion_info(name: String, role: String, rank: String, region: String) -> Result<ChampionInfo, i64> {
-    let request = plugins::ugg::winrate(name.clone(), role.clone(), rank.clone(), region.clone()).await;
+    let rates = plugins::ugg::Rates {name: name.clone(), role: role.clone(), rank: rank.clone(), region: region.clone()};
+    let request = plugins::ugg::Rates::winrate(&rates).await;
     match request {
         Ok(winrate) => {
             let request = plugins::ugg::pickrate(name.clone(), role.clone(), rank.clone(), region.clone()).await;

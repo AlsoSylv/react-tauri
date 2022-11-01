@@ -1,24 +1,21 @@
 use cached::proc_macro::cached;
+use linked_hash_map::LinkedHashMap;
 use serde::Deserialize;
 use serde::Serialize;
-use linked_hash_map::LinkedHashMap;
 
 #[cached(result = true)]
 pub async fn data_dragon_version() -> Result<String, i64> {
-    let request = reqwest::get("https://static.u.gg/assets/lol/riot_patch_update/prod/versions.json").await;
+    let request =
+        reqwest::get("https://static.u.gg/assets/lol/riot_patch_update/prod/versions.json").await;
     match request {
         Ok(response) => {
             let json: Result<Vec<String>, reqwest::Error> = response.json().await;
             match json {
-                Ok(json) => {
-                    Ok(json[0].clone())
-                }
-                Err(_) => panic!()
+                Ok(json) => Ok(json[0].clone()),
+                Err(_) => panic!(),
             }
         }
-        Err(_) => {
-            Err(104)
-        }
+        Err(_) => Err(104),
     }
 }
 
@@ -27,21 +24,23 @@ pub async fn runes_json() -> Result<Runes, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
         Ok(data_dragon_version) => {
-            let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json", data_dragon_version);
+            let url = format!(
+                "https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/runesReforged.json",
+                data_dragon_version
+            );
             let request = reqwest::get(&url).await;
             match request {
                 Ok(response) => {
                     let rune_json: Result<Runes, reqwest::Error> = response.json().await;
                     match rune_json {
                         Ok(rune_json) => Ok(rune_json),
-                        Err(_) => Err(104)
+                        Err(_) => Err(104),
                     }
-                    
                 }
-                Err(_) => Err(104)
+                Err(_) => Err(104),
             }
         }
-        Err(err) => Err(err)
+        Err(err) => Err(err),
     }
 }
 
@@ -53,19 +52,19 @@ pub struct Root {
     pub key: String,
     pub icon: String,
     pub name: String,
-    pub slots: Vec<Slot>
+    pub slots: Vec<Slot>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Slot {
-    pub runes: Vec<Rune>
+    pub runes: Vec<Rune>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Rune {
     pub id: i64,
     pub key: String,
-    pub icon: String, 
+    pub icon: String,
     pub name: String,
     pub short_desc: Option<String>,
     pub long_desc: Option<String>,
@@ -76,14 +75,17 @@ pub async fn champion_json() -> Result<ChampJson, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
         Ok(version) => {
-            let url = format!("https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json", version);
+            let url = format!(
+                "https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json",
+                version
+            );
             let request = reqwest::get(url).await;
-            match request{ 
+            match request {
                 Ok(response) => {
                     let champ_json: Result<ChampJson, reqwest::Error> = response.json().await;
                     match champ_json {
                         Ok(champ_json) => Ok(champ_json),
-                        Err(_) => Err(103)
+                        Err(_) => Err(103),
                     }
                 }
                 Err(err) => {
@@ -95,7 +97,7 @@ pub async fn champion_json() -> Result<ChampJson, i64> {
                 }
             }
         }
-        Err(err) => Err(err)
+        Err(err) => Err(err),
     }
 }
 
@@ -169,7 +171,7 @@ pub struct Stats {
 #[serde(untagged)]
 pub enum StatValue {
     Integer(i64),
-    Float(f64)
+    Float(f64),
 }
 
 impl Default for StatValue {

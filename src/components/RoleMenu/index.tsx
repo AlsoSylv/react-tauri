@@ -1,19 +1,17 @@
 import { SyntheticEvent } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
 import type { AutoCompleteOption } from 'interfaces';
 
-const roles: AutoCompleteOption[] = [
-  { label: 'Default', value: 'default' },
-  { label: 'Top', value: 'top' },
-  { label: 'Jungle', value: 'jungle' },
-  { label: 'Mid', value: 'mid' },
-  { label: 'ADC', value: 'adc' },
-  { label: 'Support', value: 'support' },
-];
+const roles: AutoCompleteOption[] = [];
+
+invoke<string[]>('roles').then((role) => {
+  role.map((Role) => roles.push({ label: Role, value: Role }));
+});
 
 function RoleMenu() {
   const {

@@ -18,6 +18,7 @@ fn main() {
             champion_names,
             shard_names,
             champion_info,
+            roles,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -165,10 +166,16 @@ async fn shard_names(
     let data = Data {
         name: name.clone(), role, rank, region
     };
-    
+
     let shards = Data::shard_tuple(&data).await;
     match shards {
         Ok(shards) => Ok(shards),
         Err(err) => Err(err),
     }
+}
+
+#[tauri::command]
+#[cached]
+fn roles() -> [&'static str; 6] {
+    ["Default", "Top", "Jungle", "Mid", "ADC", "Support"]
 }

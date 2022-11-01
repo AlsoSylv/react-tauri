@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use cached::proc_macro::cached;
-use phf::phf_map;
+use phf::{phf_map, phf_ordered_map};
 use serde_json::Value;
 
 use crate::{shared, Active, RuneImages};
@@ -9,7 +9,7 @@ use shared::{data_dragon, helpers};
 
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
-static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
+static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
     "na1" => "1",
     "euw1" => "2",
     "kr" => "3",
@@ -24,7 +24,7 @@ static REGIONS: phf::Map<&'static str, &'static str> = phf_map! {
     "world" => "12"
 };
 
-static TIERS: phf::Map<&'static str, &'static str> = phf_map! {
+static TIERS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
     "challenger" => "1",
     "master" => "2",
     "diamond" => "3",
@@ -62,17 +62,17 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
 };
 
 async fn position(name: String, role: String) -> Result<String, i64> {
+    println!("{}", role);
     let role = match role.as_str() {
         "jungle" => "1",
         "support" => "2",
         "adc" => "3",
         "top" => "4",
         "mid" => "5",
-        "default" => "6",
-        _ => unreachable!(),
+        _ => &role,
     }
     .to_owned();
-    if role == "6" {
+    if role == "default" {
         let role = default_role(name).await;
         match role {
             Ok(role) => Ok(role),

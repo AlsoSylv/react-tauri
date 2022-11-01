@@ -19,7 +19,7 @@ const ranks: AutoCompleteOption[] = [
   { label: 'All Ranks', value: 'overall' },
   { label: 'Master +', value: 'master_plus' },
   { label: 'Diamond +', value: 'diamond_plus' },
-  { label: 'Diamond 2 +', value: 'diamond_2_plus0' },
+  { label: 'Diamond 2 +', value: 'diamond_2_plus' },
   { label: 'Platinum +', value: 'platinum_plus' },
 ];
 

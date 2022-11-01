@@ -83,10 +83,8 @@ async fn position(name: String, role: String) -> Result<String, i64> {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Roles {
-    pub role: HashMap<String, Vec<i64>>
-}
+//#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+type Roles = HashMap<String, Vec<i64>>;
 
 async fn default_role(name: String) -> Result<String, i64> {
     let stat_version = "1.5";
@@ -108,7 +106,7 @@ async fn default_role(name: String) -> Result<String, i64> {
                             let json: Result<Roles, reqwest::Error> = json.json().await;
                             match json {
                                 Ok(json) => {
-                                    Ok(json.role[&id.to_string()][0].to_string())
+                                    Ok(json[&id.to_string()][0].to_string())
                                 }
                                 Err(_) => Err(201)
                             }
@@ -140,11 +138,12 @@ async fn overiew_json(name: String) -> Result<String, i64> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
-    let data_dragon_version = data_dragon::data_dragon_version().await;
+    let future_data_dragon_version = data_dragon::data_dragon_version();
+    let future_champion_id = helpers::champion_id(name);
+    let (data_dragon_version, champion_id) = futures::join!(future_data_dragon_version, future_champion_id);
     match data_dragon_version {
         Ok(version) => {
             let lol_version: Vec<&str> = version.split(".").collect();
-            let champion_id = helpers::champion_id(name).await;
             match champion_id {
                 Ok(id) => {
                     let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
@@ -186,11 +185,12 @@ async fn ranking_json(name: String) -> Result<String, i64> {
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
-    let data_dragon_version = data_dragon::data_dragon_version().await;
+    let future_data_dragon_version = data_dragon::data_dragon_version();
+    let future_champion_id = helpers::champion_id(name);
+    let (data_dragon_version, champion_id) = futures::join!(future_data_dragon_version, future_champion_id);
     match data_dragon_version {
         Ok(version) => {
             let lol_version: Vec<&str> = version.split(".").collect();
-            let champion_id = helpers::champion_id(name).await;
             match champion_id {
                 Ok(id) => {
                     let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);

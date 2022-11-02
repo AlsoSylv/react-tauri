@@ -141,7 +141,7 @@ async fn default_role(name: String) -> Result<String, i64> {
 // Further investigation is needed into finding out which champs this is offered for automatically
 #[cached(result = true, size = 1)]
 async fn overview_json(name: String) -> Result<String, i64> {
-    let stats_version = "1.1";
+    let stats_version = "1.5";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
@@ -192,7 +192,7 @@ async fn overview_json(name: String) -> Result<String, i64> {
 
 #[cached(result = true, size = 1)]
 async fn ranking_json(name: String) -> Result<String, i64> {
-    let stats_version = "1.1";
+    let stats_version = "1.5";
     let overview_version = "1.5.0";
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";

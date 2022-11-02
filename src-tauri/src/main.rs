@@ -98,16 +98,16 @@ async fn champion_info(
     let fut_champion_json = shared::data_dragon::champion_json();
     let fut_version = shared::data_dragon::data_dragon_version();
     let (
-        winrate, 
-        pickrate, 
-        banrate, 
-        champion_json, 
+        winrate,
+        pickrate,
+        banrate,
+        champion_json,
         version
     ) = futures::join!(
-        fut_winrate, 
-        fut_pickrate, 
-        fut_banrate, 
-        fut_champion_json, 
+        fut_winrate,
+        fut_pickrate,
+        fut_banrate,
+        fut_champion_json,
         fut_version
     );
 

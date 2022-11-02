@@ -1,43 +1,11 @@
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { RouterProvider } from 'react-router-dom';
 
-import Container from 'components/Container';
-import { GlobalStateProvider } from 'context/global';
-import MainPage from 'pages/MainPage';
+import router from 'utils/router';
 
 import './style.css';
 
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-  typography: {
-    fontFamily: [
-      'Poppins',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
-  },
-});
-
 function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline enableColorScheme />
-      <Container>
-        <GlobalStateProvider>
-          <MainPage />
-        </GlobalStateProvider>
-      </Container>
-    </ThemeProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

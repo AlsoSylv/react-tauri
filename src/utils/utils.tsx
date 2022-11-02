@@ -44,6 +44,8 @@ const validateState = (state: State): ValidatedStateResponse => {
   return { isValid: true, message: '' };
 };
 
-const createArrayFromLength = (length: number) => [...Array(length)].map((_) => Math.ceil(Math.random() * 40 * length));
+const getRandomKey = () => crypto.randomUUID();
 
-export { getChampionInfo, getChampionNames, validateState, createArrayFromLength };
+const createArrayFromLength = (length: number) => [...Array(length)].map(getRandomKey);
+
+export { getChampionInfo, getChampionNames, validateState, createArrayFromLength, getRandomKey };

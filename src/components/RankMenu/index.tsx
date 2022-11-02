@@ -1,27 +1,17 @@
 import { SyntheticEvent } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
 import AutoCompleteOption from 'interfaces/AutoCompleteOption';
 
-const ranks: AutoCompleteOption[] = [
-  { label: 'Challenger', value: 'challenger' },
-  { label: 'Grandmaster', value: 'grandmaster' },
-  { label: 'Master', value: 'master' },
-  { label: 'Diamond', value: 'diamond' },
-  { label: 'Platinum', value: 'platinum' },
-  { label: 'Gold', value: 'gold' },
-  { label: 'Silver', value: 'silver' },
-  { label: 'Bronze', value: 'bronze' },
-  { label: 'Iron', value: 'iron' },
-  { label: 'All Ranks', value: 'overall' },
-  { label: 'Master +', value: 'master_plus' },
-  { label: 'Diamond +', value: 'diamond_plus' },
-  { label: 'Diamond 2 +', value: 'diamond_2_plus' },
-  { label: 'Platinum +', value: 'platinum_plus' },
-];
+const ranks: AutoCompleteOption[] = [];
+
+invoke<string[]>('tiers').then((tier) => {
+  tier.map((Tier) => ranks.push({ label: Tier, value: Tier }));
+});
 
 function RankMenu() {
   const {

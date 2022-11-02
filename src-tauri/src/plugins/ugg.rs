@@ -9,36 +9,36 @@ use shared::{data_dragon, helpers};
 
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
-static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
-    "na1" => "1",
-    "euw1" => "2",
-    "kr" => "3",
-    "eun1" => "4",
-    "br1" => "5",
-    "la1" => "6",
-    "la2" => "7",
-    "oc1" => "8",
-    "ru" => "9",
-    "tr1" => "10",
-    "jp1" => "11",
-    "world" => "12"
+pub static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
+    "World" => "12",
+    "North America" => "1",
+    "EU West" => "2",
+    "EU North" => "4",
+    "Korea" => "3",
+    "Brazil" => "5",
+    "LA North" => "6",
+    "LA South" => "7",
+    "OCE" => "8",
+    "Russia" => "9",
+    "Turkey" => "10",
+    "Japan" => "11",
 };
 
-static TIERS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
-    "challenger" => "1",
-    "master" => "2",
-    "diamond" => "3",
-    "platinum" => "4",
-    "gold" => "5",
-    "silver" => "6",
-    "bronze" => "7",
-    "overall" => "8",
-    "platinum_plus" => "10",
-    "diamond_plus" => "11",
-    "diamond_2_plus" => "12",
-    "grandmaster" => "13",
-    "master_plus" => "14",
-    "iron" => "15",
+pub static TIERS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
+    "Challenger" => "1",
+    "Grandmaster" => "13",
+    "Master" => "2",
+    "Diamond" => "3",
+    "Platinum" => "4",
+    "Gold" => "5",
+    "Silver" => "6",
+    "Bronze" => "7",
+    "Iron" => "15",
+    "Overall" => "8",
+    "Master Plus" => "14",
+    "Diamond Plus" => "11",
+    "Diamond 2 Plus" => "12",
+    "Platinum Plus" => "10",
 };
 
 static DATA: phf::Map<&'static str, usize> = phf_map! {
@@ -64,15 +64,15 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
 async fn position(name: String, role: String) -> Result<String, i64> {
     println!("{}", role);
     let role = match role.as_str() {
-        "jungle" => "1",
-        "support" => "2",
-        "adc" => "3",
-        "top" => "4",
-        "mid" => "5",
+        "Jungle" => "1",
+        "Support" => "2",
+        "ADC" => "3",
+        "Top" => "4",
+        "Mid" => "5",
         _ => &role,
     }
     .to_owned();
-    if role == "default" {
+    if role == "Default" {
         let role = default_role(name).await;
         match role {
             Ok(role) => Ok(role),
@@ -259,8 +259,8 @@ async fn ranking(
 
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]]
-                                [TIERS[&ranks.to_lowercase()]][role];
+                            let json_read: &Value = &json[REGIONS[&regions]]
+                                [TIERS[&ranks]][role];
 
                             Ok(json_read.to_owned())
                         }
@@ -290,8 +290,8 @@ async fn overview(
                     let role = position(name, role).await;
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&region.to_lowercase()]]
-                                [TIERS[&rank.to_lowercase()]][role][0];
+                            let json_read: &Value = &json[REGIONS[&region]]
+                                [TIERS[&rank]][role][0];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),

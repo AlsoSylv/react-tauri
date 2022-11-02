@@ -1,29 +1,13 @@
 import { Box, Unstable_Grid2 as Grid } from '@mui/material';
 
-import ChampionInformationDisplay from 'components/ChampionInformationDisplay';
 import ChampionOptions from 'components/ChampionSelection';
-import RankMenu from 'components/RankMenu';
-import RegionMenu from 'components/RegionMenu';
-import RoleMenu from 'components/RoleMenu';
 
 function MainPage() {
   return (
     <Box>
-      <Grid container spacing={2}>
-        <Grid xs={3}>
-          <ChampionOptions />
-        </Grid>
-        <Grid xs={3}>
-          <RoleMenu />
-        </Grid>
-        <Grid xs={3}>
-          <RegionMenu />
-        </Grid>
-        <Grid xs={3}>
-          <RankMenu />
-        </Grid>
+      <Grid container spacing={2} sx={{ minWidth: '600px' }}>
         <Grid xs={12}>
-          <ChampionInformationDisplay />
+          <ChampionOptions />
         </Grid>
       </Grid>
     </Box>

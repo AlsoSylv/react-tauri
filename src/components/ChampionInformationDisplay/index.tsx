@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Alert, Box, Unstable_Grid2 as Grid, Typography, Avatar } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
 import Runes from 'components/Runes';
 import { useGlobalContext } from 'context/global';
@@ -9,6 +10,7 @@ import { getChampionInfo, validateState } from 'utils/utils';
 
 function ChampionInformationDisplay() {
   const { state } = useGlobalContext();
+  const { champion = '' } = useParams();
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [championInfo, setChampionInfo] = useState<CompleteChampionInfo | null>(null);
@@ -28,7 +30,7 @@ function ChampionInformationDisplay() {
         return;
       }
 
-      const championInfoResponse = await getChampionInfo(state);
+      const championInfoResponse = await getChampionInfo({ ...state, champion });
 
       if (championInfoResponse.completedSuccessfully) {
         const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;

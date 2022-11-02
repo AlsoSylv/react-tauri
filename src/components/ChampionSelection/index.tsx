@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
@@ -14,6 +15,7 @@ function ChampionOptions() {
     state: { champion },
     dispatch,
   } = useGlobalContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getChampions = async () => {
@@ -30,6 +32,11 @@ function ChampionOptions() {
     const newChampionSelection = value?.value || '';
 
     dispatch({ type: Actions.UPDATE_CHAMPION, payload: newChampionSelection });
+    if (newChampionSelection) {
+      console.log(newChampionSelection);
+
+      navigate(`/champions/${newChampionSelection}`);
+    }
   };
 
   return (

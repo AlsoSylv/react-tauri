@@ -4,7 +4,7 @@ import { Autocomplete, Box, TextField } from '@mui/material';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+import { AutoCompleteOption } from 'interfaces';
 
 const ranks: AutoCompleteOption[] = [
   { label: 'Challenger', value: 'challenger' },

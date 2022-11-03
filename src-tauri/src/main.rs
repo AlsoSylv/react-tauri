@@ -4,7 +4,7 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::ugg::{Shards, Data, TIERS, REGIONS};
+use plugins::ugg::{Shards, Data, TIERS, REGIONS, ROLES};
 use shared::helpers::ChampionNames;
 
 mod plugins;
@@ -177,9 +177,13 @@ async fn shard_names(
 }
 
 #[tauri::command]
-#[cached]
-fn roles() -> [&'static str; 6] {
-    ["Default", "Top", "Jungle", "Mid", "ADC", "Support"]
+fn roles() -> Vec<String> {
+    let mut roles = Vec::new();
+    roles.push("Default".to_string());
+    for (key, _value) in &ROLES {
+        roles.push(key.to_string());
+    }
+    return roles
 }
 
 #[tauri::command]

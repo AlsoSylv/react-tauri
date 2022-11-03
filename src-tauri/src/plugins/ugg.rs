@@ -41,6 +41,14 @@ pub static TIERS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map!
     "Platinum Plus" => "10",
 };
 
+pub static ROLES: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
+    "Top" => "4",
+    "Jungle" => "1",
+    "Mid" => "5",
+    "ADC" => "3",
+    "Support" => "2",
+};
+
 static DATA: phf::Map<&'static str, usize> = phf_map! {
     "perks" => 0,
     "summoner_spells" => 1,
@@ -61,17 +69,8 @@ static STATS: phf::Map<&'static str, usize> = phf_map! {
     "real_matches" => 13,
 };
 
+#[cached(size = 1, result = true)]
 async fn position(name: String, role: String) -> Result<String, i64> {
-    println!("{}", role);
-    let role = match role.as_str() {
-        "Jungle" => "1",
-        "Support" => "2",
-        "ADC" => "3",
-        "Top" => "4",
-        "Mid" => "5",
-        _ => &role,
-    }
-    .to_owned();
     if role == "Default" {
         let role = default_role(name).await;
         match role {
@@ -79,11 +78,12 @@ async fn position(name: String, role: String) -> Result<String, i64> {
             Err(err) => Err(err),
         }
     } else {
-        Ok(role)
+    let role = ROLES[&role];
+
+        Ok(role.to_string())
     }
 }
 
-//#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 type Roles = HashMap<String, Vec<i64>>;
 
 #[cached(size = 1, result = true)]
@@ -242,7 +242,7 @@ async fn ranking_json(name: String) -> Result<String, i64> {
 //U.GG uses the structure REGION - RANK - ROLE
 //For storing things in json, this does the same thing, and uses
 //The equivalent match function to change riot API names to U.GG numbers
-#[cached(size = 1)]
+#[cached(size = 1, result=true)]
 async fn ranking(
     name: String, 
     role: String, 
@@ -274,7 +274,7 @@ async fn ranking(
     }
 }
 
-#[cached(size = 1)]
+#[cached(size = 1, result=true)]
 async fn overview(
     name: String,
     role: String,

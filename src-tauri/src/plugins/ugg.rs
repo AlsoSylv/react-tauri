@@ -249,14 +249,14 @@ async fn ranking(
     ranks: String, 
     regions: String
 ) -> Result<Value, i64> {
-    let request = ranking_json(name.clone()).await;
+    let fut_request = ranking_json(name.clone());
+    let fut_role = position(name, role);
+    let (request, role) = futures::join!(fut_request, fut_role);
     match request {
         Ok(ranking) => {
             let json: Result<Value, serde_json::Error> = serde_json::from_str(&ranking);
             match json {
                 Ok(json) => {
-                    let role = position(name, role).await;
-
                     match role {
                         Ok(role) => {
                             let json_read: &Value = &json[REGIONS[&regions.to_lowercase()]]

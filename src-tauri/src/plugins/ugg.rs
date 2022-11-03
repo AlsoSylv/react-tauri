@@ -281,13 +281,14 @@ async fn overview(
     rank: String,
     region: String,
 ) -> Result<Value, i64> {
-    let request = overview_json(name.clone()).await;
+    let fut_request = overview_json(name.clone());
+    let fut_role = position(name, role);
+    let (request, role) = futures::join!(fut_request, fut_role);
     match request {
         Ok(overview) => {
             let json: Result<Value, serde_json::Error> = serde_json::from_str(&overview);
             match json {
                 Ok(json) => {
-                    let role = position(name, role).await;
                     match role {
                         Ok(role) => {
                             let json_read: &Value = &json[REGIONS[&region]]

@@ -41,11 +41,12 @@ pub struct ChampionNames {
 #[cached]
 pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
-    let request = data_dragon::champion_json().await;
-    match request {
+    let fut_champ_json = data_dragon::champion_json();
+    let fut_version = self::data_dragon::data_dragon_version();
+    let (champ_json, version) = futures::join!(fut_champ_json, fut_version);
+    match champ_json {
         Ok(json) => {
-            let request = self::data_dragon::data_dragon_version().await;
-            match request {
+            match version {
                 Ok(version) => {
                     for (champ_key, champ) in json.data.iter() {
                         let key = &champ.id;

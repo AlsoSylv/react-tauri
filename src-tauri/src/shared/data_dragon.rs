@@ -72,10 +72,7 @@ pub async fn champion_json() -> Result<ChampJson, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
         Ok(version) => {
-            let url = format!(
-                "https://ddragon.leagueoflegends.com/cdn/{}/data/en_US/champion.json",
-                version
-            );
+            let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/champion.json");
             let request = reqwest::get(url).await;
             match request {
                 Ok(response) => {

@@ -5,7 +5,7 @@ import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+import { AutoCompleteOption } from 'interfaces/AutoCompleteOption';
 
 const ranks: AutoCompleteOption[] = [];
 

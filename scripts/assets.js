@@ -6,12 +6,10 @@ version = await version.json();
 let runeJson = await fetch(`http://ddragon.leagueoflegends.com/cdn/${version[0]}/data/en_US/runesReforged.json`);
 runeJson = await runeJson.json();
 
-const downloadWriteStream = (name) => fs.createWriteStream(`./src/assets/${name}`);
-
-const stream = (name) =>
+const stream = (downloadStream) =>
   new WritableStream({
     write(chunk) {
-      downloadWriteStream(name).write(chunk);
+      downloadStream.write(chunk);
     },
   });
 
@@ -21,8 +19,11 @@ for (let y = 0; y < runeJson.length; y += 1) {
       const imgUrl = `http://ddragon.leagueoflegends.com/cdn/img/${runeJson[y].slots[i].runes[x].icon}`;
       console.log(imgUrl);
       // eslint-disable-next-line no-await-in-loop
-      await fetch(imgUrl).then((res) => {
-        res.body.pipeTo(stream(`${runeJson[y].slots[i].runes[x].key}.png`));
+      await fetch(imgUrl).then(async (res) => {
+        const body = await res.body;
+        const name = `${runeJson[y].slots[i].runes[x].key}.png`;
+        const downloadWriteStream = fs.createWriteStream(`./src/assets/${name}`);
+        body.pipeTo(stream(downloadWriteStream));
       });
     }
   }

@@ -1,7 +1,7 @@
 const initialGlobalState = {
-  rank: 'platinum_plus',
-  role: 'default',
-  region: 'world',
+  rank: 'Platinum Plus',
+  role: 'Default',
+  region: 'World',
   champion: '',
 };
 

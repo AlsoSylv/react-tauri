@@ -51,9 +51,11 @@ pub struct SecondaryTree {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Active {
     pub name: String,
     pub image: String,
+    pub local_image: String,
     pub active: bool,
     pub id: i64,
 }
@@ -71,7 +73,7 @@ async fn rune_names(
     };
     let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
-        Ok((rune_names, _tree_ids)) => Ok(rune_names),
+        Ok((rune_names, _tree_ids)) => Ok(rune_names)
         Err(err) => Err(err),
     }
 }

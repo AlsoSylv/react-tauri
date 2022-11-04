@@ -442,6 +442,7 @@ impl Data {
                                             image: rune.image.clone(),
                                             active: true,
                                             id: rune.id,
+                                            local_image: rune.local_image.clone()
                                         }
                                     }
                                 });

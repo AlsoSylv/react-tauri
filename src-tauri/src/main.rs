@@ -73,7 +73,7 @@ async fn rune_names(
     };
     let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
-        Ok((rune_names, _tree_ids)) => Ok(rune_names)
+        Ok((rune_names, _tree_ids)) => Ok(rune_names),
         Err(err) => Err(err),
     }
 }

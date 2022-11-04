@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import fs from 'fs';
-import fsa from 'fs/promises';
-import path from 'path';
+import { createWriteStream } from 'fs';
+import { access, mkdir } from 'fs/promises';
+import { resolve, join } from 'path';
 
-const rootFolder = path.resolve('./');
+const rootFolder = resolve('./');
 
 const DDRAGON_URL = 'http://ddragon.leagueoflegends.com';
 
@@ -12,7 +12,7 @@ const runePaths = await (await fetch(`${DDRAGON_URL}/cdn/${version[0]}/data/en_U
 
 async function pathExists(filePath) {
   try {
-    await fsa.access(filePath);
+    await access(filePath);
     return true;
   } catch {
     return false;
@@ -31,14 +31,14 @@ const stream = (downloadStream) =>
 
 async function writeFile(folderName, fileName, data) {
   try {
-    const folderDir = path.join(rootFolder, 'src/assets/', folderName);
+    const folderDir = join(rootFolder, 'src/assets/', folderName);
     const fileExists = await pathExists(folderDir);
 
     if (!fileExists) {
-      await fsa.mkdir(folderDir, { recursive: true });
+      await mkdir(folderDir, { recursive: true });
     }
 
-    const downloadWriteStream = fs.createWriteStream(path.join(folderDir, fileName));
+    const downloadWriteStream = createWriteStream(join(folderDir, fileName));
 
     data.pipeTo(stream(downloadWriteStream));
   } catch (err) {

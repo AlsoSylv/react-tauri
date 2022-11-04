@@ -340,19 +340,16 @@ impl Data {
             self.region.clone()).await;
         match request {
             Ok(json) => {
-                let wins = json[STATS["wins"]].as_f64();
-                let matches = json[STATS["matches"]].as_f64();
+                let Some(matches) = json[STATS["matches"]].as_f64() else {
+                    return Err(206);
+                };
 
-                if wins.is_some() && matches.is_some() {
-                    let win_rate = wins.unwrap() / matches.unwrap();
-                    Ok(format!("{:.1$}%", win_rate * 100.0, 1))
-                } else {
-                    if matches.is_none() {
-                        Err(206)
-                    } else {
-                        Err(205)
-                    }
-                }
+                let Some(wins) = json[STATS["wins"]].as_f64() else {
+                    return Err(205);
+                };
+
+                let win_rate = wins / matches;
+                Ok(format!("{:.1$}%", win_rate * 100.0, 1))
             }
             Err(err) => Err(err)
         }
@@ -366,19 +363,15 @@ impl Data {
             self.region.clone()).await;
         match request {
             Ok(json) => {
-                let bans = json[STATS["bans"]].as_f64();
-                let matches = json[STATS["total_matches"]].as_f64();
+                let Some(matches) = json[STATS["total_matches"]].as_f64() else {
+                    return Err(206);
+                };
 
-                if bans.is_some() && matches.is_some() {
-                    let ban_rate = bans.unwrap() / matches.unwrap();
-                    Ok(format!("{:.1$}%", ban_rate * 100.0, 1))
-                } else {
-                    if matches.is_none() {
-                        Err(206)
-                    } else {
-                        Err(205)
-                    }
-                }
+                let Some(bans)= json[STATS["bans"]].as_f64() else {
+                    return Err(205);
+                };
+                let ban_rate = bans / matches;
+                Ok(format!("{:.1$}%", ban_rate * 100.0, 1))
             }
             Err(err) => Err(err)
         }
@@ -392,18 +385,16 @@ impl Data {
             self.region.clone()).await;    
         match request {
             Ok(json) => {
-                let picks = json[STATS["matches"]].as_f64();
-                let matches = json[STATS["total_matches"]].as_f64();
-                if picks.is_some() && matches.is_some() {
-                    let pick_rate = picks.unwrap() / matches.unwrap();
-                    Ok(format!("{:.1$}%", pick_rate * 100.0, 1))
-                } else {
-                    if matches.is_none() {
-                        Err(206)
-                    } else {
-                        Err(205)
-                    }
-                }
+                let Some(matches) = json[STATS["total_matches"]].as_f64() else {
+                    return Err(206);
+                };
+
+                let Some(picks) = json[STATS["matches"]].as_f64() else {
+                    return Err(205);
+                };
+
+                let pick_rate = picks / matches;
+                Ok(format!("{:.1$}%", pick_rate * 100.0, 1))
             }
             Err(err) => Err(err)
         }
@@ -415,8 +406,12 @@ impl Data {
             Ok(json) => {
                 let json = &json[DATA["perks"]];
                 let rune_ids = &json[4];
-                let tree_id_one: &i64 = &json[2].as_i64().unwrap();
-                let tree_id_two: &i64 = &json[3].as_i64().unwrap();
+                let Some(tree_id_one) = &json[2].as_i64() else {
+                    return Err(206);
+                };
+                let Some(tree_id_two) = &json[3].as_i64() else {
+                    return Err(206);
+                };
                 let all_runes = helpers::all_rune_images(*tree_id_one, *tree_id_two).await;
                 match all_runes {
                     Ok(immutable_all_runes) => {

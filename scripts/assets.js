@@ -7,8 +7,9 @@ const rootFolder = resolve('./');
 
 const DDRAGON_URL = 'http://ddragon.leagueoflegends.com';
 
-const version = await (await fetch(`${DDRAGON_URL}/api/versions.json`)).json();
-const runePaths = await (await fetch(`${DDRAGON_URL}/cdn/${version[0]}/data/en_US/runesReforged.json`)).json();
+const dDragonVersion = (await (await fetch(`${DDRAGON_URL}/api/versions.json`)).json())[0];
+const runePaths = await (await fetch(`${DDRAGON_URL}/cdn/${dDragonVersion}/data/en_US/runesReforged.json`)).json();
+const { data: items } = await (await fetch(`${DDRAGON_URL}/cdn/${dDragonVersion}/data/en_US/item.json`)).json();
 
 async function pathExists(filePath) {
   try {
@@ -47,28 +48,51 @@ async function writeFile(folderName, fileName, data) {
   }
 }
 
-const getAndSaveImage = async (icon, folder, name) => {
-  const imgUrl = `${DDRAGON_URL}/cdn/img/${icon}`;
+const getAndSaveImage = async (url, folder, name) => {
+  const imgUrl = `${DDRAGON_URL}/cdn/${url}`;
+  try {
+    const { body } = await fetch(imgUrl);
 
-  const { body } = await fetch(imgUrl);
-
-  await writeFile(folder, `${name}.png`, body);
+    await writeFile(folder, `${name}.png`, body);
+  } catch (error) {
+    console.error('error on: ', imgUrl);
+    console.error(error);
+    throw new Error(error);
+  }
 };
 
+const getRandomMs = (minMs, maxMs) =>
+  (minMs + ((maxMs - minMs + 1) * crypto.getRandomValues(new Uint32Array(1))[0]) / 2 ** 32) | 0;
+
 try {
-  console.time('getImages');
+  console.time('Get Runes Images');
   const completeRunes = runePaths.flatMap(({ slots, icon: runePathIcon, key: runePathName }) => {
-    const runePath = [getAndSaveImage(runePathIcon, `runes/${runePathName}`, runePathName)];
+    const runePath = [getAndSaveImage(`img/${runePathIcon}`, `runes/${runePathName}`, runePathName)];
 
     const runesImages = slots.flatMap(({ runes }) =>
-      runes.map(({ icon, key }) => getAndSaveImage(icon, `runes/${runePathName}`, key))
+      runes.map(({ icon, key }) => getAndSaveImage(`img/${icon}`, `runes/${runePathName}`, key))
     );
 
     return runePath.concat(runesImages);
   });
 
   await Promise.all(completeRunes);
-  console.timeEnd('getImages');
+  console.timeEnd('Get Runes Images');
+
+  console.time('Get Item Images');
+  const completeItems = Object.keys(items).map(
+    (key) =>
+      new Promise((r) => {
+        setTimeout(async () => {
+          await getAndSaveImage(`${dDragonVersion}/img/item/${items[key].image.full}`, `items`, key);
+          r();
+        }, getRandomMs(0, 1000));
+      })
+  );
+
+  await Promise.all(completeItems);
+  console.timeEnd('Get Item Images');
+
   console.log('Completed data fetching successfully.');
 } catch (err) {
   console.error('Failed to fetch all images due to: ', err);

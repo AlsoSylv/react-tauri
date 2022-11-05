@@ -6,13 +6,13 @@ import HoverPopover from 'material-ui-popup-state/HoverPopover';
 
 import type { RuneData, Shard } from 'interfaces';
 
-function Rune({ name, image, active }: RuneData | Shard): ReactNode {
+function Rune({ name, localImage, image, active }: RuneData | Shard): ReactNode {
   const popupState = usePopupState({ variant: 'popover', popupId: `rune-${name}` });
 
   return (
     <Grid key={name} sm sx={{ display: 'flex', alignSelf: 'center', justifyContent: 'center' }}>
       <Avatar
-        src={image}
+        src={localImage ? `../runes${localImage}` : image}
         alt={name}
         sx={{ ...(!active && { filter: 'grayscale(100%)', opacity: '.3' }) }}
         {...bindHover(popupState)}

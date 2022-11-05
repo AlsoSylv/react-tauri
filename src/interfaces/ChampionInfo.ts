@@ -3,6 +3,7 @@ interface Shard {
   id: number;
   image: string;
   active: boolean;
+  localImage: string;
 }
 
 interface Shards {
@@ -15,6 +16,7 @@ interface RuneData {
   name: string;
   image: string;
   active: boolean;
+  localImage: string;
 }
 
 interface PrimaryRunes {

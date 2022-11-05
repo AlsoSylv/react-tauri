@@ -23,3 +23,5 @@ src/assets/runes
 *.njsproj
 *.sln
 *.sw?
+
+public/**/*.png

@@ -34,6 +34,7 @@
         "allowEmptyCatch": true
       }
     ],
+    "no-bitwise": ["error", { "int32Hint": true }],
     "no-unused-expressions": [
       "error",
       {

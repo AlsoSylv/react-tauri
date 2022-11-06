@@ -260,7 +260,7 @@ async fn ranking(
                     match role {
                         Ok(role) => {
                             let json_read: &Value = &json[REGIONS[&regions]]
-                                [TIERS[&ranks]][role];
+                                [TIERS[&ranks]][&role];
 
                             Ok(json_read.to_owned())
                         }
@@ -292,7 +292,7 @@ async fn overview(
                     match role {
                         Ok(role) => {
                             let json_read: &Value = &json[REGIONS[&region]]
-                                [TIERS[&rank]][role][0];
+                                [TIERS[&rank]][&role][0];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -551,4 +551,122 @@ impl Data {
             Err(err) => Err(err),
         }
     }
+
+    pub async fn items(&self) -> Result<ItemsMap, i64> {
+        let fut_request = overview(
+            self.name.clone(), 
+            self.role.clone(), 
+            self.rank.clone(), 
+            self.region.clone()
+        );
+        let fut_items = data_dragon::item_json();
+
+        let (request, items) = futures::join!(fut_request, fut_items);
+
+        let mut items_map = 
+        ItemsMap { 
+            start: Vec::new(), 
+            core: Vec::new(), 
+            fourth: Vec::new(), 
+            fifth: Vec::new(), 
+            sixth: Vec::new() 
+        };
+
+        match request {
+            Ok(json) => {
+                match items {
+                    Ok(items) => {
+                        let start = json[DATA["starting_items"]][2].as_array();
+                        let mythic = json[DATA["mythic_and_core"]][2].as_array();
+                        let fourth = json[DATA["other_items"]][0].as_array();
+                        let fifth = json[DATA["other_items"]][1].as_array();
+                        let sixth = json[DATA["other_items"]][2].as_array();
+
+                        for (key, item_data) in items["data"].as_object().unwrap()  {
+                            match start {
+                                Some(start) => {
+                                    for i in start {
+                                        if &i.to_string() == key {
+                                            items_map.start.push(item_data["name"].as_str().unwrap().to_string())
+                                        }
+                                    }
+                                },
+                                None => (),
+                            }
+                            match mythic {
+                                Some(mythic) => {
+                                    for i in mythic {
+                                        if &i.to_string() == key {
+                                            items_map.core.push(item_data["name"].as_str().unwrap().to_string())
+                                        }
+                                    }
+                                },
+                                None => (),
+                            }
+                            match fourth {
+                                Some(fouth) => {
+                                    for y in fouth {
+                                        if y.is_array() {
+                                            if &y[0].to_string() == key {
+                                                items_map.fourth.push(item_data["name"].as_str().unwrap().to_string())
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                },
+                                None => (),
+                            }
+                            match fifth {
+                                Some(fifth) => {
+                                    for y in fifth {
+                                        if y.is_array() {
+                                            if &y[0].to_string() == key {
+                                                items_map.fifth.push(item_data["name"].as_str().unwrap().to_string())
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                },
+                                None => (),
+                            }
+                            match sixth {
+                                Some(sixth) => {
+                                    for y in sixth {
+                                        if y.is_array() {
+                                            if &y[0].to_string() == key {
+                                                items_map.sixth.push(item_data["name"].as_str().unwrap().to_string())
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                },
+                                None => (),
+                            }
+                        }
+                        Ok(items_map)
+                    },
+                    Err(_) => todo!()
+                }
+            },
+            Err(_) => todo!()
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ItemsMap {
+    start: Vec<String>,
+    core: Vec<String>,
+    fourth: Vec<String>,
+    fifth: Vec<String>,
+    sixth: Vec<String>
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Item {
+    name: String,
+    cost: String
 }

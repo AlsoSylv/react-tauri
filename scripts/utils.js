@@ -2,6 +2,7 @@
 import { createWriteStream } from 'fs';
 import { access, mkdir } from 'fs/promises';
 import { join } from 'path';
+import crypto from 'crypto';
 
 import { DDRAGON_URL, ROOT_FOLDER } from './constants.js';
 

@@ -1,14 +1,14 @@
 use shaco::rest;
 use serde_json::Value;
 
-pub async fn push_runes_to_client(page: Value) {
+pub async fn push_runes_to_client(page: Value) -> Result<i64, i64> {
     let client = rest::RESTClient::new();
     let pages_endpoint = String::from("/lol-perks/v1/pages");
     match client {
         Ok(client) => {
             let post = client.put(pages_endpoint.clone(), page.clone()).await;
             match post {
-                Ok(_) => (),
+                Ok(_) => Ok(404),
                 Err(_) => {
                     let response = client.get("/lol-perks/v1/currentpage".to_string()).await;
                     match response {
@@ -21,18 +21,18 @@ pub async fn push_runes_to_client(page: Value) {
                                 Ok(_) => {
                                     let post = client.put(pages_endpoint, page).await;
                                     match post {
-                                        Ok(_) => todo!(),
-                                        Err(_) => todo!(),
+                                        Ok(_) => Ok(405),
+                                        Err(_) => Err(402),
                                     }
                                 }
-                                Err(_) => panic!()
+                                Err(_) => Err(403)
                             }
                         },
-                        Err(_) => todo!()
+                        Err(_) => Err(404)
                     }
                 },
             }
         },
-        Err(_) => todo!()
+        Err(_) => Err(401)
     }
 }

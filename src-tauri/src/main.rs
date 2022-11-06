@@ -22,6 +22,7 @@ fn main() {
             tiers,
             regions,
             items,
+            push_runes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -228,16 +229,28 @@ async fn push_runes(
     role: String,
     rank: String,
     region: String,
-) -> Result<(), i64> {
+) -> Result<i64, i64> {
     let data = Data {
-        name: name.clone(), role, rank, region
+        name: name.clone(), role: role.clone(), rank, region
     };
+
+    let winrate = Data::winrate(&data).await;
     let rune_match = Data::rune_tuple(&data).await;
+    // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
+
     match rune_match {
         Ok((_, tree_ids, rune_ids)) => {
-            let page = create_rune_page(name, tree_ids[0], tree_ids[1], rune_ids).await;
-            let result = push_runes_to_client(page).await;
-            Ok(())
+            match winrate {
+                Ok(win_rate) => {
+                    let page = create_rune_page(format!("{0} {1} {2}", name, role, win_rate), tree_ids[0], tree_ids[1], rune_ids).await;
+                    let result = push_runes_to_client(page).await;
+                    match result {
+                        Ok(ok) => Ok(ok),
+                        Err(err) => Err(err)
+                    }
+                }
+                Err(err) => Err(err)
+            }
         },
         Err(err) => Err(err)
     }

@@ -2770,8 +2770,7 @@ dependencies = [
 [[package]]
 name = "shaco"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd2612bc51968cdc14710290e1eb026fe88a2b7e5a9717fe17959c179bdcb260"
+source = "git+https://github.com/AlsoSylv/Shaco?branch=test#9c236c54e9c4fd8af79161e85fa7ed9e7f4185cb"
 dependencies = [
  "base64",
  "futures-util",

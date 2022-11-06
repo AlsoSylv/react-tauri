@@ -4,8 +4,8 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::ugg::{Shards, Data, TIERS, REGIONS, ROLES};
-use shared::helpers::ChampionNames;
+use plugins::{ugg::{Shards, Data, TIERS, REGIONS, ROLES}, lcu::push_runes_to_client};
+use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;
 mod shared;
@@ -71,7 +71,7 @@ async fn rune_names(
     };
     let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
-        Ok((rune_names, _tree_ids)) => Ok(rune_names),
+        Ok((rune_names, _, _)) => Ok(rune_names),
         Err(err) => Err(err),
     }
 }
@@ -202,4 +202,25 @@ fn regions() -> Vec<String> {
         regions.push(key.to_string());
     }
     return regions
+}
+
+#[tauri::command]
+async fn push_runes(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<(), i64> {
+    let data = Data {
+        name: name.clone(), role, rank, region
+    };
+    let rune_match = Data::rune_tuple(&data).await;
+    match rune_match {
+        Ok((_, tree_ids, rune_ids)) => {
+            let page = create_rune_page(name, tree_ids[0], tree_ids[1], rune_ids).await;
+            let result = push_runes_to_client(page).await;
+            Ok(())
+        },
+        Err(err) => Err(err)
+    }
 }

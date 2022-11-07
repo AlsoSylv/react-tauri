@@ -12,6 +12,7 @@ function ChampionInformationDisplay() {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [championInfo, setChampionInfo] = useState<CompleteChampionInfo | null>(null);
+  // const [url, setUrl] = useState<string>(`../champions${championInfo?.localImage}`);
 
   useEffect(() => {
     const handleGetChampionInformation = async () => {
@@ -56,7 +57,7 @@ function ChampionInformationDisplay() {
               <>
                 <Grid container sx={{ display: 'flex' }}>
                   <Grid xs={1}>
-                    <Avatar src={championInfo?.url} alt={state.champion} />
+                    <Avatar src={`../champions${championInfo?.localImage}`} alt={state.champion} />
                   </Grid>
                   <Grid xs={3}>
                     <Typography variant="body1" alignSelf="center">

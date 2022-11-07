@@ -2,6 +2,7 @@ use cached::proc_macro::cached;
 use linked_hash_map::LinkedHashMap;
 use serde::Deserialize;
 use serde::Serialize;
+use serde_json::Value;
 
 #[cached(result = true)]
 pub async fn data_dragon_version() -> Result<String, i64> {
@@ -101,25 +102,25 @@ pub struct ChampJson {
     pub type_field: String,
     pub format: String,
     pub version: String,
-    pub data: LinkedHashMap<String, Data>,
+    pub data: LinkedHashMap<String, ChampData>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Data {
+pub struct ChampData {
     pub version: String,
     pub id: String,
     pub key: String,
     pub name: String,
     pub blurb: String,
-    pub info: Info,
-    pub image: Image,
+    pub info: ChampInfo,
+    pub image: ChampImage,
     pub tags: Vec<String>,
     pub partype: String,
-    pub stats: Stats,
+    pub stats: ChampStats,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Info {
+pub struct ChampInfo {
     pub attack: i64,
     pub defense: i64,
     pub magic: i64,
@@ -127,7 +128,7 @@ pub struct Info {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Image {
+pub struct ChampImage {
     pub full: String,
     pub sprite: String,
     pub group: String,
@@ -138,7 +139,7 @@ pub struct Image {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Stats {
+pub struct ChampStats {
     pub hp: StatValue,
     pub hpperlevel: StatValue,
     pub mp: StatValue,
@@ -171,5 +172,33 @@ pub enum StatValue {
 impl Default for StatValue {
     fn default() -> Self {
         Self::Integer(0)
+    }
+}
+
+pub async fn item_json() -> Result<Value, i64> {
+    let data_dragon_version = data_dragon_version().await;
+    match data_dragon_version {
+        Ok(version) => {
+            let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/item.json");
+            let request = reqwest::get(url).await;
+            match request {
+                Ok(response) => {
+                    let item_json: Result<Value, reqwest::Error> = response.json().await;
+                    match item_json {
+                        Ok(item_json) => Ok(item_json),
+                        Err(_) => Err(103),
+                    }
+                },
+                Err(err) => {
+                    if err.is_body() {
+                        Err(104)
+                    } else {
+                        Err(103)
+                    }
+                }
+            }
+        }
+        Err(err) => Err(err)
+        
     }
 }

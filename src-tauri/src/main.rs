@@ -4,7 +4,7 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::ugg::{Shards, Data, TIERS, REGIONS, ROLES};
+use plugins::ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap};
 use shared::helpers::ChampionNames;
 
 mod plugins;
@@ -21,6 +21,7 @@ fn main() {
             roles,
             tiers,
             regions,
+            items,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -174,6 +175,23 @@ async fn shard_names(
     let shards = Data::shard_tuple(&data).await;
     match shards {
         Ok(shards) => Ok(shards),
+        Err(err) => Err(err),
+    }
+}
+
+#[tauri::command]
+async fn items(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<ItemsMap, i64> {
+    let data = Data {
+        name: name.clone(), role, rank, region
+    };
+    let items = Data::items(&data).await;
+    match items {
+        Ok(items) => Ok(items),
         Err(err) => Err(err),
     }
 }

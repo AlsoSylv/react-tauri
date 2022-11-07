@@ -5,6 +5,7 @@ interface AutoCompleteOption {
 
 interface ChampionOptions extends AutoCompleteOption {
   url: string;
+  localImage: string;
 }
 
 export { ChampionOptions, AutoCompleteOption };

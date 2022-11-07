@@ -8,7 +8,7 @@ import type { RuneData, Shard } from 'interfaces';
 
 function Rune({ name, localImage, image, active }: RuneData | Shard): ReactNode {
   const popupState = usePopupState({ variant: 'popover', popupId: `rune-${name}` });
-  const [url, setUrl] = useState(localImage);
+  const [url, setUrl] = useState(`../runes${localImage}`);
 
   return (
     <Grid key={name} sm sx={{ display: 'flex', alignSelf: 'center', justifyContent: 'center' }}>
@@ -18,8 +18,9 @@ function Rune({ name, localImage, image, active }: RuneData | Shard): ReactNode 
         sx={{ ...(!active && { filter: 'grayscale(100%)', opacity: '.3' }) }}
         {...bindHover(popupState)}
         imgProps={{
-          onError: () => setUrl(image)
-        }}/>
+          onError: () => setUrl(image),
+        }}
+      />
       <HoverPopover
         {...bindPopover(popupState)}
         anchorOrigin={{

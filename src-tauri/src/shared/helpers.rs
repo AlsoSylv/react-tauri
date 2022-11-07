@@ -32,10 +32,12 @@ pub async fn create_rune_page(
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ChampionNames {
     pub label: String,
     pub value: String,
     pub url: String,
+    pub local_image: String,
 }
 
 #[cached]
@@ -53,7 +55,8 @@ pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
                         champions.push(ChampionNames {
                           label: champ.clone().name,
                           value: champ_key.to_string(),
-                          url: format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{key}.png")
+                          url: format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{key}.png"),
+                          local_image: format!("/{0}/{0}.png", key),
                         });
                     }
                     Ok(champions)

@@ -18,9 +18,9 @@ pub async fn champion_id(name: String) -> Result<i64, i64> {
 
 pub async fn create_rune_page(
     name: String,
-    primary_id: String,
-    secondary_id: String,
-    selected_perks: [i64; 9],
+    primary_id: i64,
+    secondary_id: i64,
+    selected_perks: Vec<i64>,
 ) -> Value {
     let rune_page = json!({
         "name": name,

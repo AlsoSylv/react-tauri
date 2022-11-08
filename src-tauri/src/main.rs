@@ -4,8 +4,8 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap};
-use shared::helpers::ChampionNames;
+use plugins::{ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap}, lcu::push_runes_to_client};
+use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;
 mod shared;
@@ -22,6 +22,7 @@ fn main() {
             tiers,
             regions,
             items,
+            push_runes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -74,7 +75,7 @@ async fn rune_names(
     };
     let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
-        Ok((rune_names, _tree_ids)) => Ok(rune_names),
+        Ok((rune_names, _, _)) => Ok(rune_names),
         Err(err) => Err(err),
     }
 }
@@ -225,4 +226,37 @@ fn regions() -> Vec<String> {
         regions.push(key.to_string());
     }
     return regions
+}
+
+#[tauri::command]
+async fn push_runes(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<i64, i64> {
+    let data = Data {
+        name: name.clone(), role: role.clone(), rank, region
+    };
+
+    let winrate = Data::winrate(&data).await;
+    let rune_match = Data::rune_tuple(&data).await;
+    // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
+
+    match rune_match {
+        Ok((_, tree_ids, rune_ids)) => {
+            match winrate {
+                Ok(win_rate) => {
+                    let page = create_rune_page(format!("{0} {1} {2}", name, role, win_rate), tree_ids[0], tree_ids[1], rune_ids).await;
+                    let result = push_runes_to_client(page).await;
+                    match result {
+                        Ok(ok) => Ok(ok),
+                        Err(err) => Err(err)
+                    }
+                }
+                Err(err) => Err(err)
+            }
+        },
+        Err(err) => Err(err)
+    }
 }

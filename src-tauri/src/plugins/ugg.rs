@@ -400,7 +400,7 @@ impl Data {
         }
     }
 
-    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2]), i64>{
+    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), i64>{
         let request = overview(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
         match request {
             Ok(json) => {
@@ -415,6 +415,7 @@ impl Data {
                 let all_runes = helpers::all_rune_images(*tree_id_one, *tree_id_two).await;
                 match all_runes {
                     Ok(immutable_all_runes) => {
+                        let mut used_rune_ids = Vec::new();
                         let mut all_runes = immutable_all_runes.clone();
                         let mut slots: [&mut Vec<Active>; 7] = [
                             &mut all_runes.primary_runes.slot_one,
@@ -438,12 +439,13 @@ impl Data {
                                             active: true,
                                             id: rune.id,
                                             local_image: rune.local_image.clone()
-                                        }
+                                        };
+                                        used_rune_ids.push(rune.id);
                                     }
                                 });
                             });
                         }
-                        Ok((all_runes, [*tree_id_one, *tree_id_two]))
+                        Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
                     Err(err) => Err(err),
                 }

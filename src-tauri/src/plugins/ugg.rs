@@ -697,6 +697,65 @@ impl Data {
             Err(err) => Err(err),
         }
     }
+
+    pub async fn abilities(&self) -> Result<AbilitiesMap, i64> {
+        let fut_abilities = overview(
+            self.name.clone(), 
+            self.role.clone(), 
+            self.rank.clone(), 
+            self.region.clone()
+        );
+        let fut_champ_json = data_dragon::champion_json();
+        let (abilities, champ_json) = futures::join!(fut_abilities, fut_champ_json);
+        match abilities {
+            Ok(json) => {
+                let Some(abilities_order) = json[DATA["abilities"]][2].as_array() else {
+                    return Err(207)
+                };
+                let mut abilities = AbilitiesMap { q: Vec::new(), w: Vec::new(), e: Vec::new(), r: Vec::new() };
+                match champ_json {
+                    Ok(json) => {
+                        for y in abilities_order {
+                            if y.is_string() {
+                                match y.as_str().unwrap() {
+                                    "Q" => {
+                                        abilities.q.push(y.as_str().unwrap().to_string());
+                                        abilities.w.push("".to_string());
+                                        abilities.e.push("".to_string());
+                                        abilities.r.push("".to_string());
+                                    },
+                                    "W" => {
+                                        abilities.q.push("".to_string());
+                                        abilities.w.push(y.as_str().unwrap().to_string());
+                                        abilities.e.push("".to_string());
+                                        abilities.r.push("".to_string());
+                                    },
+                                    "E" => {
+                                        abilities.q.push("".to_string());
+                                        abilities.w.push("".to_string());
+                                        abilities.e.push(y.as_str().unwrap().to_string());
+                                        abilities.r.push("".to_string());
+                                    },
+                                    "R" => {
+                                        abilities.q.push("".to_string());
+                                        abilities.w.push("".to_string());
+                                        abilities.e.push("".to_string());
+                                        abilities.r.push(y.as_str().unwrap().to_string())
+                                    },
+                                    _ => break
+                                }
+                            } else {
+                                break
+                            }
+                        }
+                        Ok(abilities)
+                    },
+                    Err(err) => Err(err),
+                }
+            },
+            Err(err) => Err(err),
+        }
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -716,4 +775,12 @@ pub struct ItemValues {
     description: String,
     local_image: String,
     url: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AbilitiesMap {
+    q: Vec<String>,
+    w: Vec<String>,
+    e: Vec<String>,
+    r: Vec<String>,
 }

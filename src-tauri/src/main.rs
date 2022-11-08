@@ -11,7 +11,8 @@ mod plugins;
 mod shared;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-fn main() {
+#[tokio::main]
+async fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             rune_names,

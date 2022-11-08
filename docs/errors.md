@@ -18,6 +18,7 @@ The follow is a table of errors, codes, and their meanings:
 | Ranking Body Error | 204 | UGG Ranking URL changed | 
 | Rate Error | 205 | The Corrosponding rate has no data |
 | Matches error | 206 | There are no matches for the selected combo | 
+| No Ability Order | 207 | Overview does not contain abilties for combo | 
 | LCU connect error | 401 | No client was found to connect to |
 | Cannot delete pages | 402 | No pages were able to be deleted |
 | Cannot create pages | 403 | Was not able to create page |

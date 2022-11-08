@@ -26,6 +26,9 @@ once_cell = { version = "1.15.0" }
 futures = { version = "0.3" }
 shaco = { git = "https://github.com/AlsoSylv/Shaco", branch = "test" }
 
+# [patch.crates-io]
+# ntapi = { git = "https://github.com/MSxDOS/ntapi" }
+
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL

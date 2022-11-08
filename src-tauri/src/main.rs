@@ -52,9 +52,11 @@ pub struct SecondaryTree {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Active {
     pub name: String,
     pub image: String,
+    pub local_image: String,
     pub active: bool,
     pub id: i64,
 }
@@ -81,6 +83,7 @@ async fn rune_names(
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
     url: String,
+    local_image: String,
     win_rate: String,
     pick_rate: String,
     ban_rate: String,
@@ -127,8 +130,10 @@ async fn champion_info(
                                     match version {
                                         Ok(version) => {
                                             let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{id}.png");
+                                            let local_image = format!("/{0}/{0}.png", id);
                                             Ok(ChampionInfo {
                                                 url,
+                                                local_image,
                                                 win_rate,
                                                 pick_rate,
                                                 ban_rate,

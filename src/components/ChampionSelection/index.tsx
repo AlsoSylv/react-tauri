@@ -44,7 +44,18 @@ function ChampionOptions() {
         renderInput={(params) => <TextField {...params} label="Select a champion" />}
         renderOption={(props, option) => (
           <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-            <img loading="lazy" width="20" src={option.url} srcSet={`${option.url} 2x`} alt="" />
+            <img
+              loading="lazy"
+              width="20"
+              src={`../champions${option.localImage}`}
+              srcSet={`../champions${option.localImage} 2x`}
+              alt={option.label}
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null;
+                currentTarget.src = option.url;
+                currentTarget.srcset = `${option.url} 2x`;
+              }}
+            />
             {option.label}
           </Box>
         )}

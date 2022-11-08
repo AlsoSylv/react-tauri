@@ -12,13 +12,14 @@ function ChampionInformationDisplay() {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [championInfo, setChampionInfo] = useState<CompleteChampionInfo | null>(null);
-  // const [url, setUrl] = useState<string>(`../champions${championInfo?.localImage}`);
+  const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const handleGetChampionInformation = async () => {
       setError('');
       setChampionInfo(null);
       setLoading(true);
+      setUrl(null);
 
       const stateValidation = validateState(state);
 
@@ -34,6 +35,7 @@ function ChampionInformationDisplay() {
       if (championInfoResponse.completedSuccessfully) {
         const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;
         setChampionInfo(restChampionInfo);
+        setUrl(`../champions${championInfoResponse?.localImage}asd`);
       } else {
         setError(championInfoResponse.message);
       }
@@ -57,7 +59,11 @@ function ChampionInformationDisplay() {
               <>
                 <Grid container sx={{ display: 'flex' }}>
                   <Grid xs={1}>
-                    <Avatar src={`../champions${championInfo?.localImage}`} alt={state.champion} />
+                    <Avatar
+                      src={url || ''}
+                      alt={state.champion}
+                      imgProps={{ onError: () => setUrl(championInfo?.url || '') }}
+                    />
                   </Grid>
                   <Grid xs={3}>
                     <Typography variant="body1" alignSelf="center">

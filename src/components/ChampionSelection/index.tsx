@@ -49,7 +49,7 @@ function ChampionOptions() {
               width="20"
               src={`../champions${option.localImage}`}
               srcSet={`../champions${option.localImage} 2x`}
-              alt=""
+              alt={option.label}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null;
                 currentTarget.src = option.url;

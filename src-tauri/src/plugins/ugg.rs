@@ -139,6 +139,8 @@ async fn default_role(name: String) -> Result<String, i64> {
 // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
 // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
 // Further investigation is needed into finding out which champs this is offered for automatically
+// UPDATE: This has been investigated, and would actually just require key checking, as all champs seem to 
+// Have one, this may already be possible to support
 #[cached(result = true, size = 1)]
 async fn overview_json(name: String) -> Result<String, i64> {
     let stats_version = "1.5";

@@ -20,7 +20,7 @@ pub async fn data_dragon_version() -> Result<String, i64> {
     }
 }
 
-#[cached]
+#[cached(result = true)]
 pub async fn runes_json() -> Result<Runes, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
@@ -68,7 +68,7 @@ pub struct Rune {
     pub long_desc: Option<String>,
 }
 
-#[cached]
+#[cached(result = true)]
 pub async fn champion_json() -> Result<ChampJson, i64> {
     let data_dragon_version = data_dragon_version().await;
     match data_dragon_version {
@@ -201,4 +201,42 @@ pub async fn item_json() -> Result<Value, i64> {
         Err(err) => Err(err)
         
     }
+}
+
+pub async fn champ_full(name: String) -> Result<ChampionFull, i64> {
+    let data_dragon_version = data_dragon_version().await;
+    match data_dragon_version {
+        Ok(version) => {
+            let url = format!("http://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/champion/{name}.json");
+            let request = reqwest::get(url).await;
+            match request {
+                Ok(response) => {
+                    let champ_full: Result<ChampionFull, reqwest::Error> = response.json().await;
+                    match champ_full {
+                        Ok(champ_full) => Ok(champ_full),
+                        Err(_) => panic!()
+                    }
+                },
+                Err(err) => {
+                    if err.is_body() {
+                        Err(104)
+                    } else {
+                        Err(103)
+                    }
+                }
+            }
+        },
+        Err(err) => Err(err)
+    }
+    // http://ddragon.leagueoflegends.com/cdn/12.21.1/data/en_US/champion/Aatrox.json
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampionFull {
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub format: String,
+    pub version: String,
+    pub data: Value,
 }

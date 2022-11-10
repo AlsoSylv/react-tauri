@@ -705,42 +705,102 @@ impl Data {
             self.rank.clone(), 
             self.region.clone()
         );
-        let fut_champ_json = data_dragon::champion_json();
-        let (abilities, champ_json) = futures::join!(fut_abilities, fut_champ_json);
+        let fut_version = data_dragon::data_dragon_version();
+        let fut_champ_json = data_dragon::champ_full(self.name.clone());
+        let (abilities, champ_json, version) = futures::join!(fut_abilities, fut_champ_json, fut_version);
+        let Ok(version) = version else {
+            return Err(104);
+        };
         match abilities {
             Ok(json) => {
                 let Some(abilities_order) = json[DATA["abilities"]][2].as_array() else {
                     return Err(207)
                 };
-                let mut abilities = AbilitiesMap { q: Vec::new(), w: Vec::new(), e: Vec::new(), r: Vec::new() };
                 match champ_json {
                     Ok(json) => {
+                        let champ_json = json.data[&self.name].clone();
+
+                        let possible_passive = &champ_json["passive"]["image"]["full"];
+
+                        let spells = &champ_json["spells"];
+
+                        let Some(passive) = possible_passive.as_str() else {
+                            return Err(104);
+                        };
+                        
+                        let Some(q_image) = spells[0]["image"]["full"].as_str() else {
+                            return Err(104);
+                        };
+
+                        let Some(w_image) = spells[1]["image"]["full"].as_str() else {
+                            return Err(104);
+                        };
+
+                        let Some(e_image) = spells[2]["image"]["full"].as_str() else {
+                            return Err(104);
+                        };
+
+                        let Some(r_image) = spells[3]["image"]["full"].as_str() else {
+                            return Err(104);
+                        };
+
+                        let mut abilities = AbilitiesMap { 
+                            passive: Passive { 
+                                image: passive.to_string(), 
+                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/passive/{passive}") 
+                            },
+
+                            q: AbilitiesValue { 
+                                image: q_image.to_string(), 
+                                order: Vec::new(), 
+                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{q_image}") 
+                            },
+
+                            w: AbilitiesValue { 
+                                image: w_image.to_string(), 
+                                order: Vec::new(),
+                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{w_image}") 
+                            },
+
+                            e: AbilitiesValue { 
+                                image: e_image.to_string(), 
+                                order: Vec::new(), 
+                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{e_image}") 
+                            },
+
+                            r: AbilitiesValue { 
+                                image: r_image.to_string(), 
+                                order: Vec::new(), 
+                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{r_image}") 
+                            }, 
+                        };
+
                         for y in abilities_order {
                             if y.is_string() {
                                 match y.as_str().unwrap() {
                                     "Q" => {
-                                        abilities.q.push(y.as_str().unwrap().to_string());
-                                        abilities.w.push("".to_string());
-                                        abilities.e.push("".to_string());
-                                        abilities.r.push("".to_string());
+                                        abilities.q.order.push(y.as_str().unwrap().to_string());
+                                        abilities.w.order.push("".to_string());
+                                        abilities.e.order.push("".to_string());
+                                        abilities.r.order.push("".to_string());
                                     },
                                     "W" => {
-                                        abilities.q.push("".to_string());
-                                        abilities.w.push(y.as_str().unwrap().to_string());
-                                        abilities.e.push("".to_string());
-                                        abilities.r.push("".to_string());
+                                        abilities.q.order.push("".to_string());
+                                        abilities.w.order.push(y.as_str().unwrap().to_string());
+                                        abilities.e.order.push("".to_string());
+                                        abilities.r.order.push("".to_string());
                                     },
                                     "E" => {
-                                        abilities.q.push("".to_string());
-                                        abilities.w.push("".to_string());
-                                        abilities.e.push(y.as_str().unwrap().to_string());
-                                        abilities.r.push("".to_string());
+                                        abilities.q.order.push("".to_string());
+                                        abilities.w.order.push("".to_string());
+                                        abilities.e.order.push(y.as_str().unwrap().to_string());
+                                        abilities.r.order.push("".to_string());
                                     },
                                     "R" => {
-                                        abilities.q.push("".to_string());
-                                        abilities.w.push("".to_string());
-                                        abilities.e.push("".to_string());
-                                        abilities.r.push(y.as_str().unwrap().to_string())
+                                        abilities.q.order.push("".to_string());
+                                        abilities.w.order.push("".to_string());
+                                        abilities.e.order.push("".to_string());
+                                        abilities.r.order.push(y.as_str().unwrap().to_string())
                                     },
                                     _ => break
                                 }
@@ -779,8 +839,22 @@ pub struct ItemValues {
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesMap {
-    q: Vec<String>,
-    w: Vec<String>,
-    e: Vec<String>,
-    r: Vec<String>,
+    passive: Passive,
+    q: AbilitiesValue,
+    w: AbilitiesValue,
+    e: AbilitiesValue,
+    r: AbilitiesValue,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AbilitiesValue {
+    image: String,
+    order: Vec<String>,
+    url: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Passive {
+    image: String,
+    url: String,
 }

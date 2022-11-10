@@ -4,7 +4,7 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap}, lcu::push_runes_to_client};
+use plugins::{ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap, AbilitiesMap}, lcu::push_runes_to_client};
 use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;
@@ -24,6 +24,7 @@ async fn main() {
             regions,
             items,
             push_runes,
+            abilities,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -258,6 +259,24 @@ async fn push_runes(
                 Err(err) => Err(err)
             }
         },
+        Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn abilities(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<AbilitiesMap, i64> {
+    let data = Data {
+        name: name.clone(), role: role.clone(), rank, region
+    };
+    let abilties = Data::abilities(&data).await;
+
+    match abilties {
+        Ok(abilities) => Ok(abilities),
         Err(err) => Err(err)
     }
 }

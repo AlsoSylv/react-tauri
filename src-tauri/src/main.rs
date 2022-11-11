@@ -4,7 +4,7 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{Shards, Data, TIERS, REGIONS, ROLES, ItemsMap}, lcu::push_runes_to_client};
+use plugins::{ugg::{Shards, Data, ItemsMap, constants::{TIERS, REGIONS, ROLES}}, lcu::push_runes_to_client};
 use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;

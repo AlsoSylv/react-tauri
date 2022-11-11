@@ -177,7 +177,7 @@ async fn ranking_json(name: String) -> Result<String, i64> {
 //For storing things in json, this does the same thing, and uses
 //The equivalent match function to change riot API names to U.GG numbers
 #[cached(size = 1, result=true)]
-async fn ranking(
+pub async fn ranking(
     name: String, 
     role: String, 
     ranks: String, 

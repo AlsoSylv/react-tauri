@@ -1,7 +1,5 @@
 use phf::{phf_map, phf_ordered_map};
 
-use super::structs::{Shard};
-
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
 pub static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
@@ -54,7 +52,7 @@ pub static DATA: phf::Map<&'static str, usize> = phf_map! {
     "shards" => 8,
 };
 
-static STATS: phf::Map<&'static str, usize> = phf_map! {
+pub static STATS: phf::Map<&'static str, usize> = phf_map! {
     "wins" => 0,
     "matches" => 1,
     "rank" => 2,

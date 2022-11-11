@@ -4,11 +4,19 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{Shards, Data, ItemsMap, AbilitiesMap, constants::{TIERS, REGIONS, ROLES}}, lcu::push_runes_to_client};
+use plugins::{ugg::{structs, constants}, lcu};
+
+use structs::{Shards, Data, ItemsMap, AbilitiesMap};
+use constants::{TIERS, REGIONS, ROLES};
+use frontend_types::ChampionInfo;
+
+use lcu::{push_runes_to_client};
 use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;
 mod shared;
+mod logic;
+pub mod frontend_types;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
@@ -28,6 +36,22 @@ async fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+async fn champion_info(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<ChampionInfo, i64> {
+
+    let info = logic::champion_info(name, role, rank, region).await;
+    
+    match info {
+        Ok(values) => Ok(values),
+        Err(err) => Err(err),
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -78,82 +102,6 @@ async fn rune_names(
     let rune_match = Data::rune_tuple(&data).await;
     match rune_match {
         Ok((rune_names, _, _)) => Ok(rune_names),
-        Err(err) => Err(err),
-    }
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChampionInfo {
-    url: String,
-    local_image: String,
-    win_rate: String,
-    pick_rate: String,
-    ban_rate: String,
-}
-
-#[tauri::command]
-async fn champion_info(
-    name: String,
-    role: String,
-    rank: String,
-    region: String,
-) -> Result<ChampionInfo, i64> {
-    let rates = Data {
-        name: name.clone(), role, rank, region
-    };
-    let fut_winrate = Data::winrate(&rates);
-    let fut_pickrate = Data::pick_rate(&rates);
-    let fut_banrate = Data::ban_rate(&rates);
-    let fut_champion_json = shared::data_dragon::champion_json();
-    let fut_version = shared::data_dragon::data_dragon_version();
-    let (
-        winrate,
-        pickrate,
-        banrate,
-        champion_json,
-        version
-    ) = futures::join!(
-        fut_winrate,
-        fut_pickrate,
-        fut_banrate,
-        fut_champion_json,
-        fut_version
-    );
-
-    match winrate {
-        Ok(win_rate) => {
-            match pickrate {
-                Ok(pick_rate) => {
-                    match banrate {
-                        Ok(ban_rate) => {
-                            match champion_json {
-                                Ok(json) => {
-                                    let id = &json.data.get(&name).unwrap().id;
-                                    match version {
-                                        Ok(version) => {
-                                            let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{id}.png");
-                                            let local_image = format!("/{0}/{0}.png", id);
-                                            Ok(ChampionInfo {
-                                                url,
-                                                local_image,
-                                                win_rate,
-                                                pick_rate,
-                                                ban_rate,
-                                            })
-                                        }
-                                        Err(err) => Err(err),
-                                    }
-                                }
-                                Err(err) => Err(err),
-                            }
-                        }
-                        Err(err) => Err(err),
-                    }
-                }
-                Err(err) => Err(err),
-            }
-        }
         Err(err) => Err(err),
     }
 }

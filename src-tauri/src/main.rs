@@ -4,14 +4,15 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{Shards, Data, ItemsMap, constants::{TIERS, REGIONS, ROLES}}, lcu::push_runes_to_client};
+use plugins::{ugg::{Shards, Data, ItemsMap, AbilitiesMap, constants::{TIERS, REGIONS, ROLES}}, lcu::push_runes_to_client};
 use shared::helpers::{ChampionNames, create_rune_page};
 
 mod plugins;
 mod shared;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-fn main() {
+#[tokio::main]
+async fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             rune_names,
@@ -23,6 +24,7 @@ fn main() {
             regions,
             items,
             push_runes,
+            abilities,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -257,6 +259,24 @@ async fn push_runes(
                 Err(err) => Err(err)
             }
         },
+        Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn abilities(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<AbilitiesMap, i64> {
+    let data = Data {
+        name: name.clone(), role: role.clone(), rank, region
+    };
+    let abilties = Data::abilities(&data).await;
+
+    match abilties {
+        Ok(abilities) => Ok(abilities),
         Err(err) => Err(err)
     }
 }

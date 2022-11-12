@@ -6,12 +6,10 @@ pub async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-    let rates = Data {
-        name: name.clone(), role, rank, region
-    };
-    let fut_winrate = Data::winrate(&rates);
-    let fut_pickrate = Data::pick_rate(&rates);
-    let fut_banrate = Data::ban_rate(&rates);
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let fut_winrate = data.winrate();
+    let fut_pickrate = data.pick_rate();
+    let fut_banrate = data.ban_rate();
     let fut_champion_json = shared::data_dragon::champion_json();
     let fut_version = shared::data_dragon::data_dragon_version();
     let (

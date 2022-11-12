@@ -36,6 +36,12 @@ pub struct Data {
     pub region: String,
 }
 
+impl Data {
+    pub fn new(name: String, role: String, rank: String, region: String) -> Self {
+        return Data { name, role, rank, region }
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ItemsMap {
     pub start: Vec<ItemValues>,

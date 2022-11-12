@@ -96,10 +96,8 @@ async fn rune_names(
     rank: String,
     region: String,
 ) -> Result<RuneImages, i64> {
-    let data = Data {
-        name: name.clone(), role, rank, region
-    };
-    let rune_match = Data::rune_tuple(&data).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let rune_match = data.rune_tuple().await;
     match rune_match {
         Ok((rune_names, _, _)) => Ok(rune_names),
         Err(err) => Err(err),
@@ -122,11 +120,8 @@ async fn shard_names(
     rank: String,
     region: String,
 ) -> Result<Shards, i64> {
-    let data = Data {
-        name: name.clone(), role, rank, region
-    };
-
-    let shards = Data::shard_tuple(&data).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let shards = data.shard_tuple().await;
     match shards {
         Ok(shards) => Ok(shards),
         Err(err) => Err(err),
@@ -140,10 +135,8 @@ async fn items(
     rank: String,
     region: String,
 ) -> Result<ItemsMap, i64> {
-    let data = Data {
-        name: name.clone(), role, rank, region
-    };
-    let items = Data::items(&data).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let items = data.items().await;
     match items {
         Ok(items) => Ok(items),
         Err(err) => Err(err),
@@ -185,12 +178,9 @@ async fn push_runes(
     rank: String,
     region: String,
 ) -> Result<i64, i64> {
-    let data = Data {
-        name: name.clone(), role: role.clone(), rank, region
-    };
-
-    let winrate = Data::winrate(&data).await;
-    let rune_match = Data::rune_tuple(&data).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let winrate = data.winrate().await;
+    let rune_match = data.rune_tuple().await;
     // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
 
     match rune_match {
@@ -218,10 +208,8 @@ async fn abilities(
     rank: String,
     region: String,
 ) -> Result<AbilitiesMap, i64> {
-    let data = Data {
-        name: name.clone(), role: role.clone(), rank, region
-    };
-    let abilties = Data::abilities(&data).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let abilties = data.abilities().await;
 
     match abilties {
         Ok(abilities) => Ok(abilities),

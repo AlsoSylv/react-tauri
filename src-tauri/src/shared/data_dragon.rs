@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
-mod structs;
+pub mod structs;
 
 #[cached(result = true)]
 pub async fn data_dragon_version() -> Result<String, i64> {

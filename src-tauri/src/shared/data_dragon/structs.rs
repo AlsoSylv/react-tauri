@@ -1,22 +1,51 @@
+use tokio::sync::Mutex;
+use once_cell::sync::Lazy;
 use linked_hash_map::LinkedHashMap;
+use moka::sync::Cache;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-struct DataDragon {
-    version: String,
-    language: String,
+pub struct DataDragon {
+    pub version: String,
+    pub language: String,
     client: reqwest::Client,
 }
 
+static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
+    Mutex::new(Cache::new(1))
+});
+
 impl DataDragon {
-    pub async fn new(language: String) -> Result<Self, i64> {
+    pub async fn new(language: Option<String>) -> Result<Self, i64> {
+        let mut language = language;
+        if language == None {
+            language = Some("en_US".to_string());
+        }
         let client = reqwest::Client::new();
+        let cache = CACHED_VERSION.lock().await;
+        if cache.get("version") != None {
+            return Ok(
+                DataDragon { 
+                    version: cache.get("version").unwrap().clone(), 
+                    language: language.unwrap(), 
+                    client 
+                });
+        }
         let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
         match version {
             Ok(response) => {
                 let json: Result<Vec<String>, reqwest::Error> = response.json().await;
                 match json {
-                    Ok(json) => Ok(DataDragon { version: json[0].clone(), language, client }),
+                    Ok(json) => {
+                        let version = json[0].clone();
+                        cache.insert("version".to_string(), version.clone());
+                        Ok(
+                            DataDragon { 
+                                version, 
+                                language: language.unwrap(), 
+                                client
+                            })
+                    },
                     Err(_) => panic!(),
                 }
             },

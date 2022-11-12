@@ -25,7 +25,8 @@ impl Shard {
             name: name.to_string(), 
             id, 
             image: image.to_string(), 
-            active: false }
+            active: false 
+        }
     }
 }
 

@@ -8,7 +8,7 @@ use serde_json::Value;
 pub struct DataDragon {
     pub version: String,
     pub language: String,
-    client: reqwest::Client,
+    pub client: reqwest::Client,
 }
 
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
@@ -59,8 +59,6 @@ impl DataDragon {
         }
     }
 }
-
-type Runes = Vec<RuneTree>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RuneTree {

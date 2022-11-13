@@ -1,4 +1,4 @@
-use crate::shared::data_dragon::structs::DataDragon;
+use crate::core::data_dragon::structs::DataDragon;
 
 use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DATA};
 

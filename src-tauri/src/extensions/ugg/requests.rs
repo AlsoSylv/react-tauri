@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{shared::{data_dragon, helpers}, plugins::ugg::structs};
+use crate::{core::{data_dragon, helpers}, extensions::ugg::structs};
 use helpers::champs::champion_id;
 
 impl structs::UggRequest {

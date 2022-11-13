@@ -1,6 +1,6 @@
 use serde_json::{Value, json};
 
-use crate::{frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages}, shared::data_dragon::structs::DataDragon};
+use crate::{frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages}, core::data_dragon::structs::DataDragon};
 
 pub async fn create_rune_page(
     name: String,

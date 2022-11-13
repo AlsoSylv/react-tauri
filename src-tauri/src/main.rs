@@ -4,18 +4,18 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{structs, constants}};
+use extensions::{ugg::{structs, constants}};
 
 use structs::{Shards, Data, ItemsMap, AbilitiesMap};
 use constants::{TIERS, REGIONS, ROLES};
 use frontend_types::ChampionInfo;
 
-use shared::helpers::structs::ChampionNames;
+use crate::core::helpers::structs::ChampionNames;
 
 use crate::frontend_types::RuneImages;
 
-mod plugins;
-mod shared;
+mod extensions;
+mod core;
 mod logic;
 pub mod frontend_types;
 
@@ -71,7 +71,7 @@ async fn rune_names(
 
 #[tauri::command]
 async fn champion_names() -> Result<Vec<ChampionNames>, i64> {
-    let request = shared::helpers::champs::all_champion_names().await;
+    let request = core::helpers::champs::all_champion_names().await;
     match request {
         Ok(names) => Ok(names),
         Err(err) => Err(err),

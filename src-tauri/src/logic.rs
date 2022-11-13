@@ -1,9 +1,9 @@
-use crate::{frontend_types, plugins, shared};
-use plugins::{ugg, lcu};
+use crate::{frontend_types, extensions};
+use extensions::{ugg, lcu};
 
 use frontend_types::ChampionInfo;
-use shared::data_dragon::structs::DataDragon; 
-use shared::helpers::runes::create_rune_page;
+use crate::core::data_dragon::structs::DataDragon; 
+use crate::core::helpers::runes::create_rune_page;
 
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;

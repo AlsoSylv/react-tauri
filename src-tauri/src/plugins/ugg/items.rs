@@ -1,21 +1,11 @@
-use crate::shared::data_dragon;
+use crate::shared::data_dragon::structs::DataDragon;
 
 use super::{structs::{self, ItemsMap, ItemValues}, requests::overview, constants::DATA};
 
 impl structs::Data {
     
     pub async fn items(&self) -> Result<ItemsMap, i64> {
-        let fut_request = overview(
-            self.name.clone(), 
-            self.role.clone(), 
-            self.rank.clone(), 
-            self.region.clone()
-        );
-        let fut_items = data_dragon::item_json();
-        let fut_version = data_dragon::data_dragon_version();
-
-        let (request, items, version) = futures::join!(fut_request, fut_items, fut_version);
-
+        let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
         let mut items_map = 
         ItemsMap { 
             start: Vec::new(), 
@@ -24,8 +14,24 @@ impl structs::Data {
             fifth: Vec::new(), 
             sixth: Vec::new() 
         };
-        match version {
-            Ok(version) => {        
+        
+        match data_dragon {
+            Ok(data_dragon) => {
+                let fut_request = overview(
+                    self.name.clone(), 
+                    self.role.clone(), 
+                    self.rank.clone(), 
+                    self.region.clone()
+                );
+                let fut_items = data_dragon.item_json();
+        
+                let (
+                    request, 
+                    items
+                ) = futures::join!(
+                    fut_request, 
+                    fut_items
+                );
                 match request {
                     Ok(json) => {
                         match items {
@@ -47,7 +53,11 @@ impl structs::Data {
                                                             cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
                                                             description: item_data["description"].as_str().unwrap().to_string(), 
                                                             local_image: image.clone(), 
-                                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/item/{image}"),
+                                                            url: format!(
+                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                                                &data_dragon.version,
+                                                                &image
+                                                            ),
                                                         })
                                                     }
                                                 }
@@ -65,7 +75,12 @@ impl structs::Data {
                                                             cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
                                                             description: item_data["description"].as_str().unwrap().to_string(), 
                                                             local_image: image.clone(), 
-                                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/item/{image}"),                                                        })
+                                                            url: format!(
+                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                                                &data_dragon.version,
+                                                                &image
+                                                            ),
+                                                        })
                                                     }
                                                 }
                                             },
@@ -83,7 +98,12 @@ impl structs::Data {
                                                                 cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
                                                                 description: item_data["description"].as_str().unwrap().to_string(), 
                                                                 local_image: image.clone(), 
-                                                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/item/{image}"),                                                            })
+                                                                url: format!(
+                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                                                    &data_dragon.version,
+                                                                    &image
+                                                                ),
+                                                            })
                                                         }
                                                     } else {
                                                         break;
@@ -104,7 +124,12 @@ impl structs::Data {
                                                                 cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
                                                                 description: item_data["description"].as_str().unwrap().to_string(), 
                                                                 local_image: image.clone(), 
-                                                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/item/{image}"),                                                            })
+                                                                url: format!(
+                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                                                    &data_dragon.version,
+                                                                    &image
+                                                                ),
+                                                            })
                                                         }
                                                     } else {
                                                         break;
@@ -125,7 +150,12 @@ impl structs::Data {
                                                                 cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
                                                                 description: item_data["description"].as_str().unwrap().to_string(), 
                                                                 local_image: image.clone(), 
-                                                                url: format!("http://ddragon.leagueoflegends.com/cdn/{version}/img/item/{image}"),                                                            })
+                                                                url: format!(
+                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                                                    &data_dragon.version,
+                                                                    &image
+                                                                ),
+                                                            })
                                                         }
                                                     } else {
                                                         break;

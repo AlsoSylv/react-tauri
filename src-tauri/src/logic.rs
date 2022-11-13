@@ -1,4 +1,4 @@
-use crate::{frontend_types::ChampionInfo, plugins::ugg::structs::Data, shared::{self, data_dragon::structs::DataDragon}};
+use crate::{frontend_types::ChampionInfo, plugins::ugg::structs::Data, shared::data_dragon::structs::DataDragon};
 
 pub async fn champion_info(
     name: String,
@@ -14,19 +14,16 @@ pub async fn champion_info(
             let fut_pickrate = data.pick_rate();
             let fut_banrate = data.ban_rate();
             let fut_champion_json = data_dragon.champion_json();
-            let fut_version = shared::data_dragon::data_dragon_version();
             let (
                 winrate,
                 pickrate,
                 banrate,
                 champion_json,
-                version
             ) = futures::join!(
                 fut_winrate,
                 fut_pickrate,
                 fut_banrate,
                 fut_champion_json,
-                fut_version
             );
         
             match winrate {
@@ -38,20 +35,19 @@ pub async fn champion_info(
                                     match champion_json {
                                         Ok(json) => {
                                             let id = &json.data.get(&name).unwrap().id;
-                                            match version {
-                                                Ok(version) => {
-                                                    let url = format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{id}.png");
-                                                    let local_image = format!("/{0}/{0}.png", id);
-                                                    Ok(ChampionInfo {
-                                                        url,
-                                                        local_image,
-                                                        win_rate,
-                                                        pick_rate,
-                                                        ban_rate,
-                                                    })
-                                                }
-                                                Err(err) => Err(err),
-                                            }
+                                            let url = format!(
+                                                "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                                                &data_dragon.version,
+                                                &id
+                                            );
+                                            let local_image = format!("/{0}/{0}.png", id);
+                                            Ok(ChampionInfo {
+                                                url,
+                                                local_image,
+                                                win_rate,
+                                                pick_rate,
+                                                ban_rate,
+                                            })
                                         }
                                         Err(err) => Err(err),
                                     }

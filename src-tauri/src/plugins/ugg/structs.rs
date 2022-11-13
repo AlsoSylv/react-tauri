@@ -39,7 +39,12 @@ pub struct Data {
 
 impl Data {
     pub fn new(name: String, role: String, rank: String, region: String) -> Self {
-        return Data { name, role, rank, region }
+        return Data { 
+            name, 
+            role, 
+            rank, 
+            region 
+        }
     }
 }
 

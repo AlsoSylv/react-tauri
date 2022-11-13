@@ -11,7 +11,7 @@ async fn default_role(name: String) -> Result<String, i64> {
     let base_role_url = "https://stats2.u.gg/lol";
     let role_version = "1.5.0";
 
-    let future_data_dragon_version = data_dragon::data_dragon_version();
+    let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
     let future_champion_id = helpers::champion_id(name);
     let (
         data_dragon_version, 
@@ -22,8 +22,8 @@ async fn default_role(name: String) -> Result<String, i64> {
     );
 
     match data_dragon_version {
-        Ok(version) => {
-            let lol_version: Vec<&str> = version.split(".").collect();
+        Ok(data_dragon) => {
+            let lol_version: Vec<&str> = data_dragon.version.split(".").collect();
             match champion_id {
                 Ok(id) => {
                     let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
@@ -80,7 +80,7 @@ async fn overview_json(name: String) -> Result<String, i64> {
     let base_overview_url = "https://stats2.u.gg/lol";
     let game_mode = "ranked_solo_5x5";
 
-    let future_data_dragon_version = data_dragon::data_dragon_version();
+    let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
     let future_champion_id = helpers::champion_id(name);
     let (
         data_dragon_version, 
@@ -91,8 +91,8 @@ async fn overview_json(name: String) -> Result<String, i64> {
     );
 
     match data_dragon_version {
-        Ok(version) => {
-            let lol_version: Vec<&str> = version.split(".").collect();
+        Ok(data_dragon) => {
+            let lol_version: Vec<&str> = data_dragon.version.split(".").collect();
             match champion_id {
                 Ok(id) => {
                     let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);

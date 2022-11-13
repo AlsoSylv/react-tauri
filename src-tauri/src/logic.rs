@@ -1,4 +1,12 @@
-use crate::{frontend_types::ChampionInfo, plugins::{ugg::structs::Data, lcu::push_runes_to_client}, shared::{data_dragon::structs::DataDragon, helpers::create_rune_page}};
+use crate::{frontend_types, plugins, shared};
+use plugins::{ugg, lcu};
+
+use frontend_types::ChampionInfo;
+use shared::data_dragon::structs::DataDragon; 
+use shared::helpers::runes::create_rune_page;
+
+use ugg::structs::Data;
+use lcu::runes::push_runes_to_client;
 
 pub async fn champion_info(
     name: String,

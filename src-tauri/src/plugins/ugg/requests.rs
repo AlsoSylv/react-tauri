@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{shared::{data_dragon, helpers}, plugins::ugg::structs};
+use helpers::champs::champion_id;
 
 impl structs::UggRequest {
     pub async fn default_role(&self) -> Result<String, i64> {
@@ -8,7 +9,7 @@ impl structs::UggRequest {
         let base_role_url = "https://stats2.u.gg/lol";
         let role_version = "1.5.0";
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = helpers::champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name);
         let client = &self.client;
         let (
             data_dragon_version, 
@@ -63,7 +64,7 @@ impl structs::UggRequest {
         let game_mode = "ranked_solo_5x5";
     
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = helpers::champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name);
         let client = &self.client;
         let (
             data_dragon_version, 
@@ -114,7 +115,7 @@ impl structs::UggRequest {
         let game_mode = "ranked_solo_5x5";
     
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = helpers::champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name);
         let client = &self.client;
         let (
             data_dragon_version, 

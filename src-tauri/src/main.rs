@@ -34,6 +34,7 @@ async fn main() {
             items,
             push_runes,
             abilities,
+            get_languages,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -161,6 +162,15 @@ async fn abilities(
     let abilties = data.abilities().await;
     match abilties {
         Ok(abilities) => Ok(abilities),
+        Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn get_languages() -> Result<Vec<String>, i64> {
+    let langs = logic::languages().await;
+    match langs {
+        Ok(langs) => Ok(langs),
         Err(err) => Err(err)
     }
 }

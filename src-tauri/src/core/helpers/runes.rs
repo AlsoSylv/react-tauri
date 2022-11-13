@@ -18,7 +18,7 @@ pub async fn create_rune_page(
 }
 
 
-pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: String) -> Result<RuneImages, i64> {
+pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str) -> Result<RuneImages, i64> {
     let data_dragon = DataDragon::new(Some(language)).await;
     match data_dragon {
         Ok(data_dragon) => {

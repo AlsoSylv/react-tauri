@@ -5,7 +5,7 @@ use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DA
 impl structs::Data {
     
     pub async fn items(&self) -> Result<ItemsMap, i64> {
-        let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
+        let data_dragon = DataDragon::new(Some("en_US")).await;
         let mut items_map = 
         ItemsMap { 
             start: Vec::new(), 

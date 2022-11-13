@@ -4,7 +4,7 @@ use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overvi
 
 impl structs::Data {
     pub async fn abilities(&self) -> Result<AbilitiesMap, i64> {
-        let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
+        let data_dragon = DataDragon::new(Some("en_US")).await;
         match data_dragon {
             Ok(data_dragon) => {
                 let fut_abilities = overview(

@@ -4,7 +4,7 @@ use super::structs::ChampionNames;
 
 pub async fn champion_id(name: &str) -> Result<i64, i64> {
     let champion_name = format!("{}", name.clone());
-    let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
+    let data_dragon = DataDragon::new(Some("en_US")).await;
     match data_dragon {
         Ok(data_dragon) => {
             let request = data_dragon.champion_json().await;
@@ -19,7 +19,7 @@ pub async fn champion_id(name: &str) -> Result<i64, i64> {
 
 pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
-    let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
+    let data_dragon = DataDragon::new(Some("en_US")).await;
     match data_dragon {
         Ok(data_dragon) => {
             let champ_json = data_dragon.champion_json().await;

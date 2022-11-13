@@ -15,7 +15,7 @@ pub async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-    let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
+    let data_dragon = DataDragon::new(Some("en_US")).await;
     match data_dragon {
         Ok(data_dragon) => {
             let data = Data::new(name.clone(), role.clone(), rank, region);
@@ -100,5 +100,19 @@ pub async fn push_runes(
             }
         },
         Err(err) => Err(err)
+    }
+}
+
+pub async fn languages() -> Result<Vec<String>, i64> {
+    let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
+    match request {
+        Ok(response) => {
+            let langs: Result<Vec<String>, reqwest::Error> = response.json().await;
+            match langs {
+                Ok(langs) => Ok(langs),
+                Err(_) => Err(104),
+            }
+        },
+        Err(_) => Err(104),
     }
 }

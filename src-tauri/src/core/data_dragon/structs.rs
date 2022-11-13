@@ -16,10 +16,10 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
 });
 
 impl DataDragon {
-    pub async fn new(language: Option<String>) -> Result<Self, i64> {
+    pub async fn new(language: Option<&str>) -> Result<Self, i64> {
         let mut language = language;
         if language == None {
-            language = Some("en_US".to_string());
+            language = Some("en_US");
         }
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
@@ -27,7 +27,7 @@ impl DataDragon {
             return Ok(
                 DataDragon { 
                     version: cache.get("version").unwrap().clone(), 
-                    language: language.unwrap(), 
+                    language: language.unwrap().to_string(), 
                     client 
                 });
         }
@@ -42,7 +42,7 @@ impl DataDragon {
                         Ok(
                             DataDragon { 
                                 version, 
-                                language: language.unwrap(), 
+                                language: language.unwrap().to_string(), 
                                 client
                             })
                     },

@@ -3,15 +3,18 @@ pub struct Data {
     pub role: String,
     pub rank: String,
     pub region: String,
+    pub lang: String,
 }
 
 impl Data {
     pub fn new(name: String, role: String, rank: String, region: String) -> Self {
+        let lang = "en_US".to_string();
         return Data { 
             name, 
             role, 
             rank, 
-            region 
+            region,
+            lang,
         }
     }
 }

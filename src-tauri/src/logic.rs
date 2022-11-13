@@ -1,5 +1,6 @@
+use crate::core::lcu;
 use crate::{frontend_types, extensions};
-use extensions::{ugg, lcu};
+use extensions::ugg;
 
 use frontend_types::ChampionInfo;
 use crate::core::data_dragon::structs::DataDragon; 

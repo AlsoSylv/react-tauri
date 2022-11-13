@@ -1,4 +1,4 @@
-use super::{structs::{self, Shard, Shards}, requests::overview, constants::DATA};
+use super::{structs::{self, Shard, Shards}, json::overview, constants::DATA};
 
 impl structs::Data {
     pub async fn shard_tuple(&self) -> Result<Shards, i64> {

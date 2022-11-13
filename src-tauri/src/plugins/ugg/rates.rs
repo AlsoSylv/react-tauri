@@ -1,4 +1,4 @@
-use super::{structs, requests::ranking, constants::STATS};
+use super::{structs, json::ranking, constants::STATS};
 
 impl structs::Data {
         //The format is used here to get an exact result from the floating point math

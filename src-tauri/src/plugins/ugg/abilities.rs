@@ -1,6 +1,6 @@
 use crate::shared::data_dragon::structs::DataDragon;
 
-use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, requests::overview, constants::DATA};
+use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overview, constants::DATA};
 
 impl structs::Data {
     pub async fn abilities(&self) -> Result<AbilitiesMap, i64> {

@@ -5,8 +5,8 @@ use crate::{Active, PrimaryTree, RuneImages, SecondaryTree};
 
 use super::data_dragon::structs::DataDragon;
 
-#[cached(size = 25, result = true)]
-pub async fn champion_id(name: String) -> Result<i64, i64> {
+//#[cached(size = 25, result = true)]
+pub async fn champion_id(name: &str) -> Result<i64, i64> {
     let champion_name = format!("{}", name.clone());
     let data_dragon = DataDragon::new(Some("en_US".to_string())).await;
     match data_dragon {

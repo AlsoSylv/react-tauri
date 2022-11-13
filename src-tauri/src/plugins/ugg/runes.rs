@@ -1,10 +1,10 @@
 use crate::{Active, RuneImages, shared::helpers};
 
-use super::{structs, constants, requests};
+use super::{structs, constants, json};
 
 impl structs::Data {
     pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), i64>{
-        let request = requests::overview(
+        let request = json::overview(
             self.name.clone(), 
             self.role.clone(), 
             self.rank.clone(), 

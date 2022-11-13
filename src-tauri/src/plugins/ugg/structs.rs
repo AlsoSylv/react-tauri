@@ -1,35 +1,3 @@
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Shards {
-    pub row_one: [Shard; 3],
-    pub row_two: [Shard; 3],
-    pub row_three: [Shard; 3],
-}
-
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Shard {
-    pub name: String,
-    pub id: i64,
-    pub image: String,
-    pub active: bool,
-}
-
-impl Shard {
-    pub fn create(
-        name: &str,
-        id: i64,
-        image: &str,
-    ) -> Shard {
-        return Shard { 
-            name: name.to_string(), 
-            id, 
-            image: image.to_string(), 
-            active: false 
-        }
-    }
-}
-
 pub struct Data {
     pub name: String,
     pub role: String,
@@ -45,6 +13,18 @@ impl Data {
             rank, 
             region 
         }
+    }
+}
+
+pub struct UggRequest {
+    pub name: String,
+    pub client: reqwest::Client,
+}
+
+impl UggRequest {
+    pub fn new(name: String) -> Self {
+        let client = reqwest::Client::new();
+        return UggRequest { name, client }
     }
 }
 
@@ -87,4 +67,36 @@ pub struct AbilitiesValue {
 pub struct Passive {
     pub image: String,
     pub url: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Shards {
+    pub row_one: [Shard; 3],
+    pub row_two: [Shard; 3],
+    pub row_three: [Shard; 3],
+}
+
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Shard {
+    pub name: String,
+    pub id: i64,
+    pub image: String,
+    pub active: bool,
+}
+
+impl Shard {
+    pub fn create(
+        name: &str,
+        id: i64,
+        image: &str,
+    ) -> Shard {
+        return Shard { 
+            name: name.to_string(), 
+            id, 
+            image: image.to_string(), 
+            active: false 
+        }
+    }
 }

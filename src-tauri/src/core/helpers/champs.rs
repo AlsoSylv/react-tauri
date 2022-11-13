@@ -2,9 +2,9 @@ use crate::core::data_dragon::structs::DataDragon;
 
 use super::structs::ChampionNames;
 
-pub async fn champion_id(name: &str) -> Result<i64, i64> {
+pub async fn champion_id(name: &str, lang: &str) -> Result<i64, i64> {
     let champion_name = format!("{}", name.clone());
-    let data_dragon = DataDragon::new(Some("en_US")).await;
+    let data_dragon = DataDragon::new(Some(lang)).await;
     match data_dragon {
         Ok(data_dragon) => {
             let request = data_dragon.champion_json().await;

@@ -22,12 +22,13 @@ impl Data {
 pub struct UggRequest {
     pub name: String,
     pub client: reqwest::Client,
+    pub lang: String,
 }
 
 impl UggRequest {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, lang: &str) -> Self {
         let client = reqwest::Client::new();
-        return UggRequest { name, client }
+        return UggRequest { name, client, lang: lang.to_string() }
     }
 }
 

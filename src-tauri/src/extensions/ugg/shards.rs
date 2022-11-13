@@ -48,7 +48,13 @@ impl structs::Data {
     
         let mut mutable_shards = shards.clone();
     
-        let request = overview(self.name.clone(), self.role.clone(), self.rank.clone(), self.region.clone()).await;
+        let request = overview(
+            self.name.clone(), 
+            self.role.clone(), 
+            self.rank.clone(), 
+            self.region.clone(),
+            self.lang.clone(),
+        ).await;
         match request {
             Ok(json) => {
                 let active_shards = json[DATA["shards"]][2].as_array();

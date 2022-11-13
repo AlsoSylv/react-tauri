@@ -6,11 +6,12 @@ pub async fn ranking(
     name: String, 
     role: String, 
     ranks: String, 
-    regions: String
+    regions: String,
+    lang: String,
 ) -> Result<Value, i64> {
-    let ugg = UggRequest::new(name.clone());
+    let ugg = UggRequest::new(name.clone(), &lang);
     let fut_request = ugg.ranking_json();
-    let fut_role = position(name, role);
+    let fut_role = position(name, role, lang);
     let (request, role) = futures::join!(fut_request, fut_role);
     match request {
         Ok(ranking) => {
@@ -39,10 +40,11 @@ pub async fn overview(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<Value, i64> {
-    let ugg = UggRequest::new(name.clone());
+    let ugg = UggRequest::new(name.clone(), &lang);
     let fut_request = ugg.overview_json();
-    let fut_role = position(name, role);
+    let fut_role = position(name, role, lang);
     let (
         request, 
         role
@@ -72,8 +74,12 @@ pub async fn overview(
     }
 }
 
-async fn position(name: String, role: String) -> Result<String, i64> {
-    let ugg = UggRequest::new(name);
+async fn position(
+    name: String, 
+    role: String,
+    lang: String,
+) -> Result<String, i64> {
+    let ugg = UggRequest::new(name.clone(), &lang);
     if role == "Default" {
         let role = ugg.default_role().await;
         match role {

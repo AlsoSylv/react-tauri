@@ -7,7 +7,9 @@ impl structs::Data {
                 self.name.clone(),
                 self.role.clone(),
                 self.rank.clone(),
-                self.region.clone()).await;
+                self.region.clone(),
+                self.lang.clone(),
+            ).await;
             match request {
                 Ok(json) => {
                     let Some(matches) = json[STATS["matches"]].as_f64() else {
@@ -30,7 +32,9 @@ impl structs::Data {
                 self.name.clone(),
                 self.role.clone(),
                 self.rank.clone(),
-                self.region.clone()).await;
+                self.region.clone(),
+                self.lang.clone(),
+            ).await;
             match request {
                 Ok(json) => {
                     let Some(matches) = json[STATS["total_matches"]].as_f64() else {
@@ -48,11 +52,13 @@ impl structs::Data {
         }
     
         pub async fn pick_rate(&self) -> Result<String, i64> {
-            let request = ranking (
+            let request = ranking(
                 self.name.clone(),
                 self.role.clone(),
                 self.rank.clone(),
-                self.region.clone()).await;    
+                self.region.clone(),
+                self.lang.clone(),
+            ).await; 
             match request {
                 Ok(json) => {
                     let Some(matches) = json[STATS["total_matches"]].as_f64() else {

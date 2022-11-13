@@ -9,7 +9,7 @@ impl structs::UggRequest {
         let base_role_url = "https://stats2.u.gg/lol";
         let role_version = "1.5.0";
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name, &self.lang);
         let client = &self.client;
         let (
             data_dragon_version, 
@@ -64,7 +64,7 @@ impl structs::UggRequest {
         let game_mode = "ranked_solo_5x5";
     
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name, &self.lang);
         let client = &self.client;
         let (
             data_dragon_version, 
@@ -115,7 +115,7 @@ impl structs::UggRequest {
         let game_mode = "ranked_solo_5x5";
     
         let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
-        let future_champion_id = champion_id(&self.name);
+        let future_champion_id = champion_id(&self.name, &self.lang);
         let client = &self.client;
         let (
             data_dragon_version, 

@@ -8,7 +8,8 @@ impl structs::Data {
             self.name.clone(), 
             self.role.clone(), 
             self.rank.clone(), 
-            self.region.clone()
+            self.region.clone(),
+            self.lang.clone(),
         ).await;
         match request {
             Ok(json) => {

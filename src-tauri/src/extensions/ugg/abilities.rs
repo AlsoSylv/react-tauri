@@ -4,14 +4,15 @@ use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overvi
 
 impl structs::Data {
     pub async fn abilities(&self) -> Result<AbilitiesMap, i64> {
-        let data_dragon = DataDragon::new(Some("en_US")).await;
+        let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match data_dragon {
             Ok(data_dragon) => {
                 let fut_abilities = overview(
                     self.name.clone(), 
                     self.role.clone(), 
                     self.rank.clone(), 
-                    self.region.clone()
+                    self.region.clone(),
+                    self.lang.clone(),
                 );
                 let fut_champ_json = data_dragon.champ_full(self.name.clone());
                 let (

@@ -5,7 +5,7 @@ use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DA
 impl structs::Data {
     
     pub async fn items(&self) -> Result<ItemsMap, i64> {
-        let data_dragon = DataDragon::new(Some("en_US")).await;
+        let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = 
         ItemsMap { 
             start: Vec::new(), 
@@ -21,7 +21,8 @@ impl structs::Data {
                     self.name.clone(), 
                     self.role.clone(), 
                     self.rank.clone(), 
-                    self.region.clone()
+                    self.region.clone(),
+                    self.lang.clone(),
                 );
                 let fut_items = data_dragon.item_json();
         

@@ -4,14 +4,15 @@
 )]
 
 use cached::proc_macro::cached;
-use plugins::{ugg::{structs, constants}, lcu};
+use plugins::{ugg::{structs, constants}};
 
 use structs::{Shards, Data, ItemsMap, AbilitiesMap};
 use constants::{TIERS, REGIONS, ROLES};
 use frontend_types::ChampionInfo;
 
-use lcu::{push_runes_to_client};
-use shared::helpers::{ChampionNames, create_rune_page};
+use shared::helpers::ChampionNames;
+
+use crate::frontend_types::RuneImages;
 
 mod plugins;
 mod shared;
@@ -45,47 +46,11 @@ async fn champion_info(
     rank: String,
     region: String,
 ) -> Result<ChampionInfo, i64> {
-
     let info = logic::champion_info(name, role, rank, region).await;
-    
     match info {
         Ok(values) => Ok(values),
         Err(err) => Err(err),
     }
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RuneImages {
-    pub primary_runes: PrimaryTree,
-    pub secondary_runes: SecondaryTree,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimaryTree {
-    pub slot_one: Vec<Active>,
-    pub slot_two: Vec<Active>,
-    pub slot_three: Vec<Active>,
-    pub slot_four: Vec<Active>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SecondaryTree {
-    pub slot_one: Vec<Active>,
-    pub slot_two: Vec<Active>,
-    pub slot_three: Vec<Active>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Active {
-    pub name: String,
-    pub image: String,
-    pub local_image: String,
-    pub active: bool,
-    pub id: i64,
 }
 
 #[tauri::command]
@@ -178,26 +143,10 @@ async fn push_runes(
     rank: String,
     region: String,
 ) -> Result<i64, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
-    let winrate = data.winrate().await;
-    let rune_match = data.rune_tuple().await;
-    // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
-
-    match rune_match {
-        Ok((_, tree_ids, rune_ids)) => {
-            match winrate {
-                Ok(win_rate) => {
-                    let page = create_rune_page(format!("{0} {1} {2}", name, role, win_rate), tree_ids[0], tree_ids[1], rune_ids).await;
-                    let result = push_runes_to_client(page).await;
-                    match result {
-                        Ok(ok) => Ok(ok),
-                        Err(err) => Err(err)
-                    }
-                }
-                Err(err) => Err(err)
-            }
-        },
-        Err(err) => Err(err)
+    let result = logic::push_runes(name, role, rank, region).await;
+    match result {
+        Ok(result) => Ok(result),
+        Err(err) => Err(err),
     }
 }
 
@@ -210,7 +159,6 @@ async fn abilities(
 ) -> Result<AbilitiesMap, i64> {
     let data = Data::new(name.clone(), role.clone(), rank, region);
     let abilties = data.abilities().await;
-
     match abilties {
         Ok(abilities) => Ok(abilities),
         Err(err) => Err(err)

@@ -1,7 +1,7 @@
 use cached::proc_macro::cached;
 use serde_json::{json, Value};
 
-use crate::{Active, PrimaryTree, RuneImages, SecondaryTree};
+use crate::frontend_types::{Active, PrimaryTree, RuneImages, SecondaryTree};
 
 use super::data_dragon::structs::DataDragon;
 

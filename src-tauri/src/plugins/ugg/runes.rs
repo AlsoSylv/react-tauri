@@ -1,4 +1,4 @@
-use crate::{Active, RuneImages, shared::helpers};
+use crate::{frontend_types::{Active, RuneImages}, shared::helpers};
 
 use super::{structs, constants, json};
 

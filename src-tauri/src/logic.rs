@@ -1,4 +1,4 @@
-use crate::{frontend_types::ChampionInfo, plugins::ugg::structs::Data, shared::data_dragon::structs::DataDragon};
+use crate::{frontend_types::ChampionInfo, plugins::{ugg::structs::Data, lcu::push_runes_to_client}, shared::{data_dragon::structs::DataDragon, helpers::create_rune_page}};
 
 pub async fn champion_info(
     name: String,
@@ -62,5 +62,34 @@ pub async fn champion_info(
             }
         },
         Err(err) => Err(err),
+    }
+}
+
+pub async fn push_runes(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+) -> Result<i64, i64> {
+    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let winrate = data.winrate().await;
+    let rune_match = data.rune_tuple().await;
+    // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
+
+    match rune_match {
+        Ok((_, tree_ids, rune_ids)) => {
+            match winrate {
+                Ok(win_rate) => {
+                    let page = create_rune_page(format!("{0} {1} {2}", name, role, win_rate), tree_ids[0], tree_ids[1], rune_ids).await;
+                    let result = push_runes_to_client(page).await;
+                    match result {
+                        Ok(ok) => Ok(ok),
+                        Err(err) => Err(err)
+                    }
+                }
+                Err(err) => Err(err)
+            }
+        },
+        Err(err) => Err(err)
     }
 }

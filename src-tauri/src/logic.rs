@@ -89,7 +89,12 @@ pub async fn push_runes(
         Ok((_, tree_ids, rune_ids)) => {
             match winrate {
                 Ok(win_rate) => {
-                    let page = create_rune_page(format!("{0} {1} {2}", name, role, win_rate), tree_ids[0], tree_ids[1], rune_ids).await;
+                    let page = create_rune_page(
+                        format!("{0} {1} {2}", name, role, win_rate), 
+                        tree_ids[0], 
+                        tree_ids[1], 
+                        rune_ids
+                    ).await;
                     let result = push_runes_to_client(page).await;
                     match result {
                         Ok(ok) => Ok(ok),

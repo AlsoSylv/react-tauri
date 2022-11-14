@@ -1,10 +1,22 @@
 use std::collections::HashMap;
+use moka::sync::{Cache, ConcurrentCacheExt};
+use tokio::sync::Mutex;
 
 use crate::{core::{data_dragon, helpers}, extensions::ugg::structs};
 use helpers::champs::champion_id;
+use once_cell::sync::Lazy;
 
+static CACHED_DEFAULT_ROLE: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
+    Mutex::new(Cache::new(10))
+});
+ 
 impl structs::UggRequest {
     pub async fn default_role(&self) -> Result<String, i64> {
+        let cache = CACHED_DEFAULT_ROLE.lock().await;
+        let role = cache.get(&self.name);
+        if role != None {
+            return Ok(role.unwrap())
+        }
         let stat_version = "1.5";
         let base_role_url = "https://stats2.u.gg/lol";
         let role_version = "1.5.0";
@@ -24,14 +36,18 @@ impl structs::UggRequest {
                 let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
                 let url = format!("{base_role_url}/{stat_version}/primary_roles/{ugg_lol_version}/{role_version}.json");
                 let request = client.get(url).send().await;
-    
                 match champion_id {
                     Ok(id) => {
                         match request {
                             Ok(json) => {
                                 let json: Result<HashMap<String, Vec<i64>>, reqwest::Error> = json.json().await;
                                 match json {
-                                    Ok(json) => Ok(json[&id.to_string()][0].to_string()),
+                                    Ok(json) => {
+                                        let role = &json[&id.to_string()][0].to_string();
+                                        cache.insert(self.name.clone(), role.to_string());
+                                        cache.sync();
+                                        Ok(role.to_string())
+                                    },
                                     Err(_) => Err(201),
                                 }
                             }

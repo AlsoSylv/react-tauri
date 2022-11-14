@@ -75,13 +75,14 @@ pub struct Slot {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Rune {
     pub id: i64,
     pub key: String,
     pub icon: String,
     pub name: String,
-    pub short_desc: Option<String>,
-    pub long_desc: Option<String>,
+    pub short_desc: String,
+    pub long_desc: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

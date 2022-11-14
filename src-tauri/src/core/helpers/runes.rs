@@ -48,7 +48,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         1 => tree_one_names.slot_two.push(Active {
                                             name: runes.name.clone(),
@@ -57,7 +58,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         2 => tree_one_names.slot_three.push(Active {
                                             name: runes.name.clone(),
@@ -66,7 +68,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         3 => tree_one_names.slot_four.push(Active {
                                             name: runes.name.clone(),
@@ -75,7 +78,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         _ => unreachable!(),
                                     }
@@ -93,7 +97,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         2 => tree_two_names.slot_two.push(Active {
                                             name: runes.name.clone(),
@@ -102,7 +107,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         3 => tree_two_names.slot_three.push(Active {
                                             name: runes.name.clone(),
@@ -111,7 +117,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                                 + &runes.icon.clone(),
                                             active: false,
                                             id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key)
+                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
+                                            description: runes.long_desc.clone(),
                                         }),
                                         _ => unreachable!(),
                                     }

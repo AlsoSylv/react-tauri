@@ -49,7 +49,8 @@ impl structs::Data {
                                             image: rune.image.clone(),
                                             active: true,
                                             id: rune.id,
-                                            local_image: rune.local_image.clone()
+                                            local_image: rune.local_image.clone(),
+                                            description: rune.description.clone(),
                                         };
                                         used_rune_ids.push(rune.id);
                                     }

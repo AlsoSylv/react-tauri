@@ -40,4 +40,5 @@ pub struct Active {
     pub local_image: String,
     pub active: bool,
     pub id: i64,
+    pub description: String,
 }

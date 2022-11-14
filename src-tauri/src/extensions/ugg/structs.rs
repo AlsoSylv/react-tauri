@@ -26,9 +26,9 @@ pub struct UggRequest {
 }
 
 impl UggRequest {
-    pub fn new(name: String, lang: &str) -> Self {
+    pub fn new(name: &str, lang: &str) -> Self {
         let client = reqwest::Client::new();
-        return UggRequest { name, client, lang: lang.to_string() }
+        return UggRequest { name: name.to_string(), client, lang: lang.to_string() }
     }
 }
 

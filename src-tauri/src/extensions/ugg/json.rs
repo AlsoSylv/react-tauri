@@ -3,13 +3,13 @@ use serde_json::Value;
 use super::{constants::{TIERS, REGIONS, ROLES}, structs::UggRequest};
 
 pub async fn ranking(
-    name: String, 
-    role: String, 
-    ranks: String, 
-    regions: String,
-    lang: String,
+    name: &str, 
+    role: &str, 
+    rank: &str, 
+    region: &str,
+    lang: &str,
 ) -> Result<Value, i64> {
-    let ugg = UggRequest::new(name.clone(), &lang);
+    let ugg = UggRequest::new(name, lang);
     let fut_request = ugg.ranking_json();
     let fut_role = position(name, role, lang);
     let (request, role) = futures::join!(fut_request, fut_role);
@@ -20,8 +20,8 @@ pub async fn ranking(
                 Ok(json) => {
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&regions]]
-                                [TIERS[&ranks]][&role];
+                            let json_read: &Value = &json[REGIONS[&region]]
+                                [TIERS[&rank]][&role];
 
                             Ok(json_read.to_owned())
                         }
@@ -36,13 +36,13 @@ pub async fn ranking(
 }
 
 pub async fn overview(
-    name: String,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
+    name: &str,
+    role: &str,
+    rank: &str,
+    region: &str,
+    lang: &str,
 ) -> Result<Value, i64> {
-    let ugg = UggRequest::new(name.clone(), &lang);
+    let ugg = UggRequest::new(name, lang);
     let fut_request = ugg.overview_json();
     let fut_role = position(name, role, lang);
     let (
@@ -75,11 +75,11 @@ pub async fn overview(
 }
 
 async fn position(
-    name: String, 
-    role: String,
-    lang: String,
+    name: &str, 
+    role: &str,
+    lang: &str,
 ) -> Result<String, i64> {
-    let ugg = UggRequest::new(name.clone(), &lang);
+    let ugg = UggRequest::new(name, lang);
     if role == "Default" {
         let role = ugg.default_role().await;
         match role {

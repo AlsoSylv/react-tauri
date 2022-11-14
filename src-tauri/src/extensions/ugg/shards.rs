@@ -49,11 +49,11 @@ impl structs::Data {
         let mut mutable_shards = shards.clone();
     
         let request = overview(
-            self.name.clone(), 
-            self.role.clone(), 
-            self.rank.clone(), 
-            self.region.clone(),
-            self.lang.clone(),
+            &self.name, 
+            &self.role, 
+            &self.rank, 
+            &self.region,
+            &self.lang,
         ).await;
         match request {
             Ok(json) => {

@@ -5,11 +5,11 @@ use super::{structs, constants, json};
 impl structs::Data {
     pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), i64>{
         let request = json::overview(
-            self.name.clone(), 
-            self.role.clone(), 
-            self.rank.clone(), 
-            self.region.clone(),
-            self.lang.clone(),
+            &self.name, 
+            &self.role, 
+            &self.rank, 
+            &self.region,
+            &self.lang,
         ).await;
         match request {
             Ok(json) => {

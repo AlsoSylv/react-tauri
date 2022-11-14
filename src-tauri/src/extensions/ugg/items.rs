@@ -18,11 +18,11 @@ impl structs::Data {
         match data_dragon {
             Ok(data_dragon) => {
                 let fut_request = overview(
-                    self.name.clone(), 
-                    self.role.clone(), 
-                    self.rank.clone(), 
-                    self.region.clone(),
-                    self.lang.clone(),
+                    &self.name, 
+                    &self.role, 
+                    &self.rank, 
+                    &self.region,
+                    &self.lang,
                 );
                 let fut_items = data_dragon.item_json();
         

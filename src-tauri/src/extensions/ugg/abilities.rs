@@ -1,3 +1,5 @@
+use serde_json::Value;
+
 use crate::core::data_dragon::structs::DataDragon;
 
 use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overview, constants::DATA};
@@ -106,40 +108,14 @@ impl structs::Data {
                                         ) 
                                     }, 
                                 };
-        
-                                for y in abilities_order {
-                                    if y.is_string() {
-                                        match y.as_str().unwrap() {
-                                            "Q" => {
-                                                abilities.q.order.push(y.as_str().unwrap().to_string());
-                                                abilities.w.order.push("".to_string());
-                                                abilities.e.order.push("".to_string());
-                                                abilities.r.order.push("".to_string());
-                                            },
-                                            "W" => {
-                                                abilities.q.order.push("".to_string());
-                                                abilities.w.order.push(y.as_str().unwrap().to_string());
-                                                abilities.e.order.push("".to_string());
-                                                abilities.r.order.push("".to_string());
-                                            },
-                                            "E" => {
-                                                abilities.q.order.push("".to_string());
-                                                abilities.w.order.push("".to_string());
-                                                abilities.e.order.push(y.as_str().unwrap().to_string());
-                                                abilities.r.order.push("".to_string());
-                                            },
-                                            "R" => {
-                                                abilities.q.order.push("".to_string());
-                                                abilities.w.order.push("".to_string());
-                                                abilities.e.order.push("".to_string());
-                                                abilities.r.order.push(y.as_str().unwrap().to_string())
-                                            },
-                                            _ => break
-                                        }
-                                    } else {
-                                        break
-                                    }
-                                }
+                                let maps: [&mut Vec<String>; 4] = [
+                                    &mut abilities.q.order,
+                                    &mut abilities.w.order,
+                                    &mut abilities.e.order,
+                                    &mut abilities.r.order
+                                    ];
+
+                                    match_abilities(maps, abilities_order).await;
                                 Ok(abilities)
                             },
                             Err(err) => Err(err),
@@ -149,6 +125,42 @@ impl structs::Data {
                 }
             },
             Err(err) => Err(err), 
+        }
+    }
+}
+
+async fn match_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
+    for y in abilities {
+        if y.is_string() {
+            match y.as_str().unwrap() {
+                "Q" => {
+                    maps[0].push(y.as_str().unwrap().to_string());
+                    maps[1].push("".to_string());
+                    maps[2].push("".to_string());
+                    maps[3].push("".to_string());
+                },
+                "W" => {
+                    maps[0].push("".to_string());
+                    maps[1].push(y.as_str().unwrap().to_string());
+                    maps[2].push("".to_string());
+                    maps[3].push("".to_string());
+                },
+                "E" => {
+                    maps[0].push("".to_string());
+                    maps[1].push("".to_string());
+                    maps[2].push(y.as_str().unwrap().to_string());
+                    maps[3].push("".to_string());
+                },
+                "R" => {
+                    maps[0].push("".to_string());
+                    maps[1].push("".to_string());
+                    maps[2].push("".to_string());
+                    maps[3].push(y.as_str().unwrap().to_string())
+                },
+                _ => break
+            }
+        } else {
+            break
         }
     }
 }

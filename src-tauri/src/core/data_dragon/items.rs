@@ -4,7 +4,7 @@ use super::structs;
 
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
-use moka::sync::{Cache, ConcurrentCacheExt};
+use moka::future::{Cache, ConcurrentCacheExt};
 
 static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> = Lazy::new(|| {
     Mutex::new(Cache::new(3))
@@ -30,7 +30,7 @@ impl structs::DataDragon {
                 let item_json: Result<Value, reqwest::Error> = response.json().await;
                 match item_json {
                     Ok(item_json) => {
-                        cache.insert(self.language.clone(), item_json.clone());
+                        cache.insert(self.language.clone(), item_json.clone()).await;
                         cache.sync();
                         Ok(item_json)
                     },

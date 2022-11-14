@@ -1,7 +1,7 @@
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
 use linked_hash_map::LinkedHashMap;
-use moka::sync::Cache;
+use moka::future::Cache;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -38,7 +38,7 @@ impl DataDragon {
                 match json {
                     Ok(json) => {
                         let version = json[0].clone();
-                        cache.insert("version".to_string(), version.clone());
+                        cache.insert("version".to_string(), version.clone()).await;
                         Ok(
                             DataDragon { 
                                 version, 

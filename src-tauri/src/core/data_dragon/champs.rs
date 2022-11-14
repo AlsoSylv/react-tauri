@@ -2,7 +2,7 @@ use super::structs::{self, ChampJson, ChampionFull};
 
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
-use moka::sync::{Cache, ConcurrentCacheExt};
+use moka::future::{Cache, ConcurrentCacheExt};
 
 static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> = Lazy::new(|| {
     Mutex::new(Cache::new(3))
@@ -26,7 +26,7 @@ impl structs::DataDragon {
                 let champ_json: Result<ChampJson, reqwest::Error> = response.json().await;
                 match champ_json {
                     Ok(champ_json) => {
-                        cache.insert(self.language.clone(), champ_json.clone());
+                        cache.insert(self.language.clone(), champ_json.clone()).await;
                         cache.sync();
                         Ok(champ_json)
                     },
@@ -68,7 +68,7 @@ impl structs::DataDragon {
                 let champ_full: Result<ChampionFull, reqwest::Error> = response.json().await;
                 match champ_full {
                     Ok(champ_full) =>{
-                        cache.insert(self.language.clone(), champ_full.clone());
+                        cache.insert(self.language.clone(), champ_full.clone()).await;
                         cache.sync();
                         Ok(champ_full)
                     },

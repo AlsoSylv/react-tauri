@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use moka::sync::{Cache, ConcurrentCacheExt};
+use moka::future::{Cache, ConcurrentCacheExt};
 use tokio::sync::Mutex;
 
 use crate::{core::{data_dragon, helpers}, extensions::ugg::structs};
@@ -44,7 +44,7 @@ impl structs::UggRequest {
                                 match json {
                                     Ok(json) => {
                                         let role = &json[&id.to_string()][0].to_string();
-                                        cache.insert(self.name.clone(), role.to_string());
+                                        cache.insert(self.name.clone(), role.to_string()).await;
                                         cache.sync();
                                         Ok(role.to_string())
                                     },

@@ -4,7 +4,7 @@ use super::structs::ChampionNames;
 
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
-use moka::sync::{Cache, ConcurrentCacheExt};
+use moka::future::{Cache, ConcurrentCacheExt};
 
 static CACHED_CHAMP_ID: Lazy<Mutex<Cache<String, i64>>> = Lazy::new(|| {
     Mutex::new(Cache::new(25))
@@ -25,7 +25,7 @@ pub async fn champion_id(name: &str, lang: &str) -> Result<i64, i64> {
             match request {
                 Ok(json) => {
                     let id: i64 = json.data[&champion_name].key.parse().unwrap();
-                    cache.insert(name.clone().to_string(), id);
+                    cache.insert(name.clone().to_string(), id).await;
                     cache.sync();
                     Ok(id)
                 },

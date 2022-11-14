@@ -24,7 +24,7 @@ linked-hash-map = { version = "0.5.6", features = ["serde_impl"] }
 once_cell = { version = "1.16.0" }
 futures = { version = "0.3" }
 shaco = { git = "https://github.com/AlsoSylv/Shaco", branch = "test" }
-moka = { version = "0.9.6" }
+moka = { version = "0.9", features = ["future"] }
 
 # [patch.crates-io]
 # ntapi = { git = "https://github.com/MSxDOS/ntapi" }

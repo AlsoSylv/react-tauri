@@ -37,7 +37,7 @@ impl structs::Data {
                                 let possible_passive = &champ_json["passive"]["image"]["full"];
         
                                 let spells = &champ_json["spells"];
-        
+
                                 let Some(passive) = possible_passive.as_str() else {
                                     return Err(104);
                                 };
@@ -115,7 +115,7 @@ impl structs::Data {
                                     &mut abilities.r.order
                                     ];
 
-                                    match_abilities(maps, abilities_order).await;
+                                    split_abilities(maps, abilities_order);
                                 Ok(abilities)
                             },
                             Err(err) => Err(err),
@@ -129,7 +129,7 @@ impl structs::Data {
     }
 }
 
-async fn match_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
+fn split_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
     for y in abilities {
         if y.is_string() {
             match y.as_str().unwrap() {

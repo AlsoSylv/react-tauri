@@ -1,6 +1,8 @@
 use serde_json::{Value, json};
 
-use crate::{frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages}, core::data_dragon::structs::DataDragon};
+use crate::{frontend_types, core::data_dragon::structs::DataDragon};
+
+use frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages};
 
 pub async fn create_rune_page(
     name: String,
@@ -16,7 +18,6 @@ pub async fn create_rune_page(
     });
     return rune_page;
 }
-
 
 pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str) -> Result<RuneImages, i64> {
     let data_dragon = DataDragon::new(Some(language)).await;

@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use cached::proc_macro::cached;
 use extensions::{ugg::{structs, constants}};
 
 use structs::{Shards, Data, ItemsMap, AbilitiesMap};
@@ -55,7 +54,6 @@ async fn champion_info(
 }
 
 #[tauri::command]
-#[cached(result = true, size = 5)]
 async fn rune_names(
     name: String,
     role: String,

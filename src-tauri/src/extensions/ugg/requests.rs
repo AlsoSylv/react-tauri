@@ -9,6 +9,14 @@ use once_cell::sync::Lazy;
 static CACHED_DEFAULT_ROLE: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
     Mutex::new(Cache::new(10))
 });
+
+static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
+    Mutex::new(Cache::new(10))
+});
+
+static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
+    Mutex::new(Cache::new(10))
+});
  
 impl structs::UggRequest {
     pub async fn default_role(&self) -> Result<String, i64> {
@@ -74,6 +82,11 @@ impl structs::UggRequest {
     // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
     // Further investigation is needed into finding out which champs this is offered for automatically
     pub async fn overview_json(&self) -> Result<String, i64> {
+        let cache = CACHED_OVERIEW_REQUEST.lock().await;
+        let overview = cache.get(&self.name);
+        if overview != None {
+            return Ok(overview.unwrap())
+        }
         let stats_version = "1.5";
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";
@@ -102,7 +115,12 @@ impl structs::UggRequest {
                             Ok(json) => {
                                 let overview = json.text().await;
                                 match overview {
-                                    Ok(valid) => Ok(valid),
+                                    Ok(valid) => {
+                                        let overview = valid.clone();
+                                        cache.insert(self.name.clone(), overview).await;
+                                        cache.sync();
+                                        Ok(valid)
+                                    },
                                     Err(_) => Err(201),
                                 }
                             }
@@ -125,6 +143,11 @@ impl structs::UggRequest {
     }
 
     pub async fn ranking_json(&self) -> Result<String, i64> {
+        let cache = CACHED_RANKING_REQUEST.lock().await;
+        let ranking = cache.get(&self.name);
+        if ranking != None {
+            return Ok(ranking.unwrap())
+        }
         let stats_version = "1.5";
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";
@@ -153,7 +176,12 @@ impl structs::UggRequest {
                             Ok(json) => {
                                 let ranking = json.text().await;
                                 match ranking {
-                                    Ok(valid) => Ok(valid),
+                                    Ok(valid) => {
+                                        let ranking = valid.clone();
+                                        cache.insert(self.name.clone(), ranking).await;
+                                        cache.sync();
+                                        Ok(valid)
+                                    },
                                     Err(_) => Err(201),
                                 }
                             }

@@ -82,9 +82,15 @@ pub async fn push_runes(
     region: String,
 ) -> Result<i64, i64> {
     let data = Data::new(name.clone(), role.clone(), rank, region);
-    let winrate = data.winrate().await;
-    let rune_match = data.rune_tuple().await;
-    // let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
+    let fut_winrate = data.winrate();
+    let fut_rune_match = data.rune_tuple();
+    let (
+        winrate, 
+        rune_match
+        ) = futures::join!(
+            fut_winrate, 
+            fut_rune_match
+        );
 
     match rune_match {
         Ok((_, tree_ids, rune_ids)) => {

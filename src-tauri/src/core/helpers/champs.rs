@@ -1,4 +1,4 @@
-use crate::core::data_dragon::structs::DataDragon;
+use crate::{core::data_dragon::structs::DataDragon, errors::DataDragonError};
 
 use super::structs::ChampionNames;
 
@@ -10,7 +10,7 @@ static CACHED_CHAMP_ID: Lazy<Mutex<Cache<String, i64>>> = Lazy::new(|| {
     Mutex::new(Cache::new(25))
 });
 
-pub async fn champion_id(name: &str, lang: &str) -> Result<i64, i64> {
+pub async fn champion_id(name: &str, lang: &str) -> Result<i64, DataDragonError> {
     let cache = CACHED_CHAMP_ID.lock().await;
     let id = cache.get(name);
     if id.is_some() {
@@ -36,7 +36,7 @@ pub async fn champion_id(name: &str, lang: &str) -> Result<i64, i64> {
     }
 }
 
-pub async fn all_champion_names() -> Result<Vec<ChampionNames>, i64> {
+pub async fn all_champion_names() -> Result<Vec<ChampionNames>, DataDragonError> {
     let mut champions = Vec::new();
     let data_dragon = DataDragon::new(Some("en_US")).await;
     match data_dragon {

@@ -3,13 +3,14 @@ use super::structs::{self, ChampJson, ChampionFull};
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
 use moka::future::{Cache, ConcurrentCacheExt};
+use crate::errors::DataDragonError;
 
 static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> = Lazy::new(|| {
     Mutex::new(Cache::new(3))
 });
 
 impl structs::DataDragon {
-    pub async fn champion_json(&self) -> Result<ChampJson, i64> {
+    pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
         let cache = CACHED_CHAMP_JSON.lock().await;
         let json = cache.get(&self.language);
         if json.is_some() {
@@ -30,14 +31,14 @@ impl structs::DataDragon {
                         cache.sync();
                         Ok(champ_json)
                     },
-                    Err(_) => Err(103),
+                    Err(_) => Err(DataDragonError::ChampMissingError),
                 }
             }
             Err(err) => {
                 if err.is_body() {
-                    Err(104)
+                    Err(DataDragonError::DataDragonMissing)
                 } else {
-                    Err(103)
+                    Err(DataDragonError::ChampMissingError)
                 }
             }
         }
@@ -49,7 +50,7 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<String, ChampionFull>>> = Lazy::new(|
 });
 
 impl structs::DataDragon {
-    pub async fn champ_full(&self, name: String) -> Result<ChampionFull, i64> {
+    pub async fn champ_full(&self, name: String) -> Result<ChampionFull, DataDragonError> {
         let cache = CACHED_CHAMP_FULL.lock().await;
         let json = cache.get(&self.language);
         if json.is_some() {
@@ -72,14 +73,14 @@ impl structs::DataDragon {
                         cache.sync();
                         Ok(champ_full)
                     },
-                    Err(_) => panic!()
+                    Err(_) => Err(DataDragonError::ChampMissingError),
                 }
-            },
+            }
             Err(err) => {
                 if err.is_body() {
-                    Err(104)
+                    Err(DataDragonError::DataDragonMissing)
                 } else {
-                    Err(103)
+                    Err(DataDragonError::ChampMissingError)
                 }
             }
         }

@@ -17,6 +17,7 @@ mod extensions;
 mod core;
 mod logic;
 pub mod frontend_types;
+pub mod errors;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
@@ -64,7 +65,7 @@ async fn rune_names(
     let rune_match = data.rune_tuple().await;
     match rune_match {
         Ok((rune_names, _, _)) => Ok(rune_names),
-        Err(err) => Err(err),
+        Err(err) => Err(i64::from(err)),
     }
 }
 
@@ -73,7 +74,7 @@ async fn champion_names() -> Result<Vec<ChampionNames>, i64> {
     let request = core::helpers::champs::all_champion_names().await;
     match request {
         Ok(names) => Ok(names),
-        Err(err) => Err(err),
+        Err(err) => Err(i64::from(err)),
     }
 }
 
@@ -88,7 +89,7 @@ async fn shard_names(
     let shards = data.shard_tuple().await;
     match shards {
         Ok(shards) => Ok(shards),
-        Err(err) => Err(err),
+        Err(err) => Err(i64::from(err)),
     }
 }
 
@@ -103,7 +104,7 @@ async fn items(
     let items = data.items().await;
     match items {
         Ok(items) => Ok(items),
-        Err(err) => Err(err),
+        Err(err) => Err(i64::from(err)),
     }
 }
 
@@ -160,7 +161,7 @@ async fn abilities(
     let abilties = data.abilities().await;
     match abilties {
         Ok(abilities) => Ok(abilities),
-        Err(err) => Err(err)
+        Err(err) => Err(i64::from(err))
     }
 }
 

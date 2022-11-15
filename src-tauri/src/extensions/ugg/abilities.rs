@@ -1,11 +1,12 @@
 use serde_json::Value;
 
-use crate::core::data_dragon::structs::DataDragon;
+use crate::{core::data_dragon::structs::DataDragon, errors::{ErrorMap, UGGDataError, DataDragonError}};
+use ErrorMap::{UGGError, DataDragonErrors};
 
 use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overview, constants::DATA};
 
 impl structs::Data {
-    pub async fn abilities(&self) -> Result<AbilitiesMap, i64> {
+    pub async fn abilities(&self) -> Result<AbilitiesMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match data_dragon {
             Ok(data_dragon) => {
@@ -28,7 +29,7 @@ impl structs::Data {
                 match abilities {
                     Ok(json) => {
                         let Some(abilities_order) = json[DATA["abilities"]][2].as_array() else {
-                            return Err(207)
+                            return Err(UGGError(UGGDataError::NoAbilityOrder))
                         };
                         match champ_json {
                             Ok(json) => {
@@ -39,23 +40,23 @@ impl structs::Data {
                                 let spells = &champ_json["spells"];
 
                                 let Some(passive) = possible_passive.as_str() else {
-                                    return Err(104);
+                                    return Err(DataDragonErrors(DataDragonError::DataDragonMissing));
                                 };
                                 
                                 let Some(q_image) = spells[0]["image"]["full"].as_str() else {
-                                    return Err(104);
+                                    return Err(DataDragonErrors(DataDragonError::DataDragonMissing));
                                 };
         
                                 let Some(w_image) = spells[1]["image"]["full"].as_str() else {
-                                    return Err(104);
+                                    return Err(DataDragonErrors(DataDragonError::DataDragonMissing));
                                 };
         
                                 let Some(e_image) = spells[2]["image"]["full"].as_str() else {
-                                    return Err(104);
+                                    return Err(DataDragonErrors(DataDragonError::DataDragonMissing));
                                 };
         
                                 let Some(r_image) = spells[3]["image"]["full"].as_str() else {
-                                    return Err(104);
+                                    return Err(DataDragonErrors(DataDragonError::DataDragonMissing));
                                 };
         
                                 let mut abilities = AbilitiesMap { 
@@ -118,13 +119,13 @@ impl structs::Data {
                                     split_abilities(maps, abilities_order);
                                 Ok(abilities)
                             },
-                            Err(err) => Err(err),
+                            Err(err) => Err(DataDragonErrors(err)),
                         }
                     },
                     Err(err) => Err(err),
                 }
             },
-            Err(err) => Err(err), 
+            Err(err) => Err(DataDragonErrors(err)), 
         }
     }
 }

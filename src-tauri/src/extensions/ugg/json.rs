@@ -1,5 +1,8 @@
 use serde_json::Value;
 
+use crate::errors::{ErrorMap, UGGDataError};
+use ErrorMap::UGGError;
+
 use super::{constants::{TIERS, REGIONS, ROLES}, structs::UggRequest};
 
 pub async fn ranking(
@@ -8,7 +11,7 @@ pub async fn ranking(
     rank: &str, 
     region: &str,
     lang: &str,
-) -> Result<Value, i64> {
+) -> Result<Value, ErrorMap> {
     let ugg = UggRequest::new(name, lang);
     let fut_request = ugg.ranking_json();
     let fut_role = position(name, role, lang);
@@ -28,7 +31,7 @@ pub async fn ranking(
                         Err(err) => Err(err),
                     }
                 }
-                Err(_) => Err(202),
+                Err(_) => Err(UGGError(UGGDataError::RankingConnect)),
             }
         }
         Err(err) => Err(err),
@@ -41,7 +44,7 @@ pub async fn overview(
     rank: &str,
     region: &str,
     lang: &str,
-) -> Result<Value, i64> {
+) -> Result<Value, ErrorMap> {
     let ugg = UggRequest::new(name, lang);
     let fut_request = ugg.overview_json();
     let fut_role = position(name, role, lang);
@@ -67,7 +70,7 @@ pub async fn overview(
                         Err(err) => Err(err),
                     }
                 }
-                Err(_) => Err(202),
+                Err(_) => Err(UGGError(UGGDataError::OverviewConnect)),
             }
         }
         Err(err) => Err(err),
@@ -78,7 +81,7 @@ async fn position(
     name: &str, 
     role: &str,
     lang: &str,
-) -> Result<String, i64> {
+) -> Result<String, ErrorMap> {
     let ugg = UggRequest::new(name, lang);
     if role == "Default" {
         let role = ugg.default_role().await;

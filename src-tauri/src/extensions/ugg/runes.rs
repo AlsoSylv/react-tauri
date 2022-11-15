@@ -1,9 +1,10 @@
-use crate::{frontend_types::{Active, RuneImages}, core::helpers};
+use crate::{frontend_types::{Active, RuneImages}, core::helpers, errors::{ErrorMap, UGGDataError}};
+use ErrorMap::DataDragonErrors;
 
 use super::{structs, constants, json};
 
 impl structs::Data {
-    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), i64>{
+    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
         let request = json::overview(
             &self.name, 
             &self.role, 
@@ -16,11 +17,11 @@ impl structs::Data {
                 let json = &json[constants::DATA["perks"]];
                 let rune_ids = &json[4];
                 let Some(tree_id_one) = &json[2].as_i64() else {
-                    return Err(206);
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
                 let Some(tree_id_two) = &json[3].as_i64() else {
-                    return Err(206);
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
                 let all_runes = helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, &self.lang).await;
@@ -59,7 +60,7 @@ impl structs::Data {
                         }
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(DataDragonErrors(err)),
                 }
             }
             Err(err) => Err(err),

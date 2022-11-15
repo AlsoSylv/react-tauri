@@ -1,8 +1,10 @@
+use crate::errors::{ErrorMap, UGGDataError};
+
 use super::{structs, json::ranking, constants::STATS};
 
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math
-    pub async fn winrate(&self) -> Result<String, i64> {
+    pub async fn winrate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
             &self.name, 
             &self.role, 
@@ -13,11 +15,11 @@ impl structs::Data {
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["matches"]].as_f64() else {
-                    return Err(206);
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
                 let Some(wins) = &json[STATS["wins"]].as_f64() else {
-                    return Err(205);
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
                 let win_rate = wins / matches;
@@ -27,7 +29,7 @@ impl structs::Data {
         }
     }
     
-    pub async fn ban_rate(&self) -> Result<String, i64> {
+    pub async fn ban_rate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
             &self.name, 
             &self.role, 
@@ -38,11 +40,11 @@ impl structs::Data {
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
-                    return Err(206);
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
                 let Some(bans)= &json[STATS["bans"]].as_f64() else {
-                    return Err(205);
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
                 let ban_rate = bans / matches;
                 Ok(format!("{:.1$}%", &ban_rate * 100.0, 1))
@@ -51,7 +53,7 @@ impl structs::Data {
         }
     }
 
-    pub async fn pick_rate(&self) -> Result<String, i64> {
+    pub async fn pick_rate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
             &self.name, 
             &self.role, 
@@ -62,11 +64,11 @@ impl structs::Data {
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
-                    return Err(206);
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
                 let Some(picks) = &json[STATS["matches"]].as_f64() else {
-                    return Err(205);
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
                 let pick_rate = picks / matches;

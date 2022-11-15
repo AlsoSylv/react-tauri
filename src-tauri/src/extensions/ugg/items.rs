@@ -1,10 +1,10 @@
-use crate::core::data_dragon::structs::DataDragon;
+use crate::{core::data_dragon::structs::DataDragon, errors::ErrorMap};
 
 use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DATA};
 
 impl structs::Data {
     
-    pub async fn items(&self) -> Result<ItemsMap, i64> {
+    pub async fn items(&self) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = 
         ItemsMap { 
@@ -168,13 +168,13 @@ impl structs::Data {
                                     }
                                 Ok(items_map)
                             },
-                            Err(_) => todo!()
+                            Err(err) => Err(ErrorMap::DataDragonErrors(err))
                         }
                     },
-                    Err(_) => todo!()
+                    Err(err) => Err(err),
                 }
             },
-            Err(err) => Err(err),
+            Err(err) => Err(ErrorMap::DataDragonErrors(err)),
         }
     }
 }

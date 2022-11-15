@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use moka::future::{Cache, ConcurrentCacheExt};
 use tokio::sync::Mutex;
 
-use crate::{core::{data_dragon, helpers}, extensions::ugg::structs};
+use crate::{core::{data_dragon, helpers}, extensions::ugg::structs, errors::{ErrorMap, UGGDataError}};
+use ErrorMap::{DataDragonErrors, UGGError};
 use helpers::champs::champion_id;
 use once_cell::sync::Lazy;
 
@@ -19,7 +20,7 @@ static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<String, String>>> = Lazy::new(||
 });
  
 impl structs::UggRequest {
-    pub async fn default_role(&self) -> Result<String, i64> {
+    pub async fn default_role(&self) -> Result<String, ErrorMap> {
         let cache = CACHED_DEFAULT_ROLE.lock().await;
         let role = cache.get(&self.name);
         if role != None {
@@ -56,32 +57,30 @@ impl structs::UggRequest {
                                         cache.sync();
                                         Ok(role.to_string())
                                     },
-                                    Err(_) => Err(201),
+                                    Err(_) => Err(UGGError(UGGDataError::RoleMissing)),
                                 }
                             }
     
                             Err(err) => {
                                 if err.is_body() {
-                                    Err(202)
-                                } else if err.is_request() {
-                                    Err(201)
+                                    Err(UGGError(UGGDataError::RoleConnect))
                                 } else {
-                                    panic!()
+                                    Err(UGGError(UGGDataError::RoleMissing))
                                 }
                             }
                         }
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(DataDragonErrors(err)),
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(DataDragonErrors(err)),
         }
     }
 
     // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
     // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
     // Further investigation is needed into finding out which champs this is offered for automatically
-    pub async fn overview_json(&self) -> Result<String, i64> {
+    pub async fn overview_json(&self) -> Result<String, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
         let overview = cache.get(&self.name);
         if overview != None {
@@ -121,28 +120,26 @@ impl structs::UggRequest {
                                         cache.sync();
                                         Ok(valid)
                                     },
-                                    Err(_) => Err(201),
+                                    Err(_) => Err(UGGError(UGGDataError::OverviewMissing)),
                                 }
                             }
                             Err(err) => {
-                                if err.is_body() {
-                                    Err(202)
-                                } else if err.is_request() {
-                                    Err(201)
+                                if err.is_connect() {
+                                    Err(UGGError(UGGDataError::OverviewConnect))
                                 } else {
-                                    panic!()
+                                    Err(UGGError(UGGDataError::OverviewMissing))
                                 }
                             }
                         }
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(DataDragonErrors(err)),
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(DataDragonErrors(err)),
         }
     }
 
-    pub async fn ranking_json(&self) -> Result<String, i64> {
+    pub async fn ranking_json(&self) -> Result<String, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
         let ranking = cache.get(&self.name);
         if ranking != None {
@@ -182,22 +179,22 @@ impl structs::UggRequest {
                                         cache.sync();
                                         Ok(valid)
                                     },
-                                    Err(_) => Err(201),
+                                    Err(_) => Err(UGGError(UGGDataError::RankingMissing)),
                                 }
                             }
                             Err(err) => {
                                 if err.is_connect() {
-                                    Err(202)
+                                    Err(UGGError(UGGDataError::RankingConnect))
                                 } else {
-                                    panic!()
+                                    Err(UGGError(UGGDataError::RankingMissing))
                                 }
                             }
                         }
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(DataDragonErrors(err)),
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(DataDragonErrors(err)),
         }
     }
 }

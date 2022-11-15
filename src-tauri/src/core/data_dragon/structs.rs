@@ -5,6 +5,8 @@ use moka::future::Cache;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::errors::DataDragonError;
+
 pub struct DataDragon {
     pub version: String,
     pub language: String,
@@ -16,7 +18,7 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
 });
 
 impl DataDragon {
-    pub async fn new(language: Option<&str>) -> Result<Self, i64> {
+    pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
         let mut language = language;
         if language == None {
             language = Some("en_US");
@@ -51,9 +53,9 @@ impl DataDragon {
             },
             Err(err) => {
                 if err.is_body() {
-                    Err(104)
+                    Err(DataDragonError::DataDragonMissing)
                 } else {
-                    Err(103)
+                    Err(DataDragonError::CannotConnect)
                 }
             }
         }

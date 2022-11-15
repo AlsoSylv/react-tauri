@@ -5,6 +5,7 @@ use super::structs;
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
 use moka::future::{Cache, ConcurrentCacheExt};
+use crate::errors::DataDragonError;
 
 static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> = Lazy::new(|| {
     Mutex::new(Cache::new(3))
@@ -12,7 +13,7 @@ static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> = Lazy::new(|| {
 
 
 impl structs::DataDragon {
-    pub async fn item_json(&self) -> Result<Value, i64> {
+    pub async fn item_json(&self) -> Result<Value, DataDragonError> {
         let cache = CACHED_ITEM_JSON.lock().await;
         let json = cache.get(&self.language);
         if json.is_some() {
@@ -34,14 +35,14 @@ impl structs::DataDragon {
                         cache.sync();
                         Ok(item_json)
                     },
-                    Err(_) => Err(103),
+                    Err(_) => Err(DataDragonError::CannotConnect),
                 }
             },
             Err(err) => {
                 if err.is_body() {
-                    Err(104)
+                    Err(DataDragonError::DataDragonMissing)
                 } else {
-                    Err(103)
+                    Err(DataDragonError::CannotConnect)
                 }
             }
         }

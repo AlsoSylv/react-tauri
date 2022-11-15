@@ -1,7 +1,9 @@
+use crate::errors::{ErrorMap, UGGDataError};
+
 use super::{structs::{self, Shard, Shards}, json::overview, constants::DATA};
 
 impl structs::Data {
-    pub async fn shard_tuple(&self) -> Result<Shards, i64> {
+    pub async fn shard_tuple(&self) -> Result<Shards, ErrorMap> {
         let armor = Shard::create(
             "Armor", 
             5002, 
@@ -92,10 +94,9 @@ impl structs::Data {
                                 }
                             }
                         }
-    
                         Ok(mutable_shards)
                     }
-                    None => Err(202),
+                    None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
                 }
             }
             Err(err) => Err(err),

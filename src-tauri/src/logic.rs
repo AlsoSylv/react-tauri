@@ -1,4 +1,5 @@
 use crate::core::lcu;
+use crate::errors::DataDragonError;
 use crate::{frontend_types, extensions};
 use extensions::ugg;
 
@@ -58,19 +59,19 @@ pub async fn champion_info(
                                                 ban_rate,
                                             })
                                         }
-                                        Err(err) => Err(err),
+                                        Err(err) => Err(i64::from(err)),
                                     }
                                 }
-                                Err(err) => Err(err),
+                                Err(err) => Err(i64::from(err)),
                             }
                         }
-                        Err(err) => Err(err),
+                        Err(err) => Err(i64::from(err)),
                     }
                 }
-                Err(err) => Err(err),
+                Err(err) => Err(i64::from(err)),
             }
         },
-        Err(err) => Err(err),
+        Err(err) => Err(i64::from(err)),
     }
 }
 
@@ -97,14 +98,14 @@ pub async fn push_runes(
                     ).await;
                     let result = push_runes_to_client(page).await;
                     match result {
-                        Ok(ok) => Ok(ok),
-                        Err(err) => Err(err)
+                        Ok(response) => Ok(i64::from(response)),
+                        Err(err) => Err(i64::from(err))
                     }
                 }
-                Err(err) => Err(err)
+                Err(err) => Err(i64::from(err))
             }
         },
-        Err(err) => Err(err)
+        Err(err) => Err(i64::from(err))
     }
 }
 
@@ -115,9 +116,9 @@ pub async fn languages() -> Result<Vec<String>, i64> {
             let langs: Result<Vec<String>, reqwest::Error> = response.json().await;
             match langs {
                 Ok(langs) => Ok(langs),
-                Err(_) => Err(104),
+                Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
             }
         },
-        Err(_) => Err(104),
+        Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
     }
 }

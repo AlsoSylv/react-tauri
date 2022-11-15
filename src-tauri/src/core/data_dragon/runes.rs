@@ -3,6 +3,7 @@ use super::structs::{self, RuneTree};
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
 use moka::future::{Cache, ConcurrentCacheExt};
+use crate::errors::DataDragonError;
 
 static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> = Lazy::new(|| {
     Mutex::new(Cache::new(3))
@@ -10,7 +11,7 @@ static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> = Lazy::new(|
 
 
 impl structs::DataDragon {
-    pub async fn runes_json(&self) -> Result<Vec<RuneTree>, i64> {
+    pub async fn runes_json(&self) -> Result<Vec<RuneTree>, DataDragonError> {
         let cache = CACHED_RUNE_JSON.lock().await;
         let json = cache.get(&self.language);
         if json.is_some() {
@@ -31,10 +32,10 @@ impl structs::DataDragon {
                         cache.sync();
                         Ok(rune_json)
                     },
-                    Err(_) => Err(104),
+                    Err(_) => Err(DataDragonError::DataDragonMissing),
                 }
             }
-            Err(_) => Err(104),
+            Err(_) => Err(DataDragonError::DataDragonMissing),
         }
     }
 }

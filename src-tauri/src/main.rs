@@ -44,7 +44,7 @@ async fn main() {
 
 #[tauri::command]
 async fn champion_info(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -59,7 +59,7 @@ async fn champion_info(
 
 #[tauri::command]
 async fn rune_names(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -75,7 +75,7 @@ async fn rune_names(
 
 #[tauri::command]
 async fn shard_names(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -91,7 +91,7 @@ async fn shard_names(
 
 #[tauri::command]
 async fn items(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -107,7 +107,7 @@ async fn items(
 
 #[tauri::command]
 async fn rank(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -124,7 +124,7 @@ async fn rank(
 
 #[tauri::command]
 async fn push_runes(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -139,7 +139,7 @@ async fn push_runes(
 
 #[tauri::command]
 async fn abilities(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,

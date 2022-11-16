@@ -6,7 +6,7 @@ use super::{structs, constants, json};
 impl structs::Data {
     pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
         let request = json::overview(
-            &self.name, 
+            &self.name.value.key, 
             &self.role, 
             &self.rank, 
             &self.region,

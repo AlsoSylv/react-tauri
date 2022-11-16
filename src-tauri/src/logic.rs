@@ -1,3 +1,4 @@
+use crate::core::helpers::structs::ChampionNames;
 use crate::core::lcu;
 use crate::errors::DataDragonError;
 use crate::{frontend_types, extensions};
@@ -11,7 +12,7 @@ use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
 pub async fn champion_info(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -45,7 +46,7 @@ pub async fn champion_info(
                                 Ok(ban_rate) => {
                                     match champion_json {
                                         Ok(json) => {
-                                            let id = &json.data.get(&name).unwrap().id;
+                                            let id = &json.data.get(&name.label).unwrap().id;
                                             let url = format!(
                                                 "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
                                                 &data_dragon.version,
@@ -77,7 +78,7 @@ pub async fn champion_info(
 }
 
 pub async fn push_runes(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
@@ -99,7 +100,7 @@ pub async fn push_runes(
             match winrate {
                 Ok(win_rate) => {
                     let page = create_rune_page(
-                        format!("{0} {1} {2}", name, role, win_rate), 
+                        format!("{0} {1} {2}", name.label, role, win_rate), 
                         tree_ids[0], 
                         tree_ids[1], 
                         rune_ids

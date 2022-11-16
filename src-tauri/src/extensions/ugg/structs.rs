@@ -1,5 +1,7 @@
+use crate::core::helpers::structs::ChampionNames;
+
 pub struct Data {
-    pub name: String,
+    pub name: ChampionNames,
     pub role: String,
     pub rank: String,
     pub region: String,
@@ -7,7 +9,7 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(name: String, role: String, rank: String, region: String, lang: String) -> Self {
+    pub fn new(name: ChampionNames, role: String, rank: String, region: String, lang: String) -> Self {
         return Data { 
             name, 
             role, 

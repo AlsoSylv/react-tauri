@@ -18,7 +18,7 @@ impl structs::Data {
         match data_dragon {
             Ok(data_dragon) => {
                 let fut_request = overview(
-                    &self.name, 
+                    &self.name.value.key, 
                     &self.role, 
                     &self.rank, 
                     &self.region,

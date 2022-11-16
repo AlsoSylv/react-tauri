@@ -11,13 +11,13 @@ impl structs::Data {
         match data_dragon {
             Ok(data_dragon) => {
                 let fut_abilities = overview(
-                    &self.name, 
+                    &self.name.value.key, 
                     &self.role, 
                     &self.rank, 
                     &self.region,
                     &self.lang,
                 );
-                let fut_champ_json = data_dragon.champ_full(self.name.clone());
+                let fut_champ_json = data_dragon.champ_full(self.name.value.key.clone());
                 let (
                     abilities, 
                     champ_json, 
@@ -33,7 +33,7 @@ impl structs::Data {
                         };
                         match champ_json {
                             Ok(json) => {
-                                let champ_json = json.data[&self.name].clone();
+                                let champ_json = json.data[&self.name.value.key].clone();
         
                                 let possible_passive = &champ_json["passive"]["image"]["full"];
         

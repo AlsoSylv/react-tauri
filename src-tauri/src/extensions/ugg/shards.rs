@@ -51,7 +51,7 @@ impl structs::Data {
         let mut mutable_shards = shards.clone();
     
         let request = overview(
-            &self.name, 
+            &self.name.value.key, 
             &self.role, 
             &self.rank, 
             &self.region,

@@ -6,7 +6,7 @@ use ErrorMap::UGGError;
 use super::{constants::{TIERS, REGIONS, ROLES}, structs::UggRequest};
 
 pub async fn ranking(
-    name: &str, 
+    name: &i64, 
     role: &str, 
     rank: &str, 
     region: &str,
@@ -39,7 +39,7 @@ pub async fn ranking(
 }
 
 pub async fn overview(
-    name: &str,
+    name: &i64,
     role: &str,
     rank: &str,
     region: &str,
@@ -78,7 +78,7 @@ pub async fn overview(
 }
 
 async fn position(
-    name: &str, 
+    name: &i64, 
     role: &str,
     lang: &str,
 ) -> Result<String, ErrorMap> {

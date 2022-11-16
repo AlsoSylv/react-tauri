@@ -6,7 +6,7 @@ impl structs::Data {
     //The format is used here to get an exact result from the floating point math
     pub async fn winrate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.key, 
+            &self.name.value.id, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -31,7 +31,7 @@ impl structs::Data {
     
     pub async fn ban_rate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.key, 
+            &self.name.value.id, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -55,7 +55,7 @@ impl structs::Data {
 
     pub async fn pick_rate(&self) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.key, 
+            &self.name.value.id, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -80,7 +80,7 @@ impl structs::Data {
 
     pub async fn rank(&self) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.key, 
+            &self.name.value.id, 
             &self.role, 
             &self.rank, 
             &self.region,

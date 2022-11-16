@@ -11,5 +11,5 @@ pub struct ChampionNames {
 #[serde(rename_all = "camelCase")]
 pub struct ChampionValue {
     pub key: String,
-    pub id: String,
+    pub id: i64,
 }

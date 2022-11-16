@@ -35,7 +35,7 @@ async fn main() {
             push_runes,
             abilities,
             get_languages,
-            rank,
+            // rank_tauri_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -110,12 +110,12 @@ async fn items(
 }
 
 #[tauri::command]
-async fn rank(
+async fn rank_tauri_command(
     name: String,
     role: String,
     rank: String,
     region: String,
-) -> Result<String, i64> {
+) -> Result<i64, i64> {
     let data = Data::new(name.clone(), role.clone(), rank, region);
     let rank = data.rank().await;
     match rank {

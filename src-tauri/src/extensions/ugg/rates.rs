@@ -78,7 +78,7 @@ impl structs::Data {
         }
     }
 
-    pub async fn rank(&self) -> Result<String, ErrorMap> {
+    pub async fn rank(&self) -> Result<i64, ErrorMap> {
         let request = ranking(
             &self.name, 
             &self.role, 
@@ -92,7 +92,7 @@ impl structs::Data {
                 let Some(rank) = &json[STATS["rank"]].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
-                Ok(rank.to_string())
+                Ok(*rank)
             }
             Err(err) => Err(err)
         }

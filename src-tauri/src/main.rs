@@ -9,7 +9,8 @@ use structs::{Shards, Data, ItemsMap, AbilitiesMap};
 use constants::{TIERS, REGIONS, ROLES};
 use frontend_types::ChampionInfo;
 
-use crate::core::helpers::structs::ChampionNames;
+use crate::core::helpers;
+use helpers::structs::ChampionNames;
 
 use crate::frontend_types::RuneImages;
 
@@ -47,8 +48,9 @@ async fn champion_info(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<ChampionInfo, i64> {
-    let info = logic::champion_info(name, role, rank, region).await;
+    let info = logic::champion_info(name, role, rank, region, lang).await;
     match info {
         Ok(values) => Ok(values),
         Err(err) => Err(err),
@@ -61,20 +63,12 @@ async fn rune_names(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<RuneImages, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let data = Data::new(name, role, rank, region, lang);
     let rune_match = data.rune_tuple().await;
     match rune_match {
         Ok((rune_names, _, _)) => Ok(rune_names),
-        Err(err) => Err(i64::from(err)),
-    }
-}
-
-#[tauri::command]
-async fn champion_names() -> Result<Vec<ChampionNames>, i64> {
-    let request = core::helpers::champs::all_champion_names().await;
-    match request {
-        Ok(names) => Ok(names),
         Err(err) => Err(i64::from(err)),
     }
 }
@@ -85,8 +79,9 @@ async fn shard_names(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<Shards, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let data = Data::new(name, role, rank, region, lang);
     let shards = data.shard_tuple().await;
     match shards {
         Ok(shards) => Ok(shards),
@@ -100,8 +95,9 @@ async fn items(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<ItemsMap, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let data = Data::new(name, role, rank, region, lang);
     let items = data.items().await;
     match items {
         Ok(items) => Ok(items),
@@ -115,12 +111,45 @@ async fn rank(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<String, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let data = Data::new(name, role, rank, region, lang);
     let rank = data.rank().await;
     match rank {
         Ok(rank) => Ok(rank),
         Err(err) => Err(i64::from(err)),
+    }
+}
+
+
+#[tauri::command]
+async fn push_runes(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<i64, i64> {
+    let result = logic::push_runes(name, role, rank, region, lang).await;
+    match result {
+        Ok(result) => Ok(result),
+        Err(err) => Err(err),
+    }
+}
+
+#[tauri::command]
+async fn abilities(
+    name: String,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<AbilitiesMap, i64> {
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let abilties = data.abilities().await;
+    match abilties {
+        Ok(abilities) => Ok(abilities),
+        Err(err) => Err(i64::from(err))
     }
 }
 
@@ -153,39 +182,19 @@ fn regions() -> Vec<String> {
 }
 
 #[tauri::command]
-async fn push_runes(
-    name: String,
-    role: String,
-    rank: String,
-    region: String,
-) -> Result<i64, i64> {
-    let result = logic::push_runes(name, role, rank, region).await;
-    match result {
-        Ok(result) => Ok(result),
-        Err(err) => Err(err),
-    }
-}
-
-#[tauri::command]
-async fn abilities(
-    name: String,
-    role: String,
-    rank: String,
-    region: String,
-) -> Result<AbilitiesMap, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
-    let abilties = data.abilities().await;
-    match abilties {
-        Ok(abilities) => Ok(abilities),
-        Err(err) => Err(i64::from(err))
-    }
-}
-
-#[tauri::command]
 async fn get_languages() -> Result<Vec<String>, i64> {
     let langs = logic::languages().await;
     match langs {
         Ok(langs) => Ok(langs),
         Err(err) => Err(err)
+    }
+}
+
+#[tauri::command]
+async fn champion_names(lang: String) -> Result<Vec<ChampionNames>, i64> {
+    let request = helpers::champs::all_champion_names(&lang).await;
+    match request {
+        Ok(names) => Ok(names),
+        Err(err) => Err(i64::from(err)),
     }
 }

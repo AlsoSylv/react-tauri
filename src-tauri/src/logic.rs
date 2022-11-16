@@ -15,11 +15,12 @@ pub async fn champion_info(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<ChampionInfo, i64> {
-    let data_dragon = DataDragon::new(Some("en_US")).await;
+    let data_dragon = DataDragon::new(Some(&lang)).await;
     match data_dragon {
         Ok(data_dragon) => {
-            let data = Data::new(name.clone(), role.clone(), rank, region);
+            let data = Data::new(name.clone(), role.clone(), rank, region, lang);
             let fut_winrate = data.winrate();
             let fut_pickrate = data.pick_rate();
             let fut_banrate = data.ban_rate();
@@ -80,8 +81,9 @@ pub async fn push_runes(
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<i64, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
     let fut_winrate = data.winrate();
     let fut_rune_match = data.rune_tuple();
     let (

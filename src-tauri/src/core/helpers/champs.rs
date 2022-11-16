@@ -36,9 +36,9 @@ pub async fn champion_id(name: &str, lang: &str) -> Result<i64, DataDragonError>
     }
 }
 
-pub async fn all_champion_names() -> Result<Vec<ChampionNames>, DataDragonError> {
+pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, DataDragonError> {
     let mut champions = Vec::new();
-    let data_dragon = DataDragon::new(Some("en_US")).await;
+    let data_dragon = DataDragon::new(Some(lang)).await;
     match data_dragon {
         Ok(data_dragon) => {
             let champ_json = data_dragon.champion_json().await;

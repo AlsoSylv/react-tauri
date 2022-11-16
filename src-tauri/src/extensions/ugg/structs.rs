@@ -7,8 +7,7 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(name: String, role: String, rank: String, region: String) -> Self {
-        let lang = "en_US".to_string();
+    pub fn new(name: String, role: String, rank: String, region: String, lang: String) -> Self {
         return Data { 
             name, 
             role, 

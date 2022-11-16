@@ -6,28 +6,25 @@ authors = ["you"]
 license = ""
 repository = ""
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.65"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.1", features = [] }
+tauri-build = { version = "1.2", features = [] }
 
 [dependencies]
 serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.1", features = ["api-all"] }
+tauri = { version = "1.2", features = ["api-all"] }
 reqwest = { version = "0.11.12", features = ["json"] }
-cached = { version = "0.40.0" }
 tokio = { version = "1.21.2", features = ["full"] }
 phf = { version = "0.11", features = ["macros"] }
 linked-hash-map = { version = "0.5.6", features = ["serde_impl"] }
-once_cell = { version = "1.15.0" }
+once_cell = { version = "1.16.0" }
 futures = { version = "0.3" }
 shaco = { git = "https://github.com/AlsoSylv/Shaco", branch = "test" }
-
-# [patch.crates-io]
-# ntapi = { git = "https://github.com/MSxDOS/ntapi" }
+moka = { version = "0.9", features = ["future"] }
 
 [features]
 # by default Tauri runs in production mode

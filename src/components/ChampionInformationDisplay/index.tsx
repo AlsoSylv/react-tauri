@@ -35,7 +35,7 @@ function ChampionInformationDisplay() {
       if (championInfoResponse.completedSuccessfully) {
         const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;
         setChampionInfo(restChampionInfo);
-        setUrl(`../champions${championInfoResponse?.localImage}asd`);
+        setUrl(`../champions${championInfoResponse?.localImage}`);
       } else {
         setError(championInfoResponse.message);
       }

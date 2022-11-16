@@ -1,6 +1,6 @@
 use crate::{core::data_dragon::structs::DataDragon, errors::DataDragonError};
 
-use super::structs::ChampionNames;
+use super::structs::{ChampionNames, ChampionValue};
 
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
@@ -48,7 +48,7 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, DataDr
                         let key = &champ.id;
                         champions.push(ChampionNames {
                           label: champ.clone().name,
-                          value: champ_key.to_string(),
+                          value: ChampionValue { key: champ_key.to_string(), id: champ.key.clone() },
                           url: format!(
                             "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
                             &data_dragon.version,

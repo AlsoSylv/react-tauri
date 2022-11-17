@@ -7,8 +7,8 @@ use crate::{frontend_types, extensions};
 use extensions::ugg;
 
 use frontend_types::ChampionInfo;
+use serde_json::json;
 use crate::core::data_dragon::structs::DataDragon; 
-use crate::core::helpers::runes::create_rune_page;
 
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
@@ -113,12 +113,12 @@ pub async fn push_runes(
         Ok((_, tree_ids, rune_ids)) => {
             match winrate {
                 Ok(win_rate) => {
-                    let page = create_rune_page(
-                        format!("{0} {1} {2}", name.label, role, win_rate), 
-                        tree_ids[0], 
-                        tree_ids[1], 
-                        rune_ids
-                    ).await;
+                    let page = json!({
+                        "name": format!("{0} {1} {2}", name.label, role, win_rate),
+                        "primaryStyleId": tree_ids[0],
+                        "subStyleId": tree_ids[1],
+                        "selectedPerkIds": rune_ids
+                    });
                     let result = push_runes_to_client(page).await;
                     match result {
                         Ok(response) => Ok(i64::from(response)),

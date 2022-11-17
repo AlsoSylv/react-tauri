@@ -35,7 +35,6 @@ async fn main() {
             push_runes,
             abilities,
             get_languages,
-            // rank_tauri_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -105,21 +104,6 @@ async fn items(
     let items = data.items().await;
     match items {
         Ok(items) => Ok(items),
-        Err(err) => Err(i64::from(err)),
-    }
-}
-
-#[tauri::command]
-async fn rank_tauri_command(
-    name: String,
-    role: String,
-    rank: String,
-    region: String,
-) -> Result<i64, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region);
-    let rank = data.rank().await;
-    match rank {
-        Ok(rank) => Ok(rank),
         Err(err) => Err(i64::from(err)),
     }
 }

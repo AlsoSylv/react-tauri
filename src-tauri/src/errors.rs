@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DataDragonError {
     ChampMissingError,
     DataDragonMissing,
@@ -15,7 +15,7 @@ impl From<DataDragonError> for i64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum UGGDataError {
     OverviewMissing,
     OverviewConnect,
@@ -44,7 +44,7 @@ impl From<UGGDataError> for i64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum LCUResponses {
     LCUConnect,
     LCUDeleteRune,
@@ -65,7 +65,7 @@ impl From<LCUResponses> for i64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ErrorMap {
     DataDragonErrors(DataDragonError),
     UGGError(UGGDataError),

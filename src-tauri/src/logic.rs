@@ -159,7 +159,8 @@ pub async fn runes_and_abilities(
     let fut_abilities = data.abilities(request.clone());
     let fut_shards = data.shard_tuple(request.clone());
     let fut_items = data.items(request);
-    let (runes,
+    let (
+        runes,
         abilities,
         shards,
         items,

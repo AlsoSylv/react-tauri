@@ -1,7 +1,8 @@
 use crate::core::helpers::structs::ChampionNames;
 use crate::core::lcu;
 use crate::errors::DataDragonError;
-use crate::extensions::ugg::json::ranking;
+use crate::extensions::ugg::json::{ranking, overview};
+use crate::frontend_types::RunesAndAbilities;
 use crate::{frontend_types, extensions};
 use extensions::ugg;
 
@@ -95,10 +96,11 @@ pub async fn push_runes(
     region: String,
     lang: String,
 ) -> Result<i64, i64> {
-    let request = ranking(&name.value.id, &role, &rank, &region, "en_US").await;
+    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
     let fut_winrate = data.winrate(request);
-    let fut_rune_match = data.rune_tuple();
+    let fut_rune_match = data.rune_tuple(request_2);
     let (
         winrate, 
         rune_match
@@ -141,5 +143,59 @@ pub async fn languages() -> Result<Vec<String>, i64> {
             }
         },
         Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
+    }
+}
+
+pub async fn runes_and_abilities(
+    name: ChampionNames,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<RunesAndAbilities, i64> {
+    let request = overview(&name.value.id, &role, &rank, &region, &lang).await;
+    let data = Data::new(name, role, rank, region, lang);
+    let fut_runes = data.rune_tuple(request.clone());
+    let fut_abilities = data.abilities(request.clone());
+    let fut_shards = data.shard_tuple(request.clone());
+    let fut_items = data.items(request);
+    let (runes,
+        abilities,
+        shards,
+        items,
+    ) = futures::join!(
+        fut_runes,
+        fut_abilities,
+        fut_shards,
+        fut_items,
+    );
+
+    match runes {
+        Ok((runes, _, _)) => {
+            match abilities {
+                Ok(abilities) => {
+                    match shards {
+                        Ok(shards) => {
+                            match items {
+                                Ok(items) => {
+                                    Ok(
+                                        RunesAndAbilities { 
+                                            runes, 
+                                            items, 
+                                            abilities, 
+                                            shards 
+                                        }
+                                    )
+                                },
+                                Err(err) => Err(i64::from(err))
+                            }
+                        },
+                        Err(err) => Err(i64::from(err))
+                    }
+                },
+                Err(err) => Err(i64::from(err))
+            }
+        },
+        Err(err) => Err(i64::from(err)),
     }
 }

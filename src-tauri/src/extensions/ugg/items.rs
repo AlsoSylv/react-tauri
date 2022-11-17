@@ -1,10 +1,11 @@
+use serde_json::Value;
+
 use crate::{core::data_dragon::structs::DataDragon, errors::ErrorMap};
 
-use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DATA};
+use super::{structs::{self, ItemsMap, ItemValues}, constants::DATA};
 
 impl structs::Data {
-    
-    pub async fn items(&self) -> Result<ItemsMap, ErrorMap> {
+    pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = 
         ItemsMap { 
@@ -17,22 +18,8 @@ impl structs::Data {
         
         match data_dragon {
             Ok(data_dragon) => {
-                let fut_request = overview(
-                    &self.name.value.id, 
-                    &self.role, 
-                    &self.rank, 
-                    &self.region,
-                    &self.lang,
-                );
-                let fut_items = data_dragon.item_json();
-        
-                let (
-                    request, 
-                    items
-                ) = futures::join!(
-                    fut_request, 
-                    fut_items
-                );
+                let items = data_dragon.item_json().await;
+
                 match request {
                     Ok(json) => {
                         match items {

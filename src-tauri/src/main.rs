@@ -3,16 +3,13 @@
     windows_subsystem = "windows"
 )]
 
-use extensions::{ugg::{structs, constants}};
+use extensions::{ugg::constants};
 
-use structs::{Shards, Data, ItemsMap, AbilitiesMap};
 use constants::{TIERS, REGIONS, ROLES};
-use frontend_types::ChampionInfo;
+use frontend_types::{ChampionInfo, RunesAndAbilities};
 
 use crate::core::helpers;
 use helpers::structs::ChampionNames;
-
-use crate::frontend_types::RuneImages;
 
 mod extensions;
 mod core;
@@ -25,17 +22,14 @@ pub mod errors;
 async fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            rune_names,
             champion_names,
-            shard_names,
             champion_info,
             roles,
             tiers,
             regions,
-            items,
             push_runes,
-            abilities,
             get_languages,
+            runes_and_abilities,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -57,50 +51,16 @@ async fn champion_info(
 }
 
 #[tauri::command]
-async fn rune_names(
+async fn runes_and_abilities(
     name: ChampionNames,
     role: String,
     rank: String,
     region: String,
     lang: String,
-) -> Result<RuneImages, i64> {
-    let data = Data::new(name, role, rank, region, lang);
-    let rune_match = data.rune_tuple().await;
-    match rune_match {
-        Ok((rune_names, _, _)) => Ok(rune_names),
-        Err(err) => Err(i64::from(err)),
-    }
-}
-
-#[tauri::command]
-async fn shard_names(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
-) -> Result<Shards, i64> {
-    let data = Data::new(name, role, rank, region, lang);
-    let shards = data.shard_tuple().await;
-    match shards {
-        Ok(shards) => Ok(shards),
-        Err(err) => Err(i64::from(err)),
-    }
-}
-
-#[tauri::command]
-async fn items(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
-) -> Result<ItemsMap, i64> {
-    let data = Data::new(name, role, rank, region, lang);
-    let items = data.items().await;
-    match items {
-        Ok(items) => Ok(items),
-        Err(err) => Err(i64::from(err)),
+) -> Result<RunesAndAbilities, i64> {
+    match logic::runes_and_abilities(name, role, rank, region, lang).await {
+        Ok(runes) => Ok(runes),
+        Err(err) => Err(err),
     }
 }
 
@@ -116,22 +76,6 @@ async fn push_runes(
     match result {
         Ok(result) => Ok(result),
         Err(err) => Err(err),
-    }
-}
-
-#[tauri::command]
-async fn abilities(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
-) -> Result<AbilitiesMap, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
-    let abilties = data.abilities().await;
-    match abilties {
-        Ok(abilities) => Ok(abilities),
-        Err(err) => Err(i64::from(err))
     }
 }
 

@@ -1,17 +1,11 @@
 use crate::{frontend_types::{Active, RuneImages}, core::helpers, errors::{ErrorMap, UGGDataError}};
 use ErrorMap::DataDragonErrors;
+use serde_json::Value;
 
-use super::{structs, constants, json};
+use super::{structs, constants};
 
 impl structs::Data {
-    pub async fn rune_tuple(&self) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
-        let request = json::overview(
-            &self.name.value.id, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
+    pub async fn rune_tuple(&self, request: Result<Value, ErrorMap>) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
         match request {
             Ok(json) => {
                 let json = &json[constants::DATA["perks"]];

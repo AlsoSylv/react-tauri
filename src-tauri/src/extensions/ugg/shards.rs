@@ -1,9 +1,11 @@
+use serde_json::Value;
+
 use crate::errors::{ErrorMap, UGGDataError};
 
-use super::{structs::{self, Shard, Shards}, json::overview, constants::DATA};
+use super::{structs::{self, Shard, Shards}, constants::DATA};
 
 impl structs::Data {
-    pub async fn shard_tuple(&self) -> Result<Shards, ErrorMap> {
+    pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
         let armor = Shard::create(
             "Armor", 
             5002, 
@@ -49,14 +51,6 @@ impl structs::Data {
         };
     
         let mut mutable_shards = shards.clone();
-    
-        let request = overview(
-            &self.name.value.id, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
         match request {
             Ok(json) => {
                 let active_shards = json[DATA["shards"]][2].as_array();

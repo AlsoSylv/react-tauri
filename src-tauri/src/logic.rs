@@ -1,6 +1,7 @@
 use crate::core::helpers::structs::ChampionNames;
 use crate::core::lcu;
 use crate::errors::DataDragonError;
+use crate::extensions::ugg::json::ranking;
 use crate::{frontend_types, extensions};
 use extensions::ugg;
 
@@ -19,23 +20,27 @@ pub async fn champion_info(
     lang: String,
 ) -> Result<ChampionInfo, i64> {
     let data_dragon = DataDragon::new(Some(&lang)).await;
+    let request = ranking(&name, &role, &rank, &region, "en_US").await;
     match data_dragon {
         Ok(data_dragon) => {
-            let data = Data::new(name.clone(), role.clone(), rank, region, lang);
-            let fut_winrate = data.winrate();
-            let fut_pickrate = data.pick_rate();
-            let fut_banrate = data.ban_rate();
+            let data = Data::new(name.clone(), role.clone(), rank, region);
+            let fut_winrate = data.winrate(request.clone());
+            let fut_pickrate = data.pick_rate(request.clone());
+            let fut_banrate = data.ban_rate(request);
+            let fut_tier = data.rank();
             let fut_champion_json = data_dragon.champion_json();
             let (
                 winrate,
                 pickrate,
                 banrate,
                 champion_json,
+                tier,
             ) = futures::join!(
                 fut_winrate,
                 fut_pickrate,
                 fut_banrate,
                 fut_champion_json,
+                fut_tier
             );
         
             match winrate {
@@ -53,13 +58,19 @@ pub async fn champion_info(
                                                 &id
                                             );
                                             let local_image = format!("/{0}/{0}.png", id);
-                                            Ok(ChampionInfo {
-                                                url,
-                                                local_image,
-                                                win_rate,
-                                                pick_rate,
-                                                ban_rate,
-                                            })
+                                            match tier {
+                                                Ok(tier) => {
+                                                    Ok(ChampionInfo {
+                                                        url,
+                                                        local_image,
+                                                        win_rate,
+                                                        pick_rate,
+                                                        ban_rate,
+                                                        tier,
+                                                    })
+                                                }
+                                                Err(err) => Err(i64::from(err))
+                                            }
                                         }
                                         Err(err) => Err(i64::from(err)),
                                     }
@@ -84,7 +95,8 @@ pub async fn push_runes(
     region: String,
     lang: String,
 ) -> Result<i64, i64> {
-    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let request = ranking(&name, &role, &rank, &region, "en_US").await;
+    let data = Data::new(name.clone(), role.clone(), rank, region);
     let fut_winrate = data.winrate();
     let fut_rune_match = data.rune_tuple();
     let (

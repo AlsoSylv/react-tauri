@@ -1,12 +1,14 @@
+use serde_json::Value;
+
 use crate::errors::{ErrorMap, UGGDataError};
 
 use super::{structs, json::ranking, constants::STATS};
 
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math
-    pub async fn winrate(&self) -> Result<String, ErrorMap> {
+    pub async fn winrate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.id, 
+            &self.name, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -29,9 +31,9 @@ impl structs::Data {
         }
     }
     
-    pub async fn ban_rate(&self) -> Result<String, ErrorMap> {
+    pub async fn ban_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.id, 
+            &self.name, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -53,9 +55,9 @@ impl structs::Data {
         }
     }
 
-    pub async fn pick_rate(&self) -> Result<String, ErrorMap> {
+    pub async fn pick_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         let request = ranking(
-            &self.name.value.id, 
+            &self.name, 
             &self.role, 
             &self.rank, 
             &self.region,
@@ -78,7 +80,7 @@ impl structs::Data {
         }
     }
 
-    pub async fn rank(&self) -> Result<String, ErrorMap> {
+    pub async fn rank(&self) -> Result<i64, ErrorMap> {
         let request = ranking(
             &self.name.value.id, 
             &self.role, 
@@ -89,10 +91,10 @@ impl structs::Data {
 
         match request {
             Ok(json) => {
-                let Some(rank) = &json[STATS["rank"]].as_i64() else {
+                let Some(rank) = json[STATS["rank"]].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
-                Ok(rank.to_string())
+                Ok(rank)
             }
             Err(err) => Err(err)
         }

@@ -1,6 +1,6 @@
 pub mod constants;
 pub mod structs;
-mod json;
+pub mod json;
 mod shards;
 mod rates;
 mod runes;

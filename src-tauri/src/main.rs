@@ -36,7 +36,6 @@ async fn main() {
             push_runes,
             abilities,
             get_languages,
-            rank,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

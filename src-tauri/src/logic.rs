@@ -1,8 +1,7 @@
-use crate::core::helpers::structs::ChampionNames;
 use crate::core::lcu;
 use crate::errors::DataDragonError;
 use crate::extensions::ugg::json::{ranking, overview};
-use crate::frontend_types::RunesAndAbilities;
+use crate::frontend_types::{RunesAndAbilities, ChampionValue, ChampionNames};
 use crate::{frontend_types, extensions};
 use extensions::ugg;
 
@@ -13,6 +12,7 @@ use crate::core::data_dragon::structs::DataDragon;
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
+#[tauri::command]
 pub async fn champion_info(
     name: ChampionNames,
     role: String,
@@ -89,6 +89,7 @@ pub async fn champion_info(
     }
 }
 
+#[tauri::command]
 pub async fn push_runes(
     name: ChampionNames,
     role: String,
@@ -132,7 +133,9 @@ pub async fn push_runes(
     }
 }
 
-pub async fn languages() -> Result<Vec<String>, i64> {
+
+#[tauri::command]
+pub async fn get_languages() -> Result<Vec<String>, i64> {
     let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
     match request {
         Ok(response) => {
@@ -146,6 +149,7 @@ pub async fn languages() -> Result<Vec<String>, i64> {
     }
 }
 
+#[tauri::command]
 pub async fn runes_and_abilities(
     name: ChampionNames,
     role: String,
@@ -195,6 +199,40 @@ pub async fn runes_and_abilities(
                     }
                 },
                 Err(err) => Err(i64::from(err))
+            }
+        },
+        Err(err) => Err(i64::from(err)),
+    }
+}
+
+
+#[tauri::command]
+pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
+    let mut champions = Vec::new();
+    let data_dragon = DataDragon::new(Some(lang)).await;
+    let id  = |id: &str| -> i64 {id.parse().unwrap()};
+
+    match data_dragon {
+        Ok(data_dragon) => {
+            let champ_json = data_dragon.champion_json().await;
+            match champ_json {
+                Ok(json) => {
+                    for (champ_key, champ) in json.data.iter() {
+                        let key = &champ.id;
+                        champions.push(ChampionNames {
+                          label: champ.clone().name,
+                          value: ChampionValue { key: champ_key.to_string(), id: id(&champ.key) },
+                          url: format!(
+                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                            &data_dragon.version,
+                            key,
+                        ),
+                          local_image: format!("/{0}/{0}.png", key),
+                        });
+                    }
+                    Ok(champions)
+                }
+                Err(err) => Err(i64::from(err)),
             }
         },
         Err(err) => Err(i64::from(err)),

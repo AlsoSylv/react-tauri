@@ -105,23 +105,6 @@ async fn items(
 }
 
 #[tauri::command]
-async fn rank(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
-) -> Result<String, i64> {
-    let data = Data::new(name, role, rank, region, lang);
-    let rank = data.rank().await;
-    match rank {
-        Ok(rank) => Ok(rank),
-        Err(err) => Err(i64::from(err)),
-    }
-}
-
-
-#[tauri::command]
 async fn push_runes(
     name: ChampionNames,
     role: String,

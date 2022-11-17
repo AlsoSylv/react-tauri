@@ -20,14 +20,14 @@ pub async fn champion_info(
     lang: String,
 ) -> Result<ChampionInfo, i64> {
     let data_dragon = DataDragon::new(Some(&lang)).await;
-    let request = ranking(&name, &role, &rank, &region, "en_US").await;
+    let request = ranking(&name.value.id, &role, &rank, &region, "en_US").await;
     match data_dragon {
         Ok(data_dragon) => {
-            let data = Data::new(name.clone(), role.clone(), rank, region);
+            let data = Data::new(name.clone(), role.clone(), rank, region, lang);
             let fut_winrate = data.winrate(request.clone());
             let fut_pickrate = data.pick_rate(request.clone());
-            let fut_banrate = data.ban_rate(request);
-            let fut_tier = data.rank();
+            let fut_banrate = data.ban_rate(request.clone());
+            let fut_tier = data.rank(request);
             let fut_champion_json = data_dragon.champion_json();
             let (
                 winrate,
@@ -95,9 +95,9 @@ pub async fn push_runes(
     region: String,
     lang: String,
 ) -> Result<i64, i64> {
-    let request = ranking(&name, &role, &rank, &region, "en_US").await;
-    let data = Data::new(name.clone(), role.clone(), rank, region);
-    let fut_winrate = data.winrate();
+    let request = ranking(&name.value.id, &role, &rank, &region, "en_US").await;
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let fut_winrate = data.winrate(request);
     let fut_rune_match = data.rune_tuple();
     let (
         winrate, 

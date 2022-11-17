@@ -2,18 +2,11 @@ use serde_json::Value;
 
 use crate::errors::{ErrorMap, UGGDataError};
 
-use super::{structs, json::ranking, constants::STATS};
+use super::{structs, constants::STATS};
 
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math
     pub async fn winrate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
-        let request = ranking(
-            &self.name, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["matches"]].as_f64() else {
@@ -32,13 +25,6 @@ impl structs::Data {
     }
     
     pub async fn ban_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
-        let request = ranking(
-            &self.name, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
@@ -56,13 +42,6 @@ impl structs::Data {
     }
 
     pub async fn pick_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
-        let request = ranking(
-            &self.name, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await; 
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
@@ -80,15 +59,7 @@ impl structs::Data {
         }
     }
 
-    pub async fn rank(&self) -> Result<i64, ErrorMap> {
-        let request = ranking(
-            &self.name.value.id, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
-
+    pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
         match request {
             Ok(json) => {
                 let Some(rank) = json[STATS["rank"]].as_i64() else {

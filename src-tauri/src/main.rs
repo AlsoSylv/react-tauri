@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use extensions::{ugg::constants};
+use extensions::ugg::constants;
 
 use constants::{TIERS, REGIONS, ROLES};
 use frontend_types::{ChampionInfo, RunesAndAbilities};

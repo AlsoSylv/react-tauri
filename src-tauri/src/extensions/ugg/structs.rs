@@ -1,4 +1,4 @@
-use crate::core::helpers::structs::ChampionNames;
+use crate::frontend_types::ChampionNames;
 
 pub struct Data {
     pub name: ChampionNames,

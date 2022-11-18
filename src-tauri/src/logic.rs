@@ -1,17 +1,20 @@
 use crate::core::{helpers, lcu, data_dragon};
 use crate::errors::DataDragonError;
 use crate::extensions::ugg::json::{ranking, overview};
-use crate::frontend_types::RunesAndAbilities;
+use crate::frontend_types::{RunesAndAbilities, ChampionValue, ChampionNames};
 use crate::{frontend_types, extensions};
 
 use extensions::ugg;
 use helpers::{structs::ChampionNames, runes::create_rune_page};
 use frontend_types::ChampionInfo;
+use serde_json::json;
 use data_dragon::structs::DataDragon; 
+use crate::core::helpers::runes::create_rune_page;
 
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
+#[tauri::command]
 pub async fn champion_info(
     name: ChampionNames,
     role: String,
@@ -88,6 +91,7 @@ pub async fn champion_info(
     }
 }
 
+#[tauri::command]
 pub async fn push_runes(
     name: ChampionNames,
     role: String,
@@ -112,12 +116,12 @@ pub async fn push_runes(
         Ok((_, tree_ids, rune_ids)) => {
             match winrate {
                 Ok(win_rate) => {
-                    let page = create_rune_page(
-                        format!("{0} {1} {2}", name.label, role, win_rate), 
-                        tree_ids[0], 
-                        tree_ids[1], 
-                        rune_ids
-                    ).await;
+                    let page = json!({
+                        "name": format!("{0} {1} {2}", name.label, role, win_rate),
+                        "primaryStyleId": tree_ids[0],
+                        "subStyleId": tree_ids[1],
+                        "selectedPerkIds": rune_ids
+                    });
                     let result = push_runes_to_client(page).await;
                     match result {
                         Ok(response) => Ok(i64::from(response)),
@@ -131,7 +135,9 @@ pub async fn push_runes(
     }
 }
 
-pub async fn languages() -> Result<Vec<String>, i64> {
+
+#[tauri::command]
+pub async fn get_languages() -> Result<Vec<String>, i64> {
     let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
     match request {
         Ok(response) => {
@@ -145,6 +151,7 @@ pub async fn languages() -> Result<Vec<String>, i64> {
     }
 }
 
+#[tauri::command]
 pub async fn runes_and_abilities(
     name: ChampionNames,
     role: String,
@@ -194,6 +201,38 @@ pub async fn runes_and_abilities(
                     }
                 },
                 Err(err) => Err(i64::from(err))
+            }
+        },
+        Err(err) => Err(i64::from(err)),
+    }
+}
+
+
+#[tauri::command]
+pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
+    let mut champions = Vec::new();
+    let data_dragon = DataDragon::new(Some(lang)).await;
+
+    match data_dragon {
+        Ok(data_dragon) => {
+            let champ_json = data_dragon.champion_json().await;
+            match champ_json {
+                Ok(json) => {
+                    for (champ_key, champ) in json.data.iter() {
+                        champions.push(ChampionNames {
+                          label: champ.clone().name,
+                          value: ChampionValue { key: champ_key.to_string(), id: champ.key.parse::<i64>().unwrap() },
+                          url: format!(
+                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                            &data_dragon.version,
+                            &champ.id,
+                        ),
+                          local_image: format!("/{0}/{0}.png", &champ.id),
+                        });
+                    }
+                    Ok(champions)
+                }
+                Err(err) => Err(i64::from(err)),
             }
         },
         Err(err) => Err(i64::from(err)),

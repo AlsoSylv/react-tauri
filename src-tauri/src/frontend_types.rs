@@ -60,8 +60,8 @@ pub struct RunesAndAbilities {
 pub struct ChampionNames {
     pub label: String,
     pub value: ChampionValue,
-    pub url: String,
-    pub local_image: String,
+    pub url: Option<String>,
+    pub local_image: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

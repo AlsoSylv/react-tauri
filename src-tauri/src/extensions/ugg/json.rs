@@ -28,9 +28,8 @@ pub async fn ranking(
                 Ok(json) => {
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&region]]
-                                [TIERS[&rank]][&role];
-
+                            //TODO: Check keys before reading, this can cause errors
+                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -68,8 +67,8 @@ pub async fn overview(
                 Ok(json) => {
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&region]]
-                                [TIERS[&rank]][&role][0];
+                            //TODO: Check keys before reading, this can cause errors
+                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role][0];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -96,7 +95,6 @@ async fn position(
         }
     } else {
     let role = ROLES[&role];
-
         Ok(role.to_string())
     }
 }

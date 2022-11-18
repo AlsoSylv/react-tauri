@@ -30,6 +30,7 @@ impl structs::Data {
                     Ok(json) => {
                         match items {
                             Ok(items) => {
+                                //TODO We can get the specfic winrates of each of these sets rather easily
                                 let start = json[DATA["starting_items"]][2].as_array();
                                 let mythic = json[DATA["mythic_and_core"]][2].as_array();
                                 let fourth = json[DATA["other_items"]][0].as_array();

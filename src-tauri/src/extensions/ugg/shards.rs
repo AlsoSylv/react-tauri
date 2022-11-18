@@ -10,6 +10,7 @@ use constants::DATA;
 
 impl structs::Data {
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
+        //TODO: Use Community Dragon to get shard data
         let armor = Shard::create(
             "Armor", 
             5002, 

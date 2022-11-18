@@ -66,6 +66,7 @@ impl structs::Data {
     pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
         match request {
             Ok(json) => {
+                //TODO: Return as rank/total-rank instead of just rank
                 let Some(rank) = json[STATS["rank"]].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };

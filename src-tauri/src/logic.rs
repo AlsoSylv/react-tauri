@@ -12,6 +12,7 @@ use data_dragon::structs::DataDragon;
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
+//TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 #[tauri::command]
 pub async fn champion_info(
     name: ChampionNames,
@@ -133,7 +134,7 @@ pub async fn push_runes(
     }
 }
 
-
+//TODO: This needs a data dragon fallback, assuming one exists
 #[tauri::command]
 pub async fn get_languages() -> Result<Vec<String>, i64> {
     let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
@@ -149,6 +150,7 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
     }
 }
 
+//TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 #[tauri::command]
 pub async fn runes_and_abilities(
     name: ChampionNames,

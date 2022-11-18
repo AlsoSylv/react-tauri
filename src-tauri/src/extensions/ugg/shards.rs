@@ -1,8 +1,12 @@
 use serde_json::Value;
 
-use crate::errors::{ErrorMap, UGGDataError};
+use crate::errors;
+use errors::{ErrorMap, UGGDataError};
 
-use super::{structs::{self, Shard, Shards}, constants::DATA};
+use super::{structs, constants};
+
+use structs::{Shard, Shards};
+use constants::DATA;
 
 impl structs::Data {
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {

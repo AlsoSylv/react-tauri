@@ -1,9 +1,16 @@
 use serde_json::Value;
 
-use crate::{core::data_dragon::structs::DataDragon, errors::{ErrorMap, UGGDataError, DataDragonError}};
+use crate::{core::data_dragon, errors};
+
+use errors::{ErrorMap, UGGDataError, DataDragonError};
+use data_dragon::structs::DataDragon;
+
 use ErrorMap::{UGGError, DataDragonErrors};
 
-use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, constants::DATA};
+use super::{structs, constants};
+
+use structs::{AbilitiesMap, AbilitiesValue, Passive};
+use constants::DATA;
 
 impl structs::Data {
     pub async fn abilities(&self, request: Result<Value, ErrorMap>) -> Result<AbilitiesMap, ErrorMap> {

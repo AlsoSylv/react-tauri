@@ -1,14 +1,13 @@
-use crate::core::helpers::structs::ChampionNames;
-use crate::core::lcu;
+use crate::core::{helpers, lcu, data_dragon};
 use crate::errors::DataDragonError;
 use crate::extensions::ugg::json::{ranking, overview};
 use crate::frontend_types::RunesAndAbilities;
 use crate::{frontend_types, extensions};
-use extensions::ugg;
 
+use extensions::ugg;
+use helpers::{structs::ChampionNames, runes::create_rune_page};
 use frontend_types::ChampionInfo;
-use crate::core::data_dragon::structs::DataDragon; 
-use crate::core::helpers::runes::create_rune_page;
+use data_dragon::structs::DataDragon; 
 
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;

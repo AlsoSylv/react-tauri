@@ -1,4 +1,7 @@
-use crate::{frontend_types::{Active, RuneImages}, core::helpers, errors::{ErrorMap, UGGDataError}};
+use crate::{frontend_types, core::helpers, errors};
+
+use frontend_types::{Active, RuneImages};
+use errors::{ErrorMap, UGGDataError};
 use ErrorMap::DataDragonErrors;
 use serde_json::Value;
 

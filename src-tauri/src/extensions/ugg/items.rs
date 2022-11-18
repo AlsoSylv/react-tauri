@@ -1,8 +1,14 @@
 use serde_json::Value;
 
-use crate::{core::data_dragon::structs::DataDragon, errors::ErrorMap};
+use crate::{core::data_dragon, errors};
 
-use super::{structs::{self, ItemsMap, ItemValues}, constants::DATA};
+use data_dragon::structs::DataDragon;
+use errors::ErrorMap;
+
+use super::{structs, constants};
+
+use constants::DATA;
+use structs::{ItemsMap, ItemValues};
 
 impl structs::Data {
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {

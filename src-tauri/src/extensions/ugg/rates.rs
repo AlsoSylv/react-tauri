@@ -1,8 +1,12 @@
 use serde_json::Value;
 
-use crate::errors::{ErrorMap, UGGDataError};
+use crate::errors;
 
-use super::{structs, constants::STATS};
+use errors::{ErrorMap, UGGDataError};
+
+use super::{structs, constants};
+
+use constants::STATS;
 
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math

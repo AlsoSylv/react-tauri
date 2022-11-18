@@ -1,9 +1,14 @@
 use serde_json::Value;
 
-use crate::errors::{ErrorMap, UGGDataError};
+use crate::errors;
+
+use errors::{ErrorMap, UGGDataError};
 use ErrorMap::UGGError;
 
-use super::{constants::{TIERS, REGIONS, ROLES}, structs::UggRequest};
+use super::{constants, structs};
+
+use structs::UggRequest;
+use constants::{TIERS, REGIONS, ROLES};
 
 pub async fn ranking(
     name: &i64, 

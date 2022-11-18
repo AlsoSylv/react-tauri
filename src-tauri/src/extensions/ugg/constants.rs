@@ -2,6 +2,8 @@ use phf::{phf_map, phf_ordered_map};
 
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
+
+//TODO: These need to support translations somehow, ideally automatically
 pub static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_map! {
     "World" => "12",
     "North America" => "1",

@@ -1,5 +1,7 @@
+use crate::frontend_types::ChampionNames;
+
 pub struct Data {
-    pub name: String,
+    pub name: ChampionNames,
     pub role: String,
     pub rank: String,
     pub region: String,
@@ -7,8 +9,7 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(name: String, role: String, rank: String, region: String) -> Self {
-        let lang = "en_US".to_string();
+    pub fn new(name: ChampionNames, role: String, rank: String, region: String, lang: String) -> Self {
         return Data { 
             name, 
             role, 
@@ -20,15 +21,15 @@ impl Data {
 }
 
 pub struct UggRequest {
-    pub name: String,
+    pub id: i64,
     pub client: reqwest::Client,
     pub lang: String,
 }
 
 impl UggRequest {
-    pub fn new(name: &str, lang: &str) -> Self {
+    pub fn new(id: &i64, lang: &str) -> Self {
         let client = reqwest::Client::new();
-        return UggRequest { name: name.to_string(), client, lang: lang.to_string() }
+        return UggRequest { id: *id, client, lang: lang.to_string() }
     }
 }
 

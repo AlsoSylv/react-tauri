@@ -1,10 +1,17 @@
-use crate::{core::data_dragon::structs::DataDragon, errors::ErrorMap};
+use serde_json::Value;
 
-use super::{structs::{self, ItemsMap, ItemValues}, json::overview, constants::DATA};
+use crate::{core::data_dragon, errors};
+
+use data_dragon::structs::DataDragon;
+use errors::ErrorMap;
+
+use super::{structs, constants};
+
+use constants::DATA;
+use structs::{ItemsMap, ItemValues};
 
 impl structs::Data {
-    
-    pub async fn items(&self) -> Result<ItemsMap, ErrorMap> {
+    pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = 
         ItemsMap { 
@@ -17,26 +24,13 @@ impl structs::Data {
         
         match data_dragon {
             Ok(data_dragon) => {
-                let fut_request = overview(
-                    &self.name, 
-                    &self.role, 
-                    &self.rank, 
-                    &self.region,
-                    &self.lang,
-                );
-                let fut_items = data_dragon.item_json();
-        
-                let (
-                    request, 
-                    items
-                ) = futures::join!(
-                    fut_request, 
-                    fut_items
-                );
+                let items = data_dragon.item_json().await;
+
                 match request {
                     Ok(json) => {
                         match items {
                             Ok(items) => {
+                                //TODO We can get the specfic winrates of each of these sets rather easily
                                 let start = json[DATA["starting_items"]][2].as_array();
                                 let mythic = json[DATA["mythic_and_core"]][2].as_array();
                                 let fourth = json[DATA["other_items"]][0].as_array();

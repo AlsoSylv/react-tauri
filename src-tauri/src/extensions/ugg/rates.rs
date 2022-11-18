@@ -1,8 +1,12 @@
 use serde_json::Value;
 
-use crate::errors::{ErrorMap, UGGDataError};
+use crate::errors;
 
-use super::{structs, json::ranking, constants::STATS};
+use errors::{ErrorMap, UGGDataError};
+
+use super::{structs, constants};
+
+use constants::STATS;
 
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math
@@ -59,17 +63,10 @@ impl structs::Data {
         }
     }
 
-    pub async fn rank(&self) -> Result<i64, ErrorMap> {
-        let request = ranking(
-            &self.name, 
-            &self.role, 
-            &self.rank, 
-            &self.region,
-            &self.lang,
-        ).await;
-
+    pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
         match request {
             Ok(json) => {
+                //TODO: Return as rank/total-rank instead of just rank
                 let Some(rank) = json[STATS["rank"]].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };

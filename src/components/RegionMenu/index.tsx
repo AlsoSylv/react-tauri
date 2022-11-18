@@ -1,25 +1,17 @@
 import { SyntheticEvent } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
+import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import AutoCompleteOption from 'interfaces/AutoCompleteOption';
+import { AutoCompleteOption } from 'interfaces/AutoCompleteOption';
 
-const regions: AutoCompleteOption[] = [
-  { label: 'World', value: 'world' },
-  { label: 'North America', value: 'na1' },
-  { label: 'EU West', value: 'euw1' },
-  { label: 'Korea', value: 'kr' },
-  { label: 'Brazil', value: 'br1' },
-  { label: 'EU North', value: 'eun1' },
-  { label: 'Japan', value: 'jp1' },
-  { label: 'LA North', value: 'la1' },
-  { label: 'LA South', value: 'la2' },
-  { label: 'OCE', value: 'oc1' },
-  { label: 'Russia', value: 'ru' },
-  { label: 'Turkey', value: 'tr1' },
-];
+const regions: AutoCompleteOption[] = [];
+
+invoke<string[]>('regions').then((region) => {
+  region.map((Region) => regions.push({ label: Region, value: Region }));
+});
 
 function RegionMenu() {
   const {

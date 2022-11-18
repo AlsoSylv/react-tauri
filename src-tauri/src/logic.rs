@@ -217,16 +217,15 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
             match champ_json {
                 Ok(json) => {
                     for (champ_key, champ) in json.data.iter() {
-                        let key = &champ.id;
                         champions.push(ChampionNames {
                           label: champ.clone().name,
                           value: ChampionValue { key: champ_key.to_string(), id: champ.key.parse::<i64>().unwrap() },
                           url: format!(
                             "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
                             &data_dragon.version,
-                            key,
+                            &champ.id,
                         ),
-                          local_image: format!("/{0}/{0}.png", key),
+                          local_image: format!("/{0}/{0}.png", &champ.id),
                         });
                     }
                     Ok(champions)

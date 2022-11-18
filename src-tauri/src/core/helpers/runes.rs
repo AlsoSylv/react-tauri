@@ -110,11 +110,12 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                             }
                         }
                     }
-                    let rune_names = RuneImages {
-                        primary_runes: tree_one_names,
-                        secondary_runes: tree_two_names,
-                    };
-                    Ok(rune_names)
+                    Ok(
+                        RuneImages {
+                            primary_runes: tree_one_names,
+                            secondary_runes: tree_two_names,
+                        }
+                    )
                 }
                 Err(err) => Err(err),
             }

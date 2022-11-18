@@ -3,13 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use crate::core::helpers;
-
 use extensions::ugg::constants;
 
 use constants::{TIERS, REGIONS, ROLES};
-use frontend_types::{ChampionInfo, RunesAndAbilities};
-use helpers::structs::ChampionNames;
 
 mod extensions;
 mod core;

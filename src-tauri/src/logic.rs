@@ -22,7 +22,7 @@ pub async fn champion_info(
     lang: String,
 ) -> Result<ChampionInfo, i64> {
     let data_dragon = DataDragon::new(Some(&lang)).await;
-    let request = ranking(&name.value.id, &role, &rank, &region, "en_US").await;
+    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
     match data_dragon {
         Ok(data_dragon) => {
             let data = Data::new(name.clone(), role.clone(), rank, region, lang);

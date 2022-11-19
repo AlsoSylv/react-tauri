@@ -27,6 +27,7 @@ function RoleMenu() {
         value={roleList.find(({ value }) => value === role)}
         options={roleList}
         onChange={handleChangeRank}
+        disableClearable
         isOptionEqualToValue={(option, value) => option?.value === value?.value}
         renderInput={(params) => <TextField {...params} label="Select a role" />}
       />

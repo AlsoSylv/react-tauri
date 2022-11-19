@@ -2,7 +2,13 @@ const initialGlobalState = {
   rank: 'Platinum Plus',
   role: 'Default',
   region: 'World',
-  champion: '',
+  champion: null,
+  regionList: [],
+  championList: [],
+  roleList: [],
+  rankList: [],
+  languageList: [],
+  selectedLanguage: '',
 };
 
 export default initialGlobalState;

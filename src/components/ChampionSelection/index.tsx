@@ -8,26 +8,27 @@ import { ChampionOptions as IChampionOptions } from 'interfaces';
 import { getChampionNames } from 'utils/utils';
 
 function ChampionOptions() {
-  const [champions, setChampions] = useState<IChampionOptions[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
-    state: { champion },
+    state: { champion, selectedLanguage, championList },
     dispatch,
   } = useGlobalContext();
 
   useEffect(() => {
     const getChampions = async () => {
-      const newNames = await getChampionNames();
+      if (selectedLanguage) {
+        const newNames = await getChampionNames(selectedLanguage);
 
-      setChampions(newNames);
-      setIsLoading(false);
+        dispatch({ type: Actions.SET_CHAMPIONS_LIST, payload: newNames });
+        setIsLoading(false);
+      }
     };
 
     getChampions();
-  }, []);
+  }, [selectedLanguage, dispatch]);
 
   const changeSelectedChampion = (_: unknown, value: IChampionOptions | null) => {
-    const newChampionSelection = value?.value || '';
+    const newChampionSelection = value ? { value: value.value, label: value.label } : null;
 
     dispatch({ type: Actions.UPDATE_CHAMPION, payload: newChampionSelection });
   };
@@ -36,11 +37,11 @@ function ChampionOptions() {
     <Box>
       <Autocomplete<IChampionOptions>
         disablePortal
-        value={champions.find(({ value }) => value === champion) || null}
+        value={championList.find(({ value }) => value.id === champion?.value.id) || null}
         onChange={changeSelectedChampion}
         loading={isLoading}
         id="champions-select"
-        options={champions}
+        options={championList}
         renderInput={(params) => <TextField {...params} label="Select a champion" />}
         renderOption={(props, option) => (
           <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>

@@ -4,14 +4,14 @@ import { Alert, Box, Unstable_Grid2 as Grid, Typography, Avatar } from '@mui/mat
 
 import Runes from 'components/Runes';
 import { useGlobalContext } from 'context/global';
-import { CompleteChampionInfo } from 'interfaces/ChampionInfo';
-import { getChampionInfo, validateState } from 'utils/utils';
+import type { ChampionData } from 'interfaces';
+import { getChampionBuild, validateState } from 'utils/utils';
 
 function ChampionInformationDisplay() {
   const { state } = useGlobalContext();
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [championInfo, setChampionInfo] = useState<CompleteChampionInfo | null>(null);
+  const [championInfo, setChampionInfo] = useState<ChampionData | null>(null);
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,7 +30,9 @@ function ChampionInformationDisplay() {
         return;
       }
 
-      const championInfoResponse = await getChampionInfo(state);
+      const championInfoResponse = await getChampionBuild(state);
+
+      console.log(championInfoResponse);
 
       if (championInfoResponse.completedSuccessfully) {
         const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;
@@ -61,7 +63,7 @@ function ChampionInformationDisplay() {
                   <Grid xs={1}>
                     <Avatar
                       src={url || ''}
-                      alt={state.champion}
+                      alt={state.champion?.label}
                       imgProps={{ onError: () => setUrl(championInfo?.url || '') }}
                     />
                   </Grid>

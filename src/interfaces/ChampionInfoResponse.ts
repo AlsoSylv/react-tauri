@@ -1,12 +1,17 @@
-import { CompleteChampionInfo } from './ChampionInfo';
+import ChampionBuild from './ChampionBuild';
+import ChampionInfo from './ChampionInfo';
 
-type ChampionInfoResponse =
-  | ({
-      completedSuccessfully: true;
-    } & CompleteChampionInfo)
-  | {
-      message: string;
-      completedSuccessfully: false;
-    };
+type ChampionData = ChampionBuild & ChampionInfo;
 
-export default ChampionInfoResponse;
+interface SuccessfulChampionInfoResponse extends ChampionData {
+  completedSuccessfully: true;
+}
+
+interface FailedChampionInfoResponse {
+  message: string;
+  completedSuccessfully: false;
+}
+
+type ChampionInfoResponse = SuccessfulChampionInfoResponse | FailedChampionInfoResponse;
+
+export { ChampionData, ChampionInfoResponse };

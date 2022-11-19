@@ -1,25 +1,18 @@
 import { SyntheticEvent } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
-import { AutoCompleteOption } from 'interfaces/AutoCompleteOption';
-
-const regions: AutoCompleteOption[] = [];
-
-invoke<string[]>('regions').then((region) => {
-  region.map((Region) => regions.push({ label: Region, value: Region }));
-});
+import { AutoCompleteOption } from 'interfaces';
 
 function RegionMenu() {
   const {
-    state: { region },
+    state: { region, regionList },
     dispatch,
   } = useGlobalContext();
 
-  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption | null) => {
+  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption<string> | null) => {
     const newValue = value?.value || '';
 
     dispatch({ type: Actions.UPDATE_REGION, payload: newValue });
@@ -30,10 +23,10 @@ function RegionMenu() {
       <Autocomplete
         disablePortal
         id="region-select"
-        value={regions.find(({ value }) => value === region)}
+        value={regionList.find(({ value }) => value === region)}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         disableClearable
-        options={regions}
+        options={regionList}
         onChange={handleChangeRank}
         renderInput={(params) => <TextField {...params} label="Select a region" />}
       />

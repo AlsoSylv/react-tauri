@@ -1,9 +1,9 @@
-interface AutoCompleteOption {
+interface AutoCompleteOption<T> {
   label: string;
-  value: string;
+  value: T;
 }
 
-interface ChampionOptions extends AutoCompleteOption {
+interface ChampionOptions extends AutoCompleteOption<{ id: number; key: string }> {
   url: string;
   localImage: string;
 }

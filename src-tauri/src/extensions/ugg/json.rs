@@ -1,12 +1,17 @@
 use serde_json::Value;
 
-use crate::errors::{ErrorMap, UGGDataError};
+use crate::errors;
+
+use errors::{ErrorMap, UGGDataError};
 use ErrorMap::UGGError;
 
-use super::{constants::{TIERS, REGIONS, ROLES}, structs::UggRequest};
+use super::{constants, structs};
+
+use structs::UggRequest;
+use constants::{TIERS, REGIONS, ROLES};
 
 pub async fn ranking(
-    name: &str, 
+    name: &i64, 
     role: &str, 
     rank: &str, 
     region: &str,
@@ -23,9 +28,8 @@ pub async fn ranking(
                 Ok(json) => {
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&region]]
-                                [TIERS[&rank]][&role];
-
+                            //TODO: Check keys before reading, this can cause errors
+                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -39,7 +43,7 @@ pub async fn ranking(
 }
 
 pub async fn overview(
-    name: &str,
+    name: &i64,
     role: &str,
     rank: &str,
     region: &str,
@@ -63,8 +67,8 @@ pub async fn overview(
                 Ok(json) => {
                     match role {
                         Ok(role) => {
-                            let json_read: &Value = &json[REGIONS[&region]]
-                                [TIERS[&rank]][&role][0];
+                            //TODO: Check keys before reading, this can cause errors
+                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role][0];
                             Ok(json_read.to_owned())
                         }
                         Err(err) => Err(err),
@@ -78,7 +82,7 @@ pub async fn overview(
 }
 
 async fn position(
-    name: &str, 
+    name: &i64, 
     role: &str,
     lang: &str,
 ) -> Result<String, ErrorMap> {
@@ -91,7 +95,6 @@ async fn position(
         }
     } else {
     let role = ROLES[&role];
-
         Ok(role.to_string())
     }
 }

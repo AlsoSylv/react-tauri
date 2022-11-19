@@ -1,3 +1,5 @@
+use crate::extensions::ugg::structs::{ItemsMap, AbilitiesMap, Shards};
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
@@ -43,3 +45,29 @@ pub struct Active {
     pub id: i64,
     pub description: String,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RunesAndAbilities {
+    pub runes: RuneImages,
+    pub items: ItemsMap,
+    pub abilities: AbilitiesMap,
+    pub shards: Shards,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampionNames {
+    pub label: String,
+    pub value: ChampionValue,
+    pub url: Option<String>,
+    pub local_image: Option<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampionValue {
+    pub key: String,
+    pub id: i64,
+}
+

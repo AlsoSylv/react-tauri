@@ -1,39 +1,31 @@
 use serde_json::Value;
 
-use crate::{core::data_dragon::structs::DataDragon, errors::{ErrorMap, UGGDataError, DataDragonError}};
+use crate::{core::data_dragon, errors};
+
+use errors::{ErrorMap, UGGDataError, DataDragonError};
+use data_dragon::structs::DataDragon;
+
 use ErrorMap::{UGGError, DataDragonErrors};
 
-use super::{structs::{self, AbilitiesMap, AbilitiesValue, Passive}, json::overview, constants::DATA};
+use super::{structs, constants};
+
+use structs::{AbilitiesMap, AbilitiesValue, Passive};
+use constants::DATA;
 
 impl structs::Data {
-    pub async fn abilities(&self) -> Result<AbilitiesMap, ErrorMap> {
+    pub async fn abilities(&self, request: Result<Value, ErrorMap>) -> Result<AbilitiesMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match data_dragon {
             Ok(data_dragon) => {
-                let fut_abilities = overview(
-                    &self.name, 
-                    &self.role, 
-                    &self.rank, 
-                    &self.region,
-                    &self.lang,
-                );
-                let fut_champ_json = data_dragon.champ_full(self.name.clone());
-                let (
-                    abilities, 
-                    champ_json, 
-                ) = futures::join!(
-                        fut_abilities, 
-                        fut_champ_json, 
-                    );
-                
-                match abilities {
+                let champ_json = data_dragon.champ_full(self.name.value.key.clone()).await;
+                match request {
                     Ok(json) => {
                         let Some(abilities_order) = json[DATA["abilities"]][2].as_array() else {
                             return Err(UGGError(UGGDataError::NoAbilityOrder))
                         };
                         match champ_json {
                             Ok(json) => {
-                                let champ_json = json.data[&self.name].clone();
+                                let champ_json = json.data[&self.name.value.key].clone();
         
                                 let possible_passive = &champ_json["passive"]["image"]["full"];
         

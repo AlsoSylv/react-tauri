@@ -5,7 +5,6 @@ import initialGlobalState from './state';
 
 // eslint-disable-next-line default-param-last
 const contextReducer = (state: State = initialGlobalState, action: GlobalActions): State => {
-  console.log(state);
   console.log(action);
   switch (action.type) {
     case Actions.UPDATE_CHAMPION: {
@@ -19,6 +18,15 @@ const contextReducer = (state: State = initialGlobalState, action: GlobalActions
     }
     case Actions.UPDATE_ROLE: {
       return { ...state, role: action.payload };
+    }
+    case Actions.SET_INITIAL_DATA: {
+      return { ...state, ...action.payload };
+    }
+    case Actions.SET_SELECTED_LANGUAGE: {
+      return { ...state, selectedLanguage: action.payload };
+    }
+    case Actions.SET_CHAMPIONS_LIST: {
+      return { ...state, championList: action.payload };
     }
     default: {
       return state;

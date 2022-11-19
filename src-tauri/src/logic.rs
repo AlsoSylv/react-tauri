@@ -1,31 +1,35 @@
-use crate::core::lcu;
+use crate::core::{lcu, data_dragon};
 use crate::errors::DataDragonError;
-use crate::extensions::ugg::json::ranking;
+use crate::extensions::ugg::json::{ranking, overview};
+use crate::frontend_types::{RunesAndAbilities, ChampionValue, ChampionNames};
 use crate::{frontend_types, extensions};
-use extensions::ugg;
 
+use extensions::ugg;
 use frontend_types::ChampionInfo;
-use crate::core::data_dragon::structs::DataDragon; 
-use crate::core::helpers::runes::create_rune_page;
+use serde_json::json;
+use data_dragon::structs::DataDragon; 
 
 use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
+//TODO: This shouldn't fail if something goes wrong, it should just send the values that work
+#[tauri::command]
 pub async fn champion_info(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<ChampionInfo, i64> {
-    let data_dragon = DataDragon::new(Some("en_US")).await;
-    let request = ranking(&name, &role, &rank, &region, "en_US").await;
+    let data_dragon = DataDragon::new(Some(&lang)).await;
+    let request = ranking(&name.value.id, &role, &rank, &region, "en_US").await;
     match data_dragon {
         Ok(data_dragon) => {
-            let data = Data::new(name.clone(), role.clone(), rank, region);
+            let data = Data::new(name.clone(), role.clone(), rank, region, lang);
             let fut_winrate = data.winrate(request.clone());
             let fut_pickrate = data.pick_rate(request.clone());
-            let fut_banrate = data.ban_rate(request);
-            let fut_tier = data.rank();
+            let fut_banrate = data.ban_rate(request.clone());
+            let fut_tier = data.rank(request);
             let fut_champion_json = data_dragon.champion_json();
             let (
                 winrate,
@@ -49,7 +53,7 @@ pub async fn champion_info(
                                 Ok(ban_rate) => {
                                     match champion_json {
                                         Ok(json) => {
-                                            let id = &json.data.get(&name).unwrap().id;
+                                            let id = &json.data.get(&name.label).unwrap().id;
                                             let url = format!(
                                                 "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
                                                 &data_dragon.version,
@@ -86,16 +90,19 @@ pub async fn champion_info(
     }
 }
 
+#[tauri::command]
 pub async fn push_runes(
-    name: String,
+    name: ChampionNames,
     role: String,
     rank: String,
     region: String,
+    lang: String,
 ) -> Result<i64, i64> {
-    let request = ranking(&name, &role, &rank, &region, "en_US").await;
-    let data = Data::new(name.clone(), role.clone(), rank, region);
+    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
     let fut_winrate = data.winrate(request);
-    let fut_rune_match = data.rune_tuple();
+    let fut_rune_match = data.rune_tuple(request_2);
     let (
         winrate, 
         rune_match
@@ -108,12 +115,12 @@ pub async fn push_runes(
         Ok((_, tree_ids, rune_ids)) => {
             match winrate {
                 Ok(win_rate) => {
-                    let page = create_rune_page(
-                        format!("{0} {1} {2}", name, role, win_rate), 
-                        tree_ids[0], 
-                        tree_ids[1], 
-                        rune_ids
-                    ).await;
+                    let page = json!({
+                        "name": format!("{0} {1} {2}", name.label, role, win_rate),
+                        "primaryStyleId": tree_ids[0],
+                        "subStyleId": tree_ids[1],
+                        "selectedPerkIds": rune_ids
+                    });
                     let result = push_runes_to_client(page).await;
                     match result {
                         Ok(response) => Ok(i64::from(response)),
@@ -127,7 +134,9 @@ pub async fn push_runes(
     }
 }
 
-pub async fn languages() -> Result<Vec<String>, i64> {
+//TODO: This needs a data dragon fallback, assuming one exists
+#[tauri::command]
+pub async fn get_languages() -> Result<Vec<String>, i64> {
     let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
     match request {
         Ok(response) => {
@@ -138,5 +147,94 @@ pub async fn languages() -> Result<Vec<String>, i64> {
             }
         },
         Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
+    }
+}
+
+//TODO: This shouldn't fail if something goes wrong, it should just send the values that work
+#[tauri::command]
+pub async fn runes_and_abilities(
+    name: ChampionNames,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<RunesAndAbilities, i64> {
+    let request = overview(&name.value.id, &role, &rank, &region, &lang).await;
+    let data = Data::new(name, role, rank, region, lang);
+    let fut_runes = data.rune_tuple(request.clone());
+    let fut_abilities = data.abilities(request.clone());
+    let fut_shards = data.shard_tuple(request.clone());
+    let fut_items = data.items(request);
+    let (
+        runes,
+        abilities,
+        shards,
+        items,
+    ) = futures::join!(
+        fut_runes,
+        fut_abilities,
+        fut_shards,
+        fut_items,
+    );
+
+    match runes {
+        Ok((runes, _, _)) => {
+            match abilities {
+                Ok(abilities) => {
+                    match shards {
+                        Ok(shards) => {
+                            match items {
+                                Ok(items) => {
+                                    Ok(
+                                        RunesAndAbilities { 
+                                            runes, 
+                                            items, 
+                                            abilities, 
+                                            shards 
+                                        }
+                                    )
+                                },
+                                Err(err) => Err(i64::from(err))
+                            }
+                        },
+                        Err(err) => Err(i64::from(err))
+                    }
+                },
+                Err(err) => Err(i64::from(err))
+            }
+        },
+        Err(err) => Err(i64::from(err)),
+    }
+}
+
+
+#[tauri::command]
+pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
+    let mut champions = Vec::new();
+    let data_dragon = DataDragon::new(Some(lang)).await;
+
+    match data_dragon {
+        Ok(data_dragon) => {
+            let champ_json = data_dragon.champion_json().await;
+            match champ_json {
+                Ok(json) => {
+                    for (champ_key, champ) in json.data.iter() {
+                        champions.push(ChampionNames {
+                          label: champ.clone().name,
+                          value: ChampionValue { key: champ_key.to_string(), id: champ.key.parse::<i64>().unwrap() },
+                          url: Some(format!(
+                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                            &data_dragon.version,
+                            &champ.id,
+                        )),
+                          local_image: Some(format!("/{0}/{0}.png", &champ.id)),
+                        });
+                    }
+                    Ok(champions)
+                }
+                Err(err) => Err(i64::from(err)),
+            }
+        },
+        Err(err) => Err(i64::from(err)),
     }
 }

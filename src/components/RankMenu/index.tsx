@@ -1,25 +1,18 @@
 import { SyntheticEvent } from 'react';
 
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { invoke } from '@tauri-apps/api';
 
 import { useGlobalContext } from 'context/global';
 import { Actions } from 'context/global/actions';
 import { AutoCompleteOption } from 'interfaces';
 
-const ranks: AutoCompleteOption[] = [];
-
-invoke<string[]>('tiers').then((tier) => {
-  tier.map((Tier) => ranks.push({ label: Tier, value: Tier }));
-});
-
 function RankMenu() {
   const {
-    state: { rank },
+    state: { rank, rankList },
     dispatch,
   } = useGlobalContext();
 
-  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption | null) => {
+  const handleChangeRank = (_: SyntheticEvent<Element, Event>, value: AutoCompleteOption<string> | null) => {
     const newValue = value?.value || '';
 
     dispatch({ type: Actions.UPDATE_RANK, payload: newValue });
@@ -31,9 +24,9 @@ function RankMenu() {
         disablePortal
         disableClearable
         id="rank-select"
-        value={ranks.find(({ value }) => value === rank)}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        options={ranks}
+        value={rankList.find(({ value }) => value === rank)}
+        isOptionEqualToValue={(option, value) => option?.value === value?.value}
+        options={rankList}
         onChange={handleChangeRank}
         renderInput={(params) => <TextField {...params} label="Select a rank" />}
       />

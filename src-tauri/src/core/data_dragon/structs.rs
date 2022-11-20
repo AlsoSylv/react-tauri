@@ -19,20 +19,22 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
 
 impl DataDragon {
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let mut language = language;
-        if language == None {
-            language = Some("en_US");
-        }
+        let lang = match language {
+            Some(lang) => lang,
+            None => "en_US",
+        };
+
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
-        if cache.get("version") != None {
+        if let Some(cache) = cache.get("version") {
             return Ok(
                 DataDragon { 
-                    version: cache.get("version").unwrap().clone(), 
-                    language: language.unwrap().to_string(), 
+                    version: cache.clone(), 
+                    language: lang.to_string(), 
                     client 
                 });
         }
+
         let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
         match version {
             Ok(response) => {
@@ -44,7 +46,7 @@ impl DataDragon {
                         Ok(
                             DataDragon { 
                                 version, 
-                                language: language.unwrap().to_string(), 
+                                language: lang.to_string(), 
                                 client
                             })
                     },

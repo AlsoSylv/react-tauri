@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { invoke } from '@tauri-apps/api';
 
 import {
@@ -8,9 +9,12 @@ import {
   ChampionBuild,
   ValidatedStateResponse,
   AutoCompleteOption,
+  InitialData,
+  CachedData,
+  InvokeAndCacheProps,
 } from 'interfaces';
 
-import errors from './errors';
+import { errors, DEFAULT_CACHE_DURATION } from './constants';
 
 async function getChampionBuild(state: State): Promise<ChampionInfoResponse> {
   const requestArgs = {
@@ -43,29 +47,40 @@ function getChampionNames(lang: string) {
   return invoke<ChampionOptions[]>('all_champion_names', { lang });
 }
 
-const getLanguageName = (baseLanguage: string, languageCode: string): string =>
-  new Intl.DisplayNames([baseLanguage], { type: 'language', languageDisplay: 'standard' }).of(languageCode.replace('_', '-')) ||
-  '';
+function getLanguageName(baseLanguage: string, languageCode: string): string {
+  return (
+    new Intl.DisplayNames([baseLanguage], { type: 'language', languageDisplay: 'standard' }).of(
+      languageCode.replace('_', '-')
+    ) || ''
+  );
+}
 
-const fixLanguageCode = (language: string): string => language.replace('_', '-');
+function fixLanguageCode(language: string): string {
+  return language.replace('_', '-');
+}
 
-const unfixLanguageCode = (language: string): string => language.replace('-', '_');
+function unfixLanguageCode(language: string): string {
+  return language.replace('-', '_');
+}
 
-const capitalize = (string: string): string =>
-  string?.length > 1 ? string.charAt(0).toUpperCase() + string.slice(1) : string.charAt(0).toUpperCase();
+function capitalize(string: string): string {
+  return string?.length > 1 ? string.charAt(0).toUpperCase() + string.slice(1) : string.charAt(0).toUpperCase();
+}
 
-const getLanguageList = (currentLanguage: string, languages: string[]): AutoCompleteOption<string>[] => {
+function getLanguageList(currentLanguage: string, languages: string[]): AutoCompleteOption<string>[] {
   const fixedLanguage = currentLanguage.replace('_', '-');
 
   return languages.map((language) => ({
     label: capitalize(getLanguageName(fixedLanguage, fixLanguageCode(language))),
     value: language,
   }));
-};
+}
 
-const getSystemLanguage = () => unfixLanguageCode(Intl.DateTimeFormat().resolvedOptions().locale);
+function getSystemLanguage() {
+  return unfixLanguageCode(Intl.DateTimeFormat().resolvedOptions().locale);
+}
 
-const validateState = (state: State): ValidatedStateResponse => {
+function validateState(state: State): ValidatedStateResponse {
   const { champion, role } = state;
 
   if (!champion) {
@@ -77,13 +92,81 @@ const validateState = (state: State): ValidatedStateResponse => {
   }
 
   return { isValid: true, message: '' };
-};
+}
 
-const getRandomKey = () => crypto.randomUUID();
+function getRandomKey() {
+  return crypto.randomUUID();
+}
 
-const createArrayFromLength = (length: number) => [...Array(length)].map(getRandomKey);
+function createArrayFromLength(length: number) {
+  return [...Array(length)].map(getRandomKey);
+}
+
+function parseJson<T>(json: string): T | null {
+  try {
+    return JSON.parse(json);
+  } catch (_) {
+    return null;
+  }
+}
+
+async function invokeAndCache<T>(props: InvokeAndCacheProps): Promise<T> {
+  const { method, args, cacheDuration = DEFAULT_CACHE_DURATION } = props;
+
+  try {
+    const localStorageValue = parseJson<CachedData<T>>(localStorage.getItem(method) || '');
+
+    if (localStorageValue && localStorageValue.validUntil > Date.now()) {
+      return localStorageValue.data;
+    }
+
+    const value = await invoke<T>(method, args);
+
+    const valueToSave: CachedData<T> = {
+      validUntil: Date.now() + cacheDuration,
+      data: value,
+    };
+
+    localStorage.setItem(method, JSON.stringify(valueToSave));
+
+    return value;
+  } catch (error) {
+    console.error('Failed to fetch and cache data: ', error);
+    throw error;
+  }
+}
+
+function getCurrentLanguage(): string {
+  return localStorage.getItem('language') || getSystemLanguage();
+}
+
+async function getInitialData(): Promise<InitialData> {
+  try {
+    const [roles, tiers, regions, languages] = await Promise.all([
+      invokeAndCache<string[]>({ method: 'roles' }),
+      invokeAndCache<string[]>({ method: 'tiers' }),
+      invokeAndCache<string[]>({ method: 'regions' }),
+      invokeAndCache<string[]>({ method: 'get_languages' }),
+    ]);
+
+    const systemLanguage = getCurrentLanguage();
+    const selectedLanguage = languages.find((language) => fixLanguageCode(systemLanguage) === language) || languages[0];
+
+    const languageList = getLanguageList(selectedLanguage, languages);
+    const roleList: AutoCompleteOption<string>[] = roles.map((role) => ({ label: role, value: role }));
+    const rankList: AutoCompleteOption<string>[] = tiers.map((tier) => ({ label: tier, value: tier }));
+    const regionList: AutoCompleteOption<string>[] = regions.map((region) => ({ label: region, value: region }));
+
+    return { languageList, rankList, roleList, regionList, selectedLanguage };
+  } catch (error) {
+    console.error('Failed to get initial data, returning empty values: ', error);
+    return { languageList: [], rankList: [], roleList: [], regionList: [], selectedLanguage: '' };
+  }
+}
 
 export {
+  getInitialData,
+  getCurrentLanguage,
   getChampionBuild,
   getChampionNames,
   validateState,

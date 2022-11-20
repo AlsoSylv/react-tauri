@@ -34,9 +34,10 @@ function ChampionOptions() {
 
     dispatch({ type: Actions.UPDATE_CHAMPION, payload: newChampionSelection });
     if (newChampionSelection) {
-      console.log(newChampionSelection);
-
-      navigate(`/champions/${newChampionSelection}`);
+      navigate({
+        pathname: `/champions/${newChampionSelection.label}`,
+        search: `id=${newChampionSelection.value.id}&key=${newChampionSelection.value.key}`,
+      });
     }
   };
 

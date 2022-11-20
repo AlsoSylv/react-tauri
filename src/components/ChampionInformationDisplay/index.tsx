@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 
 import { Alert, Box, Unstable_Grid2 as Grid, Typography, Avatar } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import Runes from 'components/Runes';
 import { useGlobalContext } from 'context/global';
-import type { ChampionData } from 'interfaces';
+import type { AutoCompleteOption, ChampionData } from 'interfaces';
 import { getChampionBuild, validateState } from 'utils/utils';
 
 function ChampionInformationDisplay() {
   const { state } = useGlobalContext();
   const { champion = '' } = useParams();
+  const [searchParams] = useSearchParams();
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [championInfo, setChampionInfo] = useState<ChampionData | null>(null);
@@ -23,7 +24,18 @@ function ChampionInformationDisplay() {
       setLoading(true);
       setUrl(null);
 
-      const stateValidation = validateState(state);
+      const championValue: { id: number; key: string } = Object.fromEntries(
+        [...searchParams.entries()].map(([key, value]) => (key === 'id' ? [key, Number(value)] : [key, value]))
+      );
+
+      const selectedChampion: AutoCompleteOption<{ id: number; key: string }> = {
+        label: champion,
+        value: championValue,
+      };
+
+      const newState = { ...state, champion: selectedChampion };
+
+      const stateValidation = validateState(newState);
 
       if (!stateValidation.isValid) {
         setError(stateValidation.message);
@@ -32,7 +44,9 @@ function ChampionInformationDisplay() {
         return;
       }
 
-      const championInfoResponse = await getChampionBuild({ ...state, champion });
+      console.log(selectedChampion);
+
+      const championInfoResponse = await getChampionBuild(newState);
 
       console.log(championInfoResponse);
 
@@ -48,7 +62,7 @@ function ChampionInformationDisplay() {
     };
 
     handleGetChampionInformation();
-  }, [state]);
+  }, [state, champion, searchParams]);
 
   return (
     <Box id="get-runes">

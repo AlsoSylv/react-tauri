@@ -15,25 +15,23 @@ impl structs::DataDragon {
         if json.is_some() {
             return Ok(json.unwrap());
         }
+
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
         let request = self.client.get(url).send().await;
+
         match request {
             Ok(response) => {
-                let champ_json: Result<ChampJson, reqwest::Error> = response.json().await;
-                match champ_json {
-                    Ok(champ_json) => {
-                        cache
-                            .insert(self.language.clone(), champ_json.clone())
-                            .await;
-                        cache.sync();
-                        Ok(champ_json)
-                    }
-                    Err(_) => Err(DataDragonError::ChampMissingError),
-                }
+                let Ok(champ_json) = response.json::<ChampJson>().await else {
+                    return Err(DataDragonError::ChampMissingError);
+                };
+                cache.insert(self.language.clone(), champ_json.clone()).await;
+                cache.sync();
+                Ok(champ_json)
             }
+
             Err(err) => {
                 if err.is_body() {
                     Err(DataDragonError::DataDragonMissing)
@@ -63,18 +61,15 @@ impl structs::DataDragon {
 
         match request {
             Ok(response) => {
-                let champ_full: Result<ChampionFull, reqwest::Error> = response.json().await;
-                match champ_full {
-                    Ok(champ_full) => {
-                        cache
-                            .insert((self.language.clone(), name.clone()), champ_full.clone())
-                            .await;
-                        cache.sync();
-                        Ok(champ_full)
-                    }
-                    Err(_) => Err(DataDragonError::ChampMissingError),
-                }
-            }
+                let Ok(champ_full) = response.json::<ChampionFull>().await else {
+                    return Err(DataDragonError::ChampMissingError);
+                };
+                cache
+                .insert((self.language.clone(), name.clone()), champ_full.clone())
+                .await;
+                cache.sync();
+                Ok(champ_full)
+            },
             Err(err) => {
                 if err.is_body() {
                     Err(DataDragonError::DataDragonMissing)

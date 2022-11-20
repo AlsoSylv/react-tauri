@@ -28,15 +28,12 @@ impl structs::DataDragon {
         let request = self.client.get(url).send().await;
         match request {
             Ok(response) => {
-                let item_json: Result<Value, reqwest::Error> = response.json().await;
-                match item_json {
-                    Ok(item_json) => {
-                        cache.insert(self.language.clone(), item_json.clone()).await;
-                        cache.sync();
-                        Ok(item_json)
-                    },
-                    Err(_) => Err(DataDragonError::CannotConnect),
-                }
+                let Ok(item_json) = response.json::<Value>().await else {
+                    return Err(DataDragonError::CannotConnect);
+                };
+                cache.insert(self.language.clone(), item_json.clone()).await;
+                cache.sync();
+                Ok(item_json)
             },
             Err(err) => {
                 if err.is_body() {

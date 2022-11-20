@@ -24,17 +24,20 @@ impl structs::DataDragon {
         let request = self.client.get(url).send().await;
         match request {
             Ok(response) => {
-                let rune_json: Result<Vec<RuneTree>, reqwest::Error> = response.json().await;
-                match rune_json {
-                    Ok(rune_json) => {
-                        cache.insert(self.language.clone(), rune_json.clone()).await;
-                        cache.sync();
-                        Ok(rune_json)
-                    },
-                    Err(_) => Err(DataDragonError::DataDragonMissing),
+                let Ok(rune_json) = response.json::<Vec<RuneTree>>().await else {
+                    return Err(DataDragonError::DataDragonMissing);
+                };
+                cache.insert(self.language.clone(), rune_json.clone()).await;
+                cache.sync();
+                Ok(rune_json)
+            },
+            Err(err) => {
+                if err.is_body() {
+                    Err(DataDragonError::DataDragonMissing)
+                } else {
+                    Err(DataDragonError::CannotConnect)
                 }
             }
-            Err(_) => Err(DataDragonError::DataDragonMissing),
         }
     }
 }

@@ -15,7 +15,7 @@ impl Data {
             role, 
             rank, 
             region,
-            lang,
+            lang: lang.to_string(),
         }
     }
 }

@@ -12,10 +12,10 @@ static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> = Lazy::new(|
 impl structs::DataDragon {
     pub async fn runes_json(&self) -> Result<Vec<RuneTree>, DataDragonError> {
         let cache = CACHED_RUNE_JSON.lock().await;
-        let json = cache.get(&self.language);
-        if json.is_some() {
-            return Ok(json.unwrap());
-        }
+        if let Some(json) = cache.get(&self.language) {
+            return Ok(json);
+        };
+        
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json", 
             &self.version,

@@ -11,10 +11,9 @@ static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> =
 impl structs::DataDragon {
     pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
         let cache = CACHED_CHAMP_JSON.lock().await;
-        let json = cache.get(&self.language);
-        if json.is_some() {
-            return Ok(json.unwrap());
-        }
+        if let Some(json) = cache.get(&self.language) {
+            return Ok(json);
+        };
 
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
@@ -49,10 +48,10 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
 impl structs::DataDragon {
     pub async fn champ_full(&self, name: String) -> Result<ChampionFull, DataDragonError> {
         let cache = CACHED_CHAMP_FULL.lock().await;
-        let json = cache.get(&(self.language.clone(), name.clone()));
-        if json.is_some() {
-            return Ok(json.unwrap());
-        }
+        if let Some(json) = cache.get(&(self.language.clone(), name.clone())) {
+            return Ok(json);
+        };
+
         let url = format!(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &name

@@ -1,12 +1,12 @@
 import { Divider, Paper, Unstable_Grid2 as Grid } from '@mui/material';
 
-import type { RuneTrees, Shards as IShards } from 'interfaces';
+import type { Runes as IRunes, Shards as IShards } from 'interfaces';
 
 import { PrimaryRunes, SecondaryRunes, Shards } from './components';
 import RunesLoading from './components/RunesLoading';
 
 interface RunesProps {
-  runes: RuneTrees | undefined;
+  runes: IRunes | undefined;
   shards: IShards | undefined;
   loading: boolean;
 }

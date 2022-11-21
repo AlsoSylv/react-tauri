@@ -15,10 +15,9 @@ static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> = Lazy::new(|| {
 impl structs::DataDragon {
     pub async fn item_json(&self) -> Result<Value, DataDragonError> {
         let cache = CACHED_ITEM_JSON.lock().await;
-        let json = cache.get(&self.language);
-        if json.is_some() {
-            return Ok(json.unwrap());
-        }
+        if let Some(json) = cache.get(&self.language) {
+            return Ok(json);
+        };
 
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
@@ -28,15 +27,12 @@ impl structs::DataDragon {
         let request = self.client.get(url).send().await;
         match request {
             Ok(response) => {
-                let item_json: Result<Value, reqwest::Error> = response.json().await;
-                match item_json {
-                    Ok(item_json) => {
-                        cache.insert(self.language.clone(), item_json.clone()).await;
-                        cache.sync();
-                        Ok(item_json)
-                    },
-                    Err(_) => Err(DataDragonError::CannotConnect),
-                }
+                let Ok(item_json) = response.json::<Value>().await else {
+                    return Err(DataDragonError::CannotConnect);
+                };
+                cache.insert(self.language.clone(), item_json.clone()).await;
+                cache.sync();
+                Ok(item_json)
             },
             Err(err) => {
                 if err.is_body() {

@@ -21,60 +21,54 @@ pub async fn champion_info(
     region: String,
     lang: String,
 ) -> Result<ChampionInfo, i64> {
-    let data_dragon = DataDragon::new(Some(&lang)).await;
+
     let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    let data_dragon = DataDragon::new(Some(&lang)).await;
+    
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let fut_winrate = data.winrate(request.clone());
+    let fut_pickrate = data.pick_rate(request.clone());
+    let fut_banrate = data.ban_rate(request.clone());
+    let fut_tier = data.rank(request);
+
+    let (
+        winrate,
+        pickrate,
+        banrate,
+        tier,
+    ) = futures::join!(
+        fut_winrate,
+        fut_pickrate,
+        fut_banrate,
+        fut_tier,
+    );
+
     match data_dragon {
         Ok(data_dragon) => {
-            let data = Data::new(name.clone(), role.clone(), rank, region, lang);
-            let fut_winrate = data.winrate(request.clone());
-            let fut_pickrate = data.pick_rate(request.clone());
-            let fut_banrate = data.ban_rate(request.clone());
-            let fut_tier = data.rank(request);
-            let fut_champion_json = data_dragon.champion_json();
-            let (
-                winrate,
-                pickrate,
-                banrate,
-                champion_json,
-                tier,
-            ) = futures::join!(
-                fut_winrate,
-                fut_pickrate,
-                fut_banrate,
-                fut_champion_json,
-                fut_tier
-            );
-        
             match winrate {
                 Ok(win_rate) => {
                     match pickrate {
                         Ok(pick_rate) => {
                             match banrate {
                                 Ok(ban_rate) => {
-                                    match champion_json {
-                                        Ok(json) => {
-                                            let id = &json.data.get(&name.label).unwrap().id;
-                                            let url = format!(
-                                                "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                                                &data_dragon.version,
-                                                &id
-                                            );
-                                            let local_image = format!("/{0}/{0}.png", id);
-                                            match tier {
-                                                Ok(tier) => {
-                                                    Ok(ChampionInfo {
-                                                        url,
-                                                        local_image,
-                                                        win_rate,
-                                                        pick_rate,
-                                                        ban_rate,
-                                                        tier,
-                                                    })
-                                                }
-                                                Err(err) => Err(i64::from(err))
-                                            }
+                                    let url = format!(
+                                        "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                                        &data_dragon.version,
+                                        &name.value.key
+                                    );
+                                    let local_image = format!("/{0}/{0}.png", &name.value.key);
+                                    match tier {
+                                        Ok(tier) => {
+                                            Ok(ChampionInfo {
+                                                url,
+                                                local_image,
+                                                win_rate,
+                                                pick_rate,
+                                                ban_rate,
+                                                tier,
+                                            })
                                         }
-                                        Err(err) => Err(i64::from(err)),
+                                        Err(err) => Err(i64::from(err))
                                     }
                                 }
                                 Err(err) => Err(i64::from(err)),
@@ -150,7 +144,7 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
     }
 }
 
-//TODO: This shouldn't fail if something goes wrong, it should just send the values that work
+// TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 #[tauri::command]
 pub async fn runes_and_abilities(
     name: ChampionNames,
@@ -159,6 +153,7 @@ pub async fn runes_and_abilities(
     region: String,
     lang: String,
 ) -> Result<RunesAndAbilities, i64> {
+
     let request = overview(&name.value.id, &role, &rank, &region, &lang).await;
     let data = Data::new(name, role, rank, region, lang);
     let fut_runes = data.rune_tuple(request.clone());
@@ -219,16 +214,20 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
             match champ_json {
                 Ok(json) => {
                     for (champ_key, champ) in json.data.iter() {
-                        champions.push(ChampionNames {
-                          label: champ.clone().name,
-                          value: ChampionValue { key: champ_key.to_string(), id: champ.key.parse::<i64>().unwrap() },
-                          url: format!(
-                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                            &data_dragon.version,
-                            &champ.id,
-                        ),
-                          local_image: format!("/{0}/{0}.png", &champ.id),
-                        });
+                        if let Ok(id) = champ.key.parse::<i64>() {
+                            champions.push(ChampionNames {
+                                label: champ.clone().name,
+                                value: ChampionValue { key: champ_key.to_string(), id },
+                                url: Some(format!(
+                                  "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                                  &data_dragon.version,
+                                  &champ.id,
+                              )),
+                                local_image: Some(format!("/{0}/{0}.png", &champ.id)),
+                              });
+                        } else {
+                            unreachable!()
+                        }
                     }
                     Ok(champions)
                 }

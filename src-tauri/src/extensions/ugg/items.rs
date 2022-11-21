@@ -36,24 +36,38 @@ impl structs::Data {
                                 let fourth = json[DATA["other_items"]][0].as_array();
                                 let fifth = json[DATA["other_items"]][1].as_array();
                                 let sixth = json[DATA["other_items"]][2].as_array();
-                                    for (key, item_data) in items["data"].as_object().unwrap()  {
+                                if let Some(map) = items["data"].as_object() {
+                                    for (key, item_data) in map  {
+                                        let Some(image) = item_data["image"]["full"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let Some(name) = item_data["name"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let Some(cost) = item_data["gold"]["base"].as_i64() else {
+                                            unreachable!();
+                                        };
+                                        let Some(description) = item_data["description"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let url = format!(
+                                            "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                            &data_dragon.version,
+                                            &image
+                                        );
                                         match start {
                                             Some(start) => {
                                                 for i in start {
                                                     if &i.to_string() == key {
-                                                        let image = item_data["image"]["full"].as_str().unwrap().to_string();
                                                         items_map.start.push(
-                                                            ItemValues { 
-                                                            name: item_data["name"].as_str().unwrap().to_string(), 
-                                                            cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                            description: item_data["description"].as_str().unwrap().to_string(), 
-                                                            local_image: image.clone(), 
-                                                            url: format!(
-                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                &data_dragon.version,
-                                                                &image
-                                                            ),
-                                                        })
+                                                            ItemValues::new(
+                                                                name, 
+                                                                cost, 
+                                                                description, 
+                                                                image, 
+                                                                &url
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             },
@@ -63,19 +77,15 @@ impl structs::Data {
                                             Some(mythic) => {
                                                 for i in mythic {
                                                     if &i.to_string() == key {
-                                                        let image = item_data["image"]["full"].as_str().unwrap().to_string();
                                                         items_map.core.push(
-                                                            ItemValues { 
-                                                            name: item_data["name"].as_str().unwrap().to_string(), 
-                                                            cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                            description: item_data["description"].as_str().unwrap().to_string(), 
-                                                            local_image: image.clone(), 
-                                                            url: format!(
-                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                &data_dragon.version,
-                                                                &image
-                                                            ),
-                                                        })
+                                                            ItemValues::new(
+                                                                name, 
+                                                                cost, 
+                                                                description, 
+                                                                image, 
+                                                                &url
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             },
@@ -86,19 +96,15 @@ impl structs::Data {
                                                 for y in fouth {
                                                     if y.is_array() {
                                                         if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
                                                             items_map.fourth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
+                                                                ItemValues::new(
+                                                                    name, 
+                                                                    cost, 
+                                                                    description, 
+                                                                    image, 
+                                                                    &url
+                                                                )
+                                                            )
                                                         }
                                                     } else {
                                                         break;
@@ -112,19 +118,15 @@ impl structs::Data {
                                                 for y in fifth {
                                                     if y.is_array() {
                                                         if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
                                                             items_map.fifth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
+                                                                ItemValues::new(
+                                                                    name, 
+                                                                    cost, 
+                                                                    description, 
+                                                                    image, 
+                                                                    &url
+                                                                )
+                                                            )
                                                         }
                                                     } else {
                                                         break;
@@ -138,19 +140,15 @@ impl structs::Data {
                                                 for y in sixth {
                                                     if y.is_array() {
                                                         if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
                                                             items_map.sixth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
+                                                                ItemValues::new(
+                                                                    name, 
+                                                                    cost, 
+                                                                    description, 
+                                                                    image, 
+                                                                    &url
+                                                                )
+                                                            )
                                                         }
                                                     } else {
                                                         break;
@@ -160,7 +158,10 @@ impl structs::Data {
                                             None => (),
                                         }
                                     }
-                                Ok(items_map)
+                                    Ok(items_map)
+                                } else {
+                                    unreachable!()
+                                }
                             },
                             Err(err) => Err(ErrorMap::DataDragonErrors(err))
                         }

@@ -15,7 +15,7 @@ impl Data {
             role, 
             rank, 
             region,
-            lang,
+            lang: lang.to_string(),
         }
     }
 }
@@ -46,10 +46,28 @@ pub struct ItemsMap {
 #[serde(rename_all = "camelCase")]
 pub struct ItemValues {
     pub name: String,
-    pub cost: String,
+    pub cost: i64,
     pub description: String,
     pub local_image: String,
     pub url: String,
+}
+
+impl ItemValues {
+    pub fn new(
+        name: &str, 
+        cost: i64, 
+        description: &str, 
+        image: &str, 
+        url: &str
+    ) -> Self {
+        return ItemValues { 
+            name: name.to_owned(), 
+            cost, 
+            description: description.to_owned(), 
+            local_image: image.to_owned(), 
+            url: url.to_owned()
+        }
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

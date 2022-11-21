@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use moka::future::{Cache, ConcurrentCacheExt};
+use serde_json::Value;
 use tokio::sync::Mutex;
 use once_cell::sync::Lazy;
 
@@ -13,11 +14,11 @@ static CACHED_DEFAULT_ROLE: Lazy<Mutex<Cache<i64, String>>> = Lazy::new(|| {
     Mutex::new(Cache::new(10))
 });
 
-static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, String>>> = Lazy::new(|| {
+static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Value>>> = Lazy::new(|| {
     Mutex::new(Cache::new(10))
 });
 
-static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, String>>> = Lazy::new(|| {
+static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Value>>> = Lazy::new(|| {
     Mutex::new(Cache::new(10))
 });
  
@@ -46,15 +47,13 @@ impl structs::UggRequest {
                 let request = client.get(url).send().await;
                 match request {
                     Ok(json) => {
-                        let json: Result<HashMap<String, Vec<i64>>, reqwest::Error> = json.json().await;
-                        match json {
-                            Ok(json) => {
-                                let role = &json[&self.id.to_string()][0].to_string();
-                                cache.insert(self.id.clone(), role.to_string()).await;
-                                cache.sync();
-                                Ok(role.to_string())
-                            },
-                            Err(_) => Err(UGGError(UGGDataError::RoleMissing)),
+                        if let Ok(json) = json.json::<HashMap<String, Vec<i64>>>().await {
+                            let role = &json[&self.id.to_string()][0].to_string();
+                            cache.insert(self.id.clone(), role.to_string()).await;
+                            cache.sync();
+                            Ok(role.to_string())
+                        } else {
+                            Err(UGGError(UGGDataError::RoleMissing))
                         }
                     }
 
@@ -74,7 +73,7 @@ impl structs::UggRequest {
     // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
     // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
     // Further investigation is needed into finding out which champs this is offered for automatically
-    pub async fn overview_json(&self) -> Result<String, ErrorMap> {
+    pub async fn overview_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
         let overview = cache.get(&self.id);
         if overview != None {
@@ -101,16 +100,14 @@ impl structs::UggRequest {
                 let request = client.get(url).send().await;
                 match request {
                     Ok(json) => {
-                        let overview = json.text().await;
-                        match overview {
-                            Ok(valid) => {
-                                let overview = valid.clone();
-                                cache.insert(self.id.clone(), overview).await;
-                                cache.sync();
-                                Ok(valid)
-                            },
-                            Err(_) => Err(UGGError(UGGDataError::OverviewMissing)),
+                        if let Ok(overview) = json.json::<Value>().await {
+                            cache.insert(self.id.clone(), overview.clone()).await;
+                            cache.sync();
+                            Ok(overview)
+                        } else {
+                            Err(UGGError(UGGDataError::OverviewMissing))
                         }
+
                     }
                     Err(err) => {
                         if err.is_connect() {
@@ -125,7 +122,7 @@ impl structs::UggRequest {
         }
     }
 
-    pub async fn ranking_json(&self) -> Result<String, ErrorMap> {
+    pub async fn ranking_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
         let ranking = cache.get(&self.id);
         if ranking != None {
@@ -152,16 +149,14 @@ impl structs::UggRequest {
                 let request = client.get(url).send().await;
                 match request {
                     Ok(json) => {
-                        let ranking = json.text().await;
-                        match ranking {
-                            Ok(valid) => {
-                                let ranking = valid.clone();
-                                cache.insert(self.id.clone(), ranking).await;
-                                cache.sync();
-                                Ok(valid)
-                            },
-                            Err(_) => Err(UGGError(UGGDataError::RankingMissing)),
+                        if let Ok(ranking) = json.json::<Value>().await {
+                            cache.insert(self.id.clone(), ranking.clone()).await;
+                            cache.sync();
+                            Ok(ranking)
+                        } else {
+                            Err(UGGError(UGGDataError::RankingMissing))
                         }
+
                     }
                     Err(err) => {
                         if err.is_connect() {

@@ -2,8 +2,7 @@ use serde_json::Value;
 
 use crate::errors;
 
-use errors::{ErrorMap, UGGDataError};
-use ErrorMap::UGGError;
+use errors::ErrorMap;
 
 use super::{constants, structs};
 
@@ -23,19 +22,13 @@ pub async fn ranking(
     let (request, role) = futures::join!(fut_request, fut_role);
     match request {
         Ok(ranking) => {
-            let json: Result<Value, serde_json::Error> = serde_json::from_str(&ranking);
-            match json {
-                Ok(json) => {
-                    match role {
-                        Ok(role) => {
-                            //TODO: Check keys before reading, this can cause errors
-                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role];
-                            Ok(json_read.to_owned())
-                        }
-                        Err(err) => Err(err),
-                    }
+            match role {
+                Ok(role) => {
+                    //TODO: Check keys before reading, this can cause errors
+                    let json_read: &Value = &ranking[REGIONS[&region]][TIERS[&rank]][&role];
+                    Ok(json_read.to_owned())
                 }
-                Err(_) => Err(UGGError(UGGDataError::RankingConnect)),
+                Err(err) => Err(err),
             }
         }
         Err(err) => Err(err),
@@ -62,19 +55,13 @@ pub async fn overview(
     
     match request {
         Ok(overview) => {
-            let json: Result<Value, serde_json::Error> = serde_json::from_str(&overview);
-            match json {
-                Ok(json) => {
-                    match role {
-                        Ok(role) => {
-                            //TODO: Check keys before reading, this can cause errors
-                            let json_read: &Value = &json[REGIONS[&region]][TIERS[&rank]][&role][0];
-                            Ok(json_read.to_owned())
-                        }
-                        Err(err) => Err(err),
-                    }
+            match role {
+                Ok(role) => {
+                    //TODO: Check keys before reading, this can cause errors
+                    let json_read: &Value = &overview[REGIONS[&region]][TIERS[&rank]][&role][0];
+                    Ok(json_read.to_owned())
                 }
-                Err(_) => Err(UGGError(UGGDataError::OverviewConnect)),
+                Err(err) => Err(err),
             }
         }
         Err(err) => Err(err),

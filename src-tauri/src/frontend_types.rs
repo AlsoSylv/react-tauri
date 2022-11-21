@@ -27,6 +27,17 @@ pub struct PrimaryTree {
     pub slot_four: Vec<Active>,
 }
 
+impl PrimaryTree {
+    pub fn as_vec(tree: &mut PrimaryTree) -> [&mut Vec<Active>; 4] {
+        return [
+            &mut tree.slot_one,
+            &mut tree.slot_two,
+            &mut tree.slot_three,
+            &mut tree.slot_four,
+        ]
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecondaryTree {
@@ -34,6 +45,17 @@ pub struct SecondaryTree {
     pub slot_two: Vec<Active>,
     pub slot_three: Vec<Active>,
 }
+
+impl SecondaryTree {
+    pub fn as_vec(tree: &mut SecondaryTree) -> [&mut Vec<Active>; 3] {
+        return [
+            &mut tree.slot_one,
+            &mut tree.slot_two,
+            &mut tree.slot_three,
+        ]
+    }
+}
+
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

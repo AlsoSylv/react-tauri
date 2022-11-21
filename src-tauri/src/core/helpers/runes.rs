@@ -26,95 +26,34 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                         if &rune.id == &tree_id_one {
                             for (position, slots) in rune.slots.iter().enumerate() {
                                 for runes in &slots.runes {
-                                    match position {
-                                        0 => tree_one_names.slot_one.push(
-                                            Active::new(
-                                            &runes.name,
-                                            format!(
-                                                "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                &runes.icon
-                                            ),
-                                            runes.id,
-                                            format!("/{0}/{1}.png", rune.key, runes.key),
-                                            &runes.long_desc
-                                        )),
-                                        1 => tree_one_names.slot_two.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        2 => tree_one_names.slot_three.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        3 => tree_one_names.slot_four.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        _ => unreachable!(),
-                                    }
+                                    PrimaryTree::as_vec(&mut tree_one_names)[position].push(
+                                        Active::new(
+                                        &runes.name,
+                                        format!(
+                                            "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                            &runes.icon
+                                        ),
+                                        runes.id,
+                                        format!("/{0}/{1}.png", rune.key, runes.key),
+                                        &runes.long_desc
+                                    ));
                                 }
                             }
                         } else if &rune.id == &tree_id_two {
                             for i in 1..4 {
                                 let slot = &rune.slots[i];
                                 for runes in &slot.runes {
-                                    match i {
-                                        1 => tree_two_names.slot_one.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        2 => tree_two_names.slot_two.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        3 => tree_two_names.slot_three.push(
-                                            Active::new(
-                                                &runes.name,
-                                                format!(
-                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
-                                                    &runes.icon
-                                                ),
-                                                runes.id,
-                                                format!("/{0}/{1}.png", rune.key, runes.key),
-                                                &runes.long_desc
-                                            )),
-                                        _ => unreachable!(),
-                                    }
+                                    SecondaryTree::as_vec(&mut tree_two_names)[i - 1].push(
+                                        Active::new(
+                                        &runes.name,
+                                        format!(
+                                            "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                            &runes.icon
+                                        ),
+                                        runes.id,
+                                        format!("/{0}/{1}.png", rune.key, runes.key),
+                                        &runes.long_desc
+                                    ));
                                 }
                             }
                         }

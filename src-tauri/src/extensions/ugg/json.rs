@@ -81,7 +81,7 @@ async fn position(
             Err(err) => Err(err),
         }
     } else {
-    let role = ROLES[&role];
+    let role: &str = ROLES[&role];
         Ok(role.to_string())
     }
 }

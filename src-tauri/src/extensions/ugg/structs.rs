@@ -42,6 +42,18 @@ pub struct ItemsMap {
     pub sixth: Vec<ItemValues>
 }
 
+impl ItemsMap {
+    pub fn new() -> Self {
+        return ItemsMap {             
+            start: Vec::new(), 
+            core: Vec::new(), 
+            fourth: Vec::new(), 
+            fifth: Vec::new(), 
+            sixth: Vec::new()  
+        }
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemValues {
@@ -86,10 +98,29 @@ pub struct AbilitiesValue {
     pub url: String,
 }
 
+impl AbilitiesValue {
+    pub fn new(image: &str, url: String) -> Self {
+        return AbilitiesValue { 
+            image: image.to_owned(), 
+            order: Vec::new(), 
+            url
+        }
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Passive {
     pub image: String,
     pub url: String,
+}
+
+impl Passive {
+    pub fn new(image: &str, url: String ) -> Self {
+        return Passive { 
+            image: image.to_owned(), 
+            url 
+        }
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

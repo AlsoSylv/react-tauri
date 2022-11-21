@@ -10,7 +10,7 @@ use constants::DATA;
 
 impl structs::Data {
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
-        //TODO: Use Community Dragon to get shard data
+        // TODO: Use Community Dragon to get shard data
         let armor = Shard::create(
             "Armor", 
             5002, 
@@ -35,65 +35,47 @@ impl structs::Data {
             "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png"
         );
     
-        let attack_speed = Shard {
-            name: "Attack Speed".to_owned(),
-            id: 5005,
-            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png".to_owned(),
-            active: false
-        };
+        let attack_speed = Shard::create(
+            "Attack Speed", 
+            5005, 
+            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png"
+        ); 
     
-        let ability_haste = Shard {
-            name: "Ability Haste".to_owned(),
-            id: 5007,
-            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png".to_owned(),
-            active: false
-        };
+        let ability_haste = Shard::create(
+            "Ability Haste", 
+            5007, 
+            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png"
+        ); 
     
-        let shards: Shards = Shards {
+        let mut shards: Shards = Shards {
             row_one: [adaptive_force.clone(), attack_speed, ability_haste],
             row_two: [adaptive_force, armor.clone(), magic_resist.clone()],
             row_three: [health, armor, magic_resist],
         };
     
-        let mut mutable_shards = shards.clone();
         match request {
             Ok(json) => {
                 let active_shards = json[DATA["shards"]][2].as_array();
                 match active_shards {
                     Some(active_shards) => {
-                        for (y, shard) in shards.row_one.iter().enumerate() {
+                        for shard in shards.row_one.iter_mut() {
                             if shard.id.to_string() == active_shards[0] {
-                                mutable_shards.row_one[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
+                                shard.active = true;
                             }
                         }
     
-                        for (y, shard) in shards.row_two.iter().enumerate() {
+                        for shard in shards.row_two.iter_mut() {
                             if shard.id.to_string() == active_shards[1] {
-                                mutable_shards.row_two[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
+                                shard.active = true;
                             }
                         }
     
-                        for (y, shard) in shards.row_three.iter().enumerate() {
+                        for shard in shards.row_three.iter_mut() {
                             if shard.id.to_string() == active_shards[2] {
-                                mutable_shards.row_three[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
+                                shard.active = true;
                             }
                         }
-                        Ok(mutable_shards)
+                        Ok(shards)
                     }
                     None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
                 }

@@ -52,54 +52,50 @@ impl structs::Data {
                                 };
         
                                 let mut abilities = AbilitiesMap { 
-                                    passive: Passive { 
-                                        image: passive.to_string(), 
-                                        url: format!(
+                                    passive: Passive::new(
+                                        passive, 
+                                        format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/passive/{}",
                                             &data_dragon.version,
                                             &passive
                                         ) 
-                                    },
+                                    ),
         
-                                    q: AbilitiesValue { 
-                                        image: q_image.to_string(), 
-                                        order: Vec::new(), 
-                                        url: format!(
+                                    q: AbilitiesValue::new(
+                                        q_image, 
+                                        format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
                                             &data_dragon.version,
                                             &q_image
                                         ) 
-                                    },
+                                    ), 
         
-                                    w: AbilitiesValue { 
-                                        image: w_image.to_string(), 
-                                        order: Vec::new(),
-                                        url: format!(
+                                    w: AbilitiesValue::new(
+                                        w_image, 
+                                        format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
                                             &data_dragon.version,
                                             &w_image
                                         ) 
-                                    },
+                                    ),
         
-                                    e: AbilitiesValue { 
-                                        image: e_image.to_string(), 
-                                        order: Vec::new(), 
-                                        url: format!(
+                                    e: AbilitiesValue::new(
+                                        e_image, 
+                                        format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
                                             &data_dragon.version,
                                             &e_image
                                         ) 
-                                    },
+                                    ),
         
-                                    r: AbilitiesValue { 
-                                        image: r_image.to_string(), 
-                                        order: Vec::new(), 
-                                        url: format!(
+                                    r: AbilitiesValue::new(
+                                        r_image, 
+                                        format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
                                             &data_dragon.version,
                                             &r_image
                                         ) 
-                                    }, 
+                                    ),
                                 };
                                 let maps: [&mut Vec<String>; 4] = [
                                     &mut abilities.q.order,
@@ -123,37 +119,36 @@ impl structs::Data {
 }
 
 fn split_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
-    for y in abilities {
+    abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {
+            let x = String::from(y);
             match y {
                 "Q" => {
-                    maps[0].push(y.to_string());
+                    maps[0].push(x);
                     maps[1].push("".to_string());
                     maps[2].push("".to_string());
                     maps[3].push("".to_string());
                 },
                 "W" => {
                     maps[0].push("".to_string());
-                    maps[1].push(y.to_string());
+                    maps[1].push(x);
                     maps[2].push("".to_string());
                     maps[3].push("".to_string());
                 },
                 "E" => {
                     maps[0].push("".to_string());
                     maps[1].push("".to_string());
-                    maps[2].push(y.to_string());
+                    maps[2].push(x);
                     maps[3].push("".to_string());
                 },
                 "R" => {
                     maps[0].push("".to_string());
                     maps[1].push("".to_string());
                     maps[2].push("".to_string());
-                    maps[3].push(y.to_string())
+                    maps[3].push(x)
                 },
-                _ => break
+                _ => ()
             }
-        } else {
-            break
         }
-    }
+    })
 }

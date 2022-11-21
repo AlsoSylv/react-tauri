@@ -7,13 +7,15 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
     match data_dragon {
         Ok(data_dragon) => {
             let request = data_dragon.runes_json().await;
-            let mut tree_one_names: PrimaryTree = PrimaryTree {
+            let mut tree_one_names = 
+            PrimaryTree {
                 slot_one: Vec::new(),
                 slot_two: Vec::new(),
                 slot_three: Vec::new(),
                 slot_four: Vec::new(),
             };
-            let mut tree_two_names: SecondaryTree = SecondaryTree {
+            let mut tree_two_names = 
+            SecondaryTree {
                 slot_one: Vec::new(),
                 slot_two: Vec::new(),
                 slot_three: Vec::new(),
@@ -25,46 +27,50 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                             for (position, slots) in rune.slots.iter().enumerate() {
                                 for runes in &slots.runes {
                                     match position {
-                                        0 => tree_one_names.slot_one.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
-                                        1 => tree_one_names.slot_two.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
-                                        2 => tree_one_names.slot_three.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
-                                        3 => tree_one_names.slot_four.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
+                                        0 => tree_one_names.slot_one.push(
+                                            Active::new(
+                                            &runes.name,
+                                            format!(
+                                                "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                &runes.icon
+                                            ),
+                                            runes.id,
+                                            format!("/{0}/{1}.png", rune.key, runes.key),
+                                            &runes.long_desc
+                                        )),
+                                        1 => tree_one_names.slot_two.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
+                                        2 => tree_one_names.slot_three.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
+                                        3 => tree_one_names.slot_four.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
                                         _ => unreachable!(),
                                     }
                                 }
@@ -74,36 +80,39 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                                 let slot = &rune.slots[i];
                                 for runes in &slot.runes {
                                     match i {
-                                        1 => tree_two_names.slot_one.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
-                                        2 => tree_two_names.slot_two.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
-                                        3 => tree_two_names.slot_three.push(Active {
-                                            name: runes.name.clone(),
-                                            image: "http://ddragon.leagueoflegends.com/cdn/img/"
-                                                .to_string()
-                                                + &runes.icon.clone(),
-                                            active: false,
-                                            id: runes.id,
-                                            local_image: format!("/{0}/{1}.png", rune.key, runes.key),
-                                            description: runes.long_desc.clone(),
-                                        }),
+                                        1 => tree_two_names.slot_one.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
+                                        2 => tree_two_names.slot_two.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
+                                        3 => tree_two_names.slot_three.push(
+                                            Active::new(
+                                                &runes.name,
+                                                format!(
+                                                    "http://ddragon.leagueoflegends.com/cdn/img/{}",
+                                                    &runes.icon
+                                                ),
+                                                runes.id,
+                                                format!("/{0}/{1}.png", rune.key, runes.key),
+                                                &runes.long_desc
+                                            )),
                                         _ => unreachable!(),
                                     }
                                 }

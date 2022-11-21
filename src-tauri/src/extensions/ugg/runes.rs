@@ -23,9 +23,8 @@ impl structs::Data {
 
                 let all_runes = helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, &self.lang).await;
                 match all_runes {
-                    Ok(immutable_all_runes) => {
+                    Ok(mut all_runes) => {
                         let mut used_rune_ids = Vec::new();
-                        let mut all_runes = immutable_all_runes.clone();
                         let mut slots: [&mut Vec<Active>; 7] = [
                             &mut all_runes.primary_runes.slot_one,
                             &mut all_runes.primary_runes.slot_two,
@@ -38,19 +37,10 @@ impl structs::Data {
                         
                         for n in 0..6 {
                             slots.iter_mut().for_each(|current_slot| {
-                                current_slot.clone().iter().enumerate().for_each(|i| {
-                                    let pos = i.0;
-                                    let rune = i.1;
-                                    if rune_ids[n] == rune.id {
-                                        current_slot[pos] = Active {
-                                            name: rune.name.clone(),
-                                            image: rune.image.clone(),
-                                            active: true,
-                                            id: rune.id,
-                                            local_image: rune.local_image.clone(),
-                                            description: rune.description.clone(),
-                                        };
-                                        used_rune_ids.push(rune.id);
+                                current_slot.iter_mut().for_each(|i| {
+                                    if rune_ids[n] == i.id {
+                                        i.active = true;
+                                        used_rune_ids.push(i.id);
                                     }
                                 });
                             });

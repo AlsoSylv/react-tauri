@@ -46,6 +46,25 @@ pub struct Active {
     pub description: String,
 }
 
+impl Active {
+    pub fn new(
+        name: &str, 
+        image: String, 
+        id: i64, 
+        local_image: String, 
+        description: &str
+    ) -> Self {
+        return Active { 
+            name: name.to_owned(), 
+            image,
+            local_image, 
+            active: false, 
+            id,
+            description: description.to_owned() 
+        }
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunesAndAbilities {

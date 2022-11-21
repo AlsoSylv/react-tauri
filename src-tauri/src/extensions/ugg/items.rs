@@ -13,14 +13,7 @@ use structs::{ItemsMap, ItemValues};
 impl structs::Data {
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
-        let mut items_map = 
-        ItemsMap { 
-            start: Vec::new(), 
-            core: Vec::new(), 
-            fourth: Vec::new(), 
-            fifth: Vec::new(), 
-            sixth: Vec::new() 
-        };
+        let mut items_map = ItemsMap::new();
         
         match data_dragon {
             Ok(data_dragon) => {

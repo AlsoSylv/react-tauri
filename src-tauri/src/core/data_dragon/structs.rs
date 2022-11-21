@@ -19,36 +19,36 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
 
 impl DataDragon {
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let mut language = language;
-        if language == None {
-            language = Some("en_US");
-        }
+        let lang = match language {
+            Some(lang) => lang,
+            None => "en_US",
+        };
+
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
-        if cache.get("version") != None {
+        if let Some(cache) = cache.get("version") {
             return Ok(
                 DataDragon { 
-                    version: cache.get("version").unwrap().clone(), 
-                    language: language.unwrap().to_string(), 
+                    version: cache.clone(), 
+                    language: lang.to_string(), 
                     client 
                 });
         }
+
         let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
         match version {
             Ok(response) => {
-                let json: Result<Vec<String>, reqwest::Error> = response.json().await;
-                match json {
-                    Ok(json) => {
-                        let version = json[0].clone();
-                        cache.insert("version".to_string(), version.clone()).await;
-                        Ok(
-                            DataDragon { 
-                                version, 
-                                language: language.unwrap().to_string(), 
-                                client
-                            })
-                    },
-                    Err(_) => panic!(),
+                if let Ok(json) = response.json::<Vec<String>>().await {
+                    let version = json[0].clone();
+                    cache.insert("version".to_string(), version.clone()).await;
+                    Ok(
+                        DataDragon { 
+                            version, 
+                            language: lang.to_string(), 
+                            client
+                        })
+                } else {
+                    unreachable!()
                 }
             },
             Err(err) => {

@@ -124,31 +124,31 @@ impl structs::Data {
 
 fn split_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
     for y in abilities {
-        if y.is_string() {
-            match y.as_str().unwrap() {
+        if let Some(y) = y.as_str() {
+            match y {
                 "Q" => {
-                    maps[0].push(y.as_str().unwrap().to_string());
+                    maps[0].push(y.to_string());
                     maps[1].push("".to_string());
                     maps[2].push("".to_string());
                     maps[3].push("".to_string());
                 },
                 "W" => {
                     maps[0].push("".to_string());
-                    maps[1].push(y.as_str().unwrap().to_string());
+                    maps[1].push(y.to_string());
                     maps[2].push("".to_string());
                     maps[3].push("".to_string());
                 },
                 "E" => {
                     maps[0].push("".to_string());
                     maps[1].push("".to_string());
-                    maps[2].push(y.as_str().unwrap().to_string());
+                    maps[2].push(y.to_string());
                     maps[3].push("".to_string());
                 },
                 "R" => {
                     maps[0].push("".to_string());
                     maps[1].push("".to_string());
                     maps[2].push("".to_string());
-                    maps[3].push(y.as_str().unwrap().to_string())
+                    maps[3].push(y.to_string())
                 },
                 _ => break
             }

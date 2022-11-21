@@ -25,10 +25,10 @@ static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Value>>> = Lazy::new(|| {
 impl structs::UggRequest {
     pub async fn default_role(&self) -> Result<String, ErrorMap> {
         let cache = CACHED_DEFAULT_ROLE.lock().await;
-        let role = cache.get(&self.id);
-        if role != None {
-            return Ok(role.unwrap())
-        }
+        if let Some(role) = cache.get(&self.id) {
+            return Ok(role)
+        };
+
         let stat_version = "1.5";
         let base_role_url = "https://stats2.u.gg/lol";
         let role_version = "1.5.0";
@@ -75,10 +75,10 @@ impl structs::UggRequest {
     // Further investigation is needed into finding out which champs this is offered for automatically
     pub async fn overview_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
-        let overview = cache.get(&self.id);
-        if overview != None {
-            return Ok(overview.unwrap())
-        }
+        if let Some(overview) = cache.get(&self.id) {
+            return Ok(overview)
+        };
+        
         let stats_version = "1.5";
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";
@@ -124,10 +124,10 @@ impl structs::UggRequest {
 
     pub async fn ranking_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
-        let ranking = cache.get(&self.id);
-        if ranking != None {
-            return Ok(ranking.unwrap())
-        }
+        if let Some(ranking) = cache.get(&self.id) {
+            return Ok(ranking)
+        };
+
         let stats_version = "1.5";
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";

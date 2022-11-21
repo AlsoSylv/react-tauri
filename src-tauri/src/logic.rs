@@ -214,16 +214,20 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
             match champ_json {
                 Ok(json) => {
                     for (champ_key, champ) in json.data.iter() {
-                        champions.push(ChampionNames {
-                          label: champ.clone().name,
-                          value: ChampionValue { key: champ_key.to_string(), id: champ.key.parse::<i64>().unwrap() },
-                          url: Some(format!(
-                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                            &data_dragon.version,
-                            &champ.id,
-                        )),
-                          local_image: Some(format!("/{0}/{0}.png", &champ.id)),
-                        });
+                        if let Ok(id) = champ.key.parse::<i64>() {
+                            champions.push(ChampionNames {
+                                label: champ.clone().name,
+                                value: ChampionValue { key: champ_key.to_string(), id },
+                                url: Some(format!(
+                                  "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                                  &data_dragon.version,
+                                  &champ.id,
+                              )),
+                                local_image: Some(format!("/{0}/{0}.png", &champ.id)),
+                              });
+                        } else {
+                            unreachable!()
+                        }
                     }
                     Ok(champions)
                 }

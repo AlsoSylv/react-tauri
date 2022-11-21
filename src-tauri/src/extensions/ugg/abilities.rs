@@ -97,14 +97,8 @@ impl structs::Data {
                                         ) 
                                     ),
                                 };
-                                let maps: [&mut Vec<String>; 4] = [
-                                    &mut abilities.q.order,
-                                    &mut abilities.w.order,
-                                    &mut abilities.e.order,
-                                    &mut abilities.r.order
-                                    ];
-
-                                    split_abilities(maps, abilities_order);
+                                
+                                split_abilities(abilities.as_array_mut(), abilities_order);
                                 Ok(abilities)
                             },
                             Err(err) => Err(DataDragonErrors(err)),
@@ -118,34 +112,34 @@ impl structs::Data {
     }
 }
 
-fn split_abilities(maps: [&mut Vec<String>; 4], abilities: &Vec<Value>) {
+fn split_abilities(maps: [&mut AbilitiesValue; 4], abilities: &Vec<Value>) {
     abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {
             let x = String::from(y);
             match y {
                 "Q" => {
-                    maps[0].push(x);
-                    maps[1].push("".to_string());
-                    maps[2].push("".to_string());
-                    maps[3].push("".to_string());
+                    maps[0].order.push(x);
+                    maps[1].order.push("".to_string());
+                    maps[2].order.push("".to_string());
+                    maps[3].order.push("".to_string());
                 },
                 "W" => {
-                    maps[0].push("".to_string());
-                    maps[1].push(x);
-                    maps[2].push("".to_string());
-                    maps[3].push("".to_string());
+                    maps[0].order.push("".to_string());
+                    maps[1].order.push(x);
+                    maps[2].order.push("".to_string());
+                    maps[3].order.push("".to_string());
                 },
                 "E" => {
-                    maps[0].push("".to_string());
-                    maps[1].push("".to_string());
-                    maps[2].push(x);
-                    maps[3].push("".to_string());
+                    maps[0].order.push("".to_string());
+                    maps[1].order.push("".to_string());
+                    maps[2].order.push(x);
+                    maps[3].order.push("".to_string());
                 },
                 "R" => {
-                    maps[0].push("".to_string());
-                    maps[1].push("".to_string());
-                    maps[2].push("".to_string());
-                    maps[3].push(x)
+                    maps[0].order.push("".to_string());
+                    maps[1].order.push("".to_string());
+                    maps[2].order.push("".to_string());
+                    maps[3].order.push(x)
                 },
                 _ => ()
             }

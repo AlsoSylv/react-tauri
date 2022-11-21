@@ -58,23 +58,13 @@ impl structs::Data {
                 let active_shards = json[DATA["shards"]][2].as_array();
                 match active_shards {
                     Some(active_shards) => {
-                        for shard in shards.row_one.iter_mut() {
-                            if shard.id.to_string() == active_shards[0] {
-                                shard.active = true;
-                            }
-                        }
-    
-                        for shard in shards.row_two.iter_mut() {
-                            if shard.id.to_string() == active_shards[1] {
-                                shard.active = true;
-                            }
-                        }
-    
-                        for shard in shards.row_three.iter_mut() {
-                            if shard.id.to_string() == active_shards[2] {
-                                shard.active = true;
-                            }
-                        }
+                        shards.as_array_mut().iter_mut().enumerate().for_each(|(pos, shard_array)| {
+                            shard_array.iter_mut().for_each(|shard| {
+                                if shard.id.to_string() == active_shards[pos] {
+                                    shard.active = true;
+                                } 
+                            });
+                        });
                         Ok(shards)
                     }
                     None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),

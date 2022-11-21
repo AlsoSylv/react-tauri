@@ -37,12 +37,12 @@ impl PrimaryTree {
         }
     }
 
-    pub fn as_vec(tree: &mut PrimaryTree) -> [&mut Vec<Active>; 4] {
+    pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 4] {
         return [
-            &mut tree.slot_one,
-            &mut tree.slot_two,
-            &mut tree.slot_three,
-            &mut tree.slot_four,
+            &mut self.slot_one,
+            &mut self.slot_two,
+            &mut self.slot_three,
+            &mut self.slot_four,
         ]
     }
 }
@@ -64,11 +64,11 @@ impl SecondaryTree {
         }
     }
 
-    pub fn as_vec(tree: &mut SecondaryTree) -> [&mut Vec<Active>; 3] {
+    pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
         return [
-            &mut tree.slot_one,
-            &mut tree.slot_two,
-            &mut tree.slot_three,
+            &mut self.slot_one,
+            &mut self.slot_two,
+            &mut self.slot_three,
         ]
     }
 }

@@ -216,7 +216,7 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
                     for (champ_key, champ) in json.data.iter() {
                         if let Ok(id) = champ.key.parse::<i64>() {
                             champions.push(ChampionNames {
-                                label: champ.clone().name,
+                                label: champ.name.clone(),
                                 value: ChampionValue { key: champ_key.to_string(), id },
                                 url: Some(format!(
                                   "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",

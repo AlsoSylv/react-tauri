@@ -91,6 +91,17 @@ pub struct AbilitiesMap {
     pub r: AbilitiesValue,
 }
 
+impl AbilitiesMap {
+    pub fn as_array_mut(&mut self) -> [&mut AbilitiesValue; 4] {
+        return [
+            &mut self.q,
+            &mut self.w,
+            &mut self.e,
+            &mut self.r
+        ];
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
     pub image: String,
@@ -131,6 +142,15 @@ pub struct Shards {
     pub row_three: [Shard; 3],
 }
 
+impl Shards {
+    pub fn as_array_mut(&mut self) -> [&mut [Shard; 3]; 3] {
+        return [
+            &mut self.row_one,
+            &mut self.row_two,
+            &mut self.row_three,
+        ];
+    }
+}
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Shard {

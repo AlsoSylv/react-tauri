@@ -38,19 +38,17 @@ impl DataDragon {
         let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
         match version {
             Ok(response) => {
-                let json: Result<Vec<String>, reqwest::Error> = response.json().await;
-                match json {
-                    Ok(json) => {
-                        let version = json[0].clone();
-                        cache.insert("version".to_string(), version.clone()).await;
-                        Ok(
-                            DataDragon { 
-                                version, 
-                                language: lang.to_string(), 
-                                client
-                            })
-                    },
-                    Err(_) => panic!(),
+                if let Ok(json) = response.json::<Vec<String>>().await {
+                    let version = json[0].clone();
+                    cache.insert("version".to_string(), version.clone()).await;
+                    Ok(
+                        DataDragon { 
+                            version, 
+                            language: lang.to_string(), 
+                            client
+                        })
+                } else {
+                    unreachable!()
                 }
             },
             Err(err) => {

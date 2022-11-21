@@ -7,19 +7,8 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
     match data_dragon {
         Ok(data_dragon) => {
             let request = data_dragon.runes_json().await;
-            let mut tree_one_names = 
-            PrimaryTree {
-                slot_one: Vec::new(),
-                slot_two: Vec::new(),
-                slot_three: Vec::new(),
-                slot_four: Vec::new(),
-            };
-            let mut tree_two_names = 
-            SecondaryTree {
-                slot_one: Vec::new(),
-                slot_two: Vec::new(),
-                slot_three: Vec::new(),
-            };
+            let mut tree_one_names = PrimaryTree::new();
+            let mut tree_two_names = SecondaryTree::new();
             match request {
                 Ok(json) => {
                     for rune in json.iter() {

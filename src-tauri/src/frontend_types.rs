@@ -28,6 +28,15 @@ pub struct PrimaryTree {
 }
 
 impl PrimaryTree {
+    pub fn new() -> Self {
+        return PrimaryTree { 
+            slot_one: Vec::new(), 
+            slot_two: Vec::new(), 
+            slot_three: Vec::new(),
+            slot_four: Vec::new(),
+        }
+    }
+
     pub fn as_vec(tree: &mut PrimaryTree) -> [&mut Vec<Active>; 4] {
         return [
             &mut tree.slot_one,
@@ -47,6 +56,14 @@ pub struct SecondaryTree {
 }
 
 impl SecondaryTree {
+    pub fn new() -> Self {
+        return SecondaryTree { 
+            slot_one: Vec::new(), 
+            slot_two: Vec::new(), 
+            slot_three: Vec::new() 
+        }
+    }
+
     pub fn as_vec(tree: &mut SecondaryTree) -> [&mut Vec<Active>; 3] {
         return [
             &mut tree.slot_one,

@@ -23,12 +23,7 @@ impl structs::Data {
                     Ok(json) => {
                         match items {
                             Ok(items) => {
-                                //TODO We can get the specfic winrates of each of these sets rather easily
-                                let start = json[DATA["starting_items"]][2].as_array();
-                                let mythic = json[DATA["mythic_and_core"]][2].as_array();
-                                let fourth = json[DATA["other_items"]][0].as_array();
-                                let fifth = json[DATA["other_items"]][1].as_array();
-                                let sixth = json[DATA["other_items"]][2].as_array();
+
                                 if let Some(map) = items["data"].as_object() {
                                     for (key, item_data) in map  {
                                         let Some(image) = item_data["image"]["full"].as_str() else {
@@ -48,9 +43,11 @@ impl structs::Data {
                                             &data_dragon.version,
                                             &image
                                         );
-                                        match start {
-                                            Some(start) => {
-                                                for i in start {
+                                        // TODO: We can get the specfic winrates of each of these sets rather easily
+
+                                        if let Some(start) = json[DATA["starting_items"]][2].as_array() {
+                                            start.iter().for_each(|i| {
+                                                if i.is_array() {
                                                     if &i.to_string() == key {
                                                         items_map.start.push(
                                                             ItemValues::new(
@@ -63,12 +60,12 @@ impl structs::Data {
                                                         )
                                                     }
                                                 }
-                                            },
-                                            None => (),
-                                        }
-                                        match mythic {
-                                            Some(mythic) => {
-                                                for i in mythic {
+                                            }) 
+                                        };
+
+                                        if let Some(mythic) = json[DATA["mythic_and_core"]][2].as_array() {
+                                            mythic.iter().for_each(|i| {
+                                                if i.is_array() {
                                                     if &i.to_string() == key {
                                                         items_map.core.push(
                                                             ItemValues::new(
@@ -81,75 +78,63 @@ impl structs::Data {
                                                         )
                                                     }
                                                 }
-                                            },
-                                            None => (),
-                                        }
-                                        match fourth {
-                                            Some(fouth) => {
-                                                for y in fouth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            items_map.fourth.push(
-                                                                ItemValues::new(
-                                                                    name, 
-                                                                    cost, 
-                                                                    description, 
-                                                                    image, 
-                                                                    &url
-                                                                )
+                                            }) 
+                                        };
+
+                                        if let Some(fourth) = json[DATA["other_items"]][0].as_array() {
+                                            fourth.iter().for_each(|y| {
+                                                if y.is_array() {
+                                                    if &y[0].to_string() == key {
+                                                        items_map.fourth.push(
+                                                            ItemValues::new(
+                                                                name, 
+                                                                cost, 
+                                                                description, 
+                                                                image, 
+                                                                &url
                                                             )
-                                                        }
-                                                    } else {
-                                                        break;
+                                                        )
                                                     }
                                                 }
-                                            },
-                                            None => (),
-                                        }
-                                        match fifth {
-                                            Some(fifth) => {
-                                                for y in fifth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            items_map.fifth.push(
-                                                                ItemValues::new(
-                                                                    name, 
-                                                                    cost, 
-                                                                    description, 
-                                                                    image, 
-                                                                    &url
-                                                                )
+                                            }) 
+                                        };
+
+                                        if let Some(fifth) = json[DATA["other_items"]][1].as_array() {
+                                            fifth.iter().for_each(|y| {
+                                                if y.is_array() {
+                                                    if &y[0].to_string() == key {
+                                                        items_map.fifth.push(
+                                                            ItemValues::new(
+                                                                name, 
+                                                                cost, 
+                                                                description, 
+                                                                image, 
+                                                                &url
                                                             )
-                                                        }
-                                                    } else {
-                                                        break;
+                                                        )
                                                     }
                                                 }
-                                            },
-                                            None => (),
-                                        }
-                                        match sixth {
-                                            Some(sixth) => {
-                                                for y in sixth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            items_map.sixth.push(
-                                                                ItemValues::new(
-                                                                    name, 
-                                                                    cost, 
-                                                                    description, 
-                                                                    image, 
-                                                                    &url
-                                                                )
+                                            })
+                                        };
+
+                                        if let Some(sixth) = json[DATA["other_items"]][2].as_array() {
+                                            sixth.iter().for_each(|y| {
+                                                if y.is_array() {
+                                                    if &y[0].to_string() == key {
+                                                        items_map.sixth.push(
+                                                            ItemValues::new(
+                                                                name, 
+                                                                cost, 
+                                                                description, 
+                                                                image, 
+                                                                &url
                                                             )
-                                                        }
-                                                    } else {
-                                                        break;
+                                                        )
                                                     }
                                                 }
-                                            },
-                                            None => (),
-                                        }
+                                            }) 
+                                        };
+
                                     }
                                     Ok(items_map)
                                 } else {

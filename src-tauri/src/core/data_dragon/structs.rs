@@ -18,6 +18,14 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
 });
 
 impl DataDragon {
+    /// A chached function to generate a new http client for Data Dragon
+    /// this also gives a version string as a result, and can fail creation
+    /// if there is no internet connection available
+    /// 
+    /// # Examples
+    /// ```
+    /// let data_dragon = DataDragon::new(None).await;
+    /// ```
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
         let lang = match language {
             Some(lang) => lang,

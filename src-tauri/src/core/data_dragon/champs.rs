@@ -5,10 +5,23 @@ use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
 
-static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> =
-    Lazy::new(|| Mutex::new(Cache::new(3)));
+static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> = {
+    Lazy::new(|| Mutex::new(Cache::new(3)))
+};
+
+static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> = {
+    Lazy::new(|| Mutex::new(Cache::new(3)))
+};
 
 impl structs::DataDragon {
+    /// A chached function to get the DataDragon champion.json and return it
+    /// searialized as a struct for the rest of the code
+    /// 
+    /// # Example
+    /// ```
+    /// let data_dragon = DataDragon::new(None).await.unwrap();
+    /// let champion_json = data_dragon.champion_json().await;
+    /// ```
     pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
         let cache = CACHED_CHAMP_JSON.lock().await;
         if let Some(json) = cache.get(&self.language) {
@@ -40,21 +53,25 @@ impl structs::DataDragon {
             }
         }
     }
-}
 
-static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
-    Lazy::new(|| Mutex::new(Cache::new(3)));
-
-impl structs::DataDragon {
-    pub async fn champ_full(&self, name: String) -> Result<ChampionFull, DataDragonError> {
+    /// A chached function to get the json files for specific
+    /// champions from DataDragon, this requires an extra
+    /// argument for the champions Key from champions.json
+    /// 
+    /// # Example
+    /// ```
+    /// let data_dragon = DataDragon::new(None).await.unwrap();
+    /// let champion_json = data_dragon.champ_full("Xayah".to_owned()).await;
+    /// ```
+    pub async fn champ_full(&self, key: String) -> Result<ChampionFull, DataDragonError> {
         let cache = CACHED_CHAMP_FULL.lock().await;
-        if let Some(json) = cache.get(&(self.language.clone(), name.clone())) {
+        if let Some(json) = cache.get(&(self.language.clone(), key.clone())) {
             return Ok(json);
         };
 
         let url = format!(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
-            &self.version, &self.language, &name
+            &self.version, &self.language, &key
         );
         let request = self.client.get(url).send().await;
 
@@ -64,7 +81,7 @@ impl structs::DataDragon {
                     return Err(DataDragonError::ChampMissingError);
                 };
                 cache
-                .insert((self.language.clone(), name.clone()), champ_full.clone())
+                .insert((self.language.clone(), key.clone()), champ_full.clone())
                 .await;
                 cache.sync();
                 Ok(champ_full)

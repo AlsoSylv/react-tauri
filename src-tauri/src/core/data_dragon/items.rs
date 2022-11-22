@@ -13,6 +13,13 @@ static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> = Lazy::new(|| {
 
 
 impl structs::DataDragon {
+    /// A chached function to get `item.json` from Data Dragon
+    /// 
+    /// # Example
+    /// ```
+    /// let data_dragon = DataDragon::new(None).await.unwrap();
+    /// let champion_json = data_dragon.item_json("Xayah".to_owned()).await;
+    /// ```
     pub async fn item_json(&self) -> Result<Value, DataDragonError> {
         let cache = CACHED_ITEM_JSON.lock().await;
         if let Some(json) = cache.get(&self.language) {

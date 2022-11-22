@@ -2,6 +2,13 @@ use crate::{frontend_types, core::data_dragon::structs::DataDragon, errors::Data
 
 use frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages}; 
 
+/// Transforms the Raw DataDragon runesReforged.json into a more manageable format 
+/// that only contains the runes for the specified IDs
+/// 
+///  # Examples
+/// 
+/// ```
+/// let runes = all_rune_images(8100, 8200, "en_US");
 pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str) -> Result<RuneImages, DataDragonError> {
     let data_dragon = DataDragon::new(Some(language)).await;
     match data_dragon {

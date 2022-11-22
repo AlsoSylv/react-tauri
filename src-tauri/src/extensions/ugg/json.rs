@@ -9,6 +9,9 @@ use super::{constants, structs};
 use structs::UggRequest;
 use constants::{TIERS, REGIONS, ROLES};
 
+/// This handles accessing JSON for the champ, specifically for things like it's winrate
+/// this is important because it handles key checking, which will need to get more 
+/// intense in the future
 pub async fn ranking(
     name: &i64, 
     role: &str, 
@@ -35,6 +38,9 @@ pub async fn ranking(
     }
 }
 
+/// This handles accessing JSON for the champ, specifically for 
+/// things such as runes and items, this is important because 
+/// it handles error catching, which will get more intense 
 pub async fn overview(
     name: &i64,
     role: &str,
@@ -68,6 +74,7 @@ pub async fn overview(
     }
 }
 
+/// Gets the default position of the character as a string
 async fn position(
     name: &i64, 
     role: &str,

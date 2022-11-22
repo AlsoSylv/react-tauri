@@ -11,6 +11,7 @@ use constants::DATA;
 use structs::{ItemsMap, ItemValues};
 
 impl structs::Data {
+    /// Returns items from the UGG API
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = ItemsMap::new();

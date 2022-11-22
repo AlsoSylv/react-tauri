@@ -19,6 +19,10 @@ pub struct RuneImages {
 }
 
 impl RuneImages {
+    /// Requires the intial struct to be mutable.
+    /// 
+    /// Returns slots from PrimaryTree and SecondaryTree
+    /// as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 7] {
         return [
             &mut self.primary_runes.slot_one,
@@ -42,6 +46,7 @@ pub struct PrimaryTree {
 }
 
 impl PrimaryTree {
+    /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
         return PrimaryTree { 
             slot_one: Vec::new(), 
@@ -51,6 +56,9 @@ impl PrimaryTree {
         }
     }
 
+    /// Requires the intial struct to be mutable.
+    /// 
+    /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 4] {
         return [
             &mut self.slot_one,
@@ -70,6 +78,7 @@ pub struct SecondaryTree {
 }
 
 impl SecondaryTree {
+    /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
         return SecondaryTree { 
             slot_one: Vec::new(), 
@@ -78,7 +87,10 @@ impl SecondaryTree {
         }
     }
 
-    pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
+    /// Requires the intial struct to be mutable.
+    /// 
+    /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
+pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
         return [
             &mut self.slot_one,
             &mut self.slot_two,

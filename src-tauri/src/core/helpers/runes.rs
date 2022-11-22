@@ -9,6 +9,7 @@ use frontend_types::{PrimaryTree, SecondaryTree, Active, RuneImages};
 /// 
 /// ```
 /// let runes = all_rune_images(8100, 8200, "en_US");
+/// ```
 pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str) -> Result<RuneImages, DataDragonError> {
     let data_dragon = DataDragon::new(Some(language)).await;
     match data_dragon {

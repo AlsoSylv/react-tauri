@@ -13,6 +13,7 @@ use structs::{AbilitiesMap, AbilitiesValue, Passive};
 use constants::DATA;
 
 impl structs::Data {
+    /// Returns abilities from the UGG API
     pub async fn abilities(&self, request: Result<Value, ErrorMap>) -> Result<AbilitiesMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match data_dragon {
@@ -116,6 +117,8 @@ impl structs::Data {
     }
 }
 
+/// Splits the abilities that U.GG provides into sub arrays so that 
+/// it's easier for the frontend to handle.
 fn split_abilities(maps: &mut [&mut AbilitiesValue; 4], abilities: &Vec<Value>) {
     abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {

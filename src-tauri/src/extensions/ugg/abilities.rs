@@ -62,6 +62,7 @@ impl structs::Data {
                                     ),
         
                                     q: AbilitiesValue::new(
+                                        "Q",
                                         q_image, 
                                         format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
@@ -71,6 +72,7 @@ impl structs::Data {
                                     ), 
         
                                     w: AbilitiesValue::new(
+                                        "W",
                                         w_image, 
                                         format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
@@ -80,6 +82,7 @@ impl structs::Data {
                                     ),
         
                                     e: AbilitiesValue::new(
+                                        "E",
                                         e_image, 
                                         format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
@@ -89,6 +92,7 @@ impl structs::Data {
                                     ),
         
                                     r: AbilitiesValue::new(
+                                        "R",
                                         r_image, 
                                         format!(
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
@@ -98,7 +102,7 @@ impl structs::Data {
                                     ),
                                 };
                                 
-                                split_abilities(abilities.as_array_mut(), abilities_order);
+                                split_abilities(&mut abilities.as_array_mut(), abilities_order);
                                 Ok(abilities)
                             },
                             Err(err) => Err(DataDragonErrors(err)),
@@ -112,37 +116,16 @@ impl structs::Data {
     }
 }
 
-fn split_abilities(maps: [&mut AbilitiesValue; 4], abilities: &Vec<Value>) {
+fn split_abilities(maps: &mut [&mut AbilitiesValue; 4], abilities: &Vec<Value>) {
     abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {
-            let x = String::from(y);
-            match y {
-                "Q" => {
-                    maps[0].order.push(x);
-                    maps[1].order.push("".to_string());
-                    maps[2].order.push("".to_string());
-                    maps[3].order.push("".to_string());
-                },
-                "W" => {
-                    maps[0].order.push("".to_string());
-                    maps[1].order.push(x);
-                    maps[2].order.push("".to_string());
-                    maps[3].order.push("".to_string());
-                },
-                "E" => {
-                    maps[0].order.push("".to_string());
-                    maps[1].order.push("".to_string());
-                    maps[2].order.push(x);
-                    maps[3].order.push("".to_string());
-                },
-                "R" => {
-                    maps[0].order.push("".to_string());
-                    maps[1].order.push("".to_string());
-                    maps[2].order.push("".to_string());
-                    maps[3].order.push(x)
-                },
-                _ => ()
-            }
+            maps.iter_mut().for_each(|ability| {
+                if &ability.name == y {
+                    ability.order.push(String::from(y));
+                } else {
+                    ability.order.push(String::from(""));
+                }
+            });
         }
     })
 }

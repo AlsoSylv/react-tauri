@@ -104,14 +104,16 @@ impl AbilitiesMap {
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
+    pub name: String,
     pub image: String,
     pub order: Vec<String>,
     pub url: String,
 }
 
 impl AbilitiesValue {
-    pub fn new(image: &str, url: String) -> Self {
+    pub fn new(name: &str, image: &str, url: String) -> Self {
         return AbilitiesValue { 
+            name: name.to_owned(),
             image: image.to_owned(), 
             order: Vec::new(), 
             url

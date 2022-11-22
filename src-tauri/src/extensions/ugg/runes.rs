@@ -1,6 +1,6 @@
 use crate::{frontend_types, core::helpers, errors};
 
-use frontend_types::{Active, RuneImages};
+use frontend_types::RuneImages;
 use errors::{ErrorMap, UGGDataError};
 use ErrorMap::DataDragonErrors;
 use serde_json::Value;
@@ -25,15 +25,7 @@ impl structs::Data {
                 match all_runes {
                     Ok(mut all_runes) => {
                         let mut used_rune_ids = Vec::new();
-                        let mut slots: [&mut Vec<Active>; 7] = [
-                            &mut all_runes.primary_runes.slot_one,
-                            &mut all_runes.primary_runes.slot_two,
-                            &mut all_runes.primary_runes.slot_three,
-                            &mut all_runes.primary_runes.slot_four,
-                            &mut all_runes.secondary_runes.slot_one,
-                            &mut all_runes.secondary_runes.slot_two,
-                            &mut all_runes.secondary_runes.slot_three,
-                        ];
+                        let mut slots = all_runes.as_array_mut();
                         
                         for n in 0..6 {
                             slots.iter_mut().for_each(|current_slot| {

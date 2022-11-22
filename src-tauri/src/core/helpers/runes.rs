@@ -9,13 +9,16 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
             let request = data_dragon.runes_json().await;
             let mut tree_one_names = PrimaryTree::new();
             let mut tree_two_names = SecondaryTree::new();
+            let tree_one_array = tree_one_names.as_array_mut();
+            let tree_two_array = tree_two_names.as_array_mut();
+
             match request {
                 Ok(json) => {
                     for rune in json.iter() {
                         if &rune.id == &tree_id_one {
                             for (position, slots) in rune.slots.iter().enumerate() {
                                 for runes in &slots.runes {
-                                    tree_one_names.as_array_mut()[position].push(
+                                    tree_one_array[position].push(
                                         Active::new(
                                         &runes.name,
                                         format!(
@@ -32,7 +35,7 @@ pub async fn all_rune_images(tree_id_one: i64, tree_id_two: i64, language: &str)
                             for i in 1..4 {
                                 let slot = &rune.slots[i];
                                 for runes in &slot.runes {
-                                    tree_two_names.as_array_mut()[i - 1].push(
+                                    tree_two_array[i - 1].push(
                                         Active::new(
                                         &runes.name,
                                         format!(

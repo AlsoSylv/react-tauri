@@ -18,6 +18,20 @@ pub struct RuneImages {
     pub secondary_runes: SecondaryTree,
 }
 
+impl RuneImages {
+    pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 7] {
+        return [
+            &mut self.primary_runes.slot_one,
+            &mut self.primary_runes.slot_two,
+            &mut self.primary_runes.slot_three,
+            &mut self.primary_runes.slot_four,
+            &mut self.secondary_runes.slot_one,
+            &mut self.secondary_runes.slot_two,
+            &mut self.secondary_runes.slot_three,
+        ]
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryTree {

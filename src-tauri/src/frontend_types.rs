@@ -38,6 +38,7 @@ impl RuneImages {
     }
 }
 
+/// A structure for the primary rune tree selected 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryTree {
@@ -71,6 +72,7 @@ impl PrimaryTree {
     }
 }
 
+/// A structure for the secondary rune tree selected 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecondaryTree {
@@ -101,7 +103,7 @@ pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
     }
 }
 
-
+/// A structure for all active runes
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Active {
@@ -132,6 +134,7 @@ impl Active {
     }
 }
 
+/// Struct for packing runes, items, abilities, etc, into a JSON map for the frontend
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunesAndAbilities {
@@ -141,6 +144,7 @@ pub struct RunesAndAbilities {
     pub shards: Shards,
 }
 
+/// Struct for passing champion names, and champ values into a JSON map for the frontend
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionNames {
@@ -150,6 +154,7 @@ pub struct ChampionNames {
     pub local_image: Option<String>,
 }
 
+/// A map containing the champions Key and Id 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionValue {

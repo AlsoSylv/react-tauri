@@ -7,12 +7,17 @@ use serde_json::Value;
 
 use crate::errors::DataDragonError;
 
+/// A new struct for getting data from Data Dragon
 pub struct DataDragon {
     pub version: String,
     pub language: String,
     pub client: reqwest::Client,
 }
 
+/// Version Cache
+/// 
+/// TODO: Figure out a timing system
+/// Does not need to invalidate on lang change
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
     Mutex::new(Cache::new(1))
 });
@@ -70,6 +75,7 @@ impl DataDragon {
     }
 }
 
+/// Searalize `runesReforged.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RuneTree {
     pub id: i64,
@@ -95,6 +101,7 @@ pub struct Rune {
     pub long_desc: String,
 }
 
+/// Searalize `champions.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ChampJson {
     #[serde(rename = "type")]
@@ -161,6 +168,8 @@ pub struct ChampStats {
     pub attackspeed: StatValue,
 }
 
+/// Used for more specfic info on champions, because it is not garenteed to be an int or a float
+/// this could be replaced with a value, and probably should be in the future.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum StatValue {
@@ -174,6 +183,7 @@ impl Default for StatValue {
     }
 }
 
+/// Searalize `championFull.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionFull {

@@ -5,10 +5,13 @@ use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
 
+/// A cache for the `champions.json` file, needs to be changed on lang change
 static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> = {
     Lazy::new(|| Mutex::new(Cache::new(3)))
 };
 
+/// A cache for the champion specific JSON files
+/// this needs to be changed on champion name, and on lang chang
 static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> = {
     Lazy::new(|| Mutex::new(Cache::new(3)))
 };

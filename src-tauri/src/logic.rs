@@ -69,7 +69,7 @@ pub async fn champion_info(
                                                 tier,
                                             })
                                         }
-                                        Err(err) => Err(i64::from(err))
+                                        Err(err) => Err(i64::from(err)),
                                     }
                                 }
                                 Err(err) => Err(i64::from(err)),
@@ -81,7 +81,7 @@ pub async fn champion_info(
                 Err(err) => Err(i64::from(err)),
             }
         },
-        Err(err) => Err(i64::from(err)),
+        Err(err) => Err(err as i64),
     }
 }
 
@@ -120,8 +120,8 @@ pub async fn push_runes(
                     });
                     let result = push_runes_to_client(page).await;
                     match result {
-                        Ok(response) => Ok(i64::from(response)),
-                        Err(err) => Err(i64::from(err))
+                        Ok(response) => Ok(response as i64),
+                        Err(err) => Err(err as i64),
                     }
                 }
                 Err(err) => Err(i64::from(err))
@@ -141,10 +141,10 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
             let langs: Result<Vec<String>, reqwest::Error> = response.json().await;
             match langs {
                 Ok(langs) => Ok(langs),
-                Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
+                Err(_) => Err(DataDragonError::DataDragonMissing as i64),
             }
         },
-        Err(_) => Err(i64::from(DataDragonError::DataDragonMissing)),
+        Err(_) => Err(DataDragonError::DataDragonMissing as i64),
     }
 }
 
@@ -239,9 +239,9 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
                     }
                     Ok(champions)
                 }
-                Err(err) => Err(i64::from(err)),
+                Err(err) => Err(err as i64),
             }
         },
-        Err(err) => Err(i64::from(err)),
+        Err(err) => Err(err as i64),
     }
 }

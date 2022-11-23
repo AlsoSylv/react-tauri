@@ -23,7 +23,6 @@ impl structs::Data {
         match request {
             Ok(json) => {
                 let Some(matches) = &json[STATS["matches"]].as_f64() else {
-                    println!("FUCK");
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
@@ -35,7 +34,6 @@ impl structs::Data {
                 Ok(format!("{:.1$}%", &win_rate * 100.0, 1))
             }
             Err(err) => {
-                println!("FUCK");
                 Err(err)
             }
         }

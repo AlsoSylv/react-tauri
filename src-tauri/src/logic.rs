@@ -13,6 +13,7 @@ use ugg::structs::Data;
 use lcu::runes::push_runes_to_client;
 
 //TODO: This shouldn't fail if something goes wrong, it should just send the values that work
+/// Returns the current pickrate, winrate, banrate, and tier for each champ as requested by the FE
 #[tauri::command]
 pub async fn champion_info(
     name: ChampionNames,
@@ -84,6 +85,8 @@ pub async fn champion_info(
     }
 }
 
+/// Manages pushing runes to the client by generating a JSON page and
+/// connecting to the LCU API to send runes
 #[tauri::command]
 pub async fn push_runes(
     name: ChampionNames,
@@ -129,6 +132,7 @@ pub async fn push_runes(
 }
 
 //TODO: This needs a data dragon fallback, assuming one exists
+/// Sends a list of all languages from DataDragon to the front end
 #[tauri::command]
 pub async fn get_languages() -> Result<Vec<String>, i64> {
     let request = reqwest::get("https://ddragon.leagueoflegends.com/cdn/languages.json").await;
@@ -145,6 +149,9 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
 }
 
 // TODO: This shouldn't fail if something goes wrong, it should just send the values that work
+/// Sends runes, items, abilities, and stat shards to the front end
+/// will later include summoner spells, and in the future will return
+/// in the form of a result instead of using pattern matching
 #[tauri::command]
 pub async fn runes_and_abilities(
     name: ChampionNames,
@@ -202,7 +209,8 @@ pub async fn runes_and_abilities(
     }
 }
 
-
+/// Generates a list of all champion names, IDs, Keys, URLs, and a local image 
+/// that is used by the front end in order to generate a selection list
 #[tauri::command]
 pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();

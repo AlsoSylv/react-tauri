@@ -7,3 +7,4 @@ mod runes;
 mod requests;
 mod items;
 mod abilities;
+mod tests;

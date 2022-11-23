@@ -1,5 +1,8 @@
 use crate::frontend_types::ChampionNames;
 
+/// This is the Data struct for calling various methods from the UGG API
+/// this handles things like getting champ winrates, pickrates, etc, and 
+/// should be used in order to reduce the amount of boilerplate garbage
 pub struct Data {
     pub name: ChampionNames,
     pub role: String,
@@ -27,6 +30,8 @@ impl Data {
     }
 }
 
+/// Handles making a new reques for the UGG extension, this should be changed
+/// to pass a barrowed reqwest client instead of using an owned reqwest client
 pub struct UggRequest {
     pub id: i64,
     pub client: reqwest::Client,
@@ -41,6 +46,7 @@ impl UggRequest {
     }
 }
 
+/// Returns the different item sets in the form of a JSON map for the frontend 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ItemsMap {
     pub start: Vec<ItemValues>,
@@ -63,6 +69,7 @@ impl ItemsMap {
     }
 }
 
+/// This returns an items value struct containing things like cost and description
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemValues {
@@ -92,6 +99,10 @@ impl ItemValues {
     }
 }
 
+/// Abilities map is a struct that contains the passive as well as the abilities
+/// for a specific champion.
+/// 
+/// When calling things like as_array_mut(), it will only return Q, W, E, and R
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesMap {
     pub passive: Passive,
@@ -104,7 +115,7 @@ pub struct AbilitiesMap {
 impl AbilitiesMap {
     /// Requires the intial struct to be mutable
     /// 
-    /// Returns q, w, e, r as a mutable array
+    /// Returns Q, W, E, R as a mutable array
     pub fn as_array_mut(&mut self) -> [&mut AbilitiesValue; 4] {
         return [
             &mut self.q,
@@ -115,6 +126,7 @@ impl AbilitiesMap {
     }
 }
 
+/// Returns an abilities value struct, with the order in which you level that specific ability
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
     pub name: String,
@@ -135,6 +147,7 @@ impl AbilitiesValue {
     }
 }
 
+// Returns the data for the passive
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Passive {
     pub image: String,
@@ -151,6 +164,7 @@ impl Passive {
     }
 }
 
+/// Returns a map of arrays of Shards
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Shards {
@@ -173,6 +187,7 @@ impl Shards {
     }
 }
 
+/// Returns the data for specific shards
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Shard {
     pub name: String,

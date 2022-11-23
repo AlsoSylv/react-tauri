@@ -31,6 +31,7 @@ async fn main() {
         .expect("error while running tauri application");
 }
 
+/// Generates a list and sends it to the front end
 #[tauri::command]
 fn roles() -> Vec<String> {
     let mut roles = Vec::new();
@@ -41,6 +42,7 @@ fn roles() -> Vec<String> {
     return roles
 }
 
+/// Generates a list and sends it to the front end
 #[tauri::command]
 fn tiers() -> Vec<String> {
     let mut tiers = Vec::new();
@@ -50,6 +52,7 @@ fn tiers() -> Vec<String> {
     return tiers
 }
 
+/// Generates a list and sends it to the front end
 #[tauri::command]
 fn regions() -> Vec<String> {
     let mut regions = Vec::new();

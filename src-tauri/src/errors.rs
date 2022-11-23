@@ -1,3 +1,5 @@
+/// A list of Data Dragon specific erreors with things like connections,
+/// the champion being missing, or Data Dragon being missing
 #[derive(Debug, Clone)]
 pub enum DataDragonError {
     ChampMissingError,
@@ -6,6 +8,7 @@ pub enum DataDragonError {
 }
 
 impl From<DataDragonError> for i64 {
+    /// Retuns the enum as an i64 for easy sending to the front end
     fn from(error: DataDragonError) -> i64 {
         match error {
             DataDragonError::ChampMissingError => return 103,
@@ -15,6 +18,8 @@ impl From<DataDragonError> for i64 {
     }
 }
 
+/// Returns sepcific errors for the UGG module, like connection, or
+/// specific files being missing
 #[derive(Debug, Clone)]
 pub enum UGGDataError {
     OverviewMissing,
@@ -29,6 +34,7 @@ pub enum UGGDataError {
 }
 
 impl From<UGGDataError> for i64 {
+    /// Retuns the enum as an i64 for easy sending to the front end
     fn from(error: UGGDataError) -> i64 {
         match error {
             UGGDataError::OverviewMissing => return 201,
@@ -44,6 +50,8 @@ impl From<UGGDataError> for i64 {
     }
 }
 
+/// Returns specfic errors for the LCU support, such as bing unable
+/// to delete runes connect to the client, or push runes
 #[derive(Debug, Clone)]
 pub enum LCUResponses {
     LCUConnect,
@@ -54,6 +62,7 @@ pub enum LCUResponses {
 }
 
 impl From<LCUResponses> for i64 {
+    /// Retuns the enum as an i64 for easy sending to the front end
     fn from(response: LCUResponses) -> i64 {
         match response {
             LCUResponses::LCUConnect => return 401,
@@ -65,6 +74,8 @@ impl From<LCUResponses> for i64 {
     }
 }
 
+/// Wraps the existing errors inside of an error map to be able 
+/// to pass them all the way down to the final tauri command
 #[derive(Debug, Clone)]
 pub enum ErrorMap {
     DataDragonErrors(DataDragonError),
@@ -73,6 +84,7 @@ pub enum ErrorMap {
 }
 
 impl From<ErrorMap> for i64 {
+    /// Retuns the enum as an i64 for easy sending to the front end
     fn from(error: ErrorMap) -> Self {
         match error {
             ErrorMap::DataDragonErrors(data_dragon) => return i64::from(data_dragon),

@@ -1,5 +1,6 @@
 use crate::extensions::ugg::structs::{ItemsMap, AbilitiesMap, Shards};
 
+/// Frontend type for packing data from the ranking JSON into a map
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
@@ -11,6 +12,7 @@ pub struct ChampionInfo {
     pub tier: i64,
 }
 
+/// Map to display runes in the same way that U.GG and the LoL client do
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RuneImages {

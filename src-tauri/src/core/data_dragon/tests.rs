@@ -13,10 +13,10 @@ async fn champion_full_test() {
                     } else {
                         panic!()
                     };
-                },
+                }
                 Err(_) => panic!(),
             }
-        },
+        }
         Err(_) => panic!(),
     }
 }
@@ -33,10 +33,10 @@ async fn champion_json_test() {
                 Ok(json) => {
                     assert!(json.data["Xayah"].key == String::from("498"))
                 }
-                Err(_) => panic!()
+                Err(_) => panic!(),
             }
         }
-        Err(_) => panic!()
+        Err(_) => panic!(),
     }
 }
 
@@ -50,7 +50,7 @@ async fn new_test() {
             println!("{}", data_dragon.version);
             assert!(data_dragon.language == String::from("en_US"));
         }
-        Err(_) => panic!()
+        Err(_) => panic!(),
     }
 }
 
@@ -70,10 +70,10 @@ async fn items_test() {
                         panic!()
                     }
                 }
-                Err(_) => panic!()
+                Err(_) => panic!(),
             }
         }
-        Err(_) => panic!()
+        Err(_) => panic!(),
     }
 }
 
@@ -90,14 +90,14 @@ async fn runes_test() {
                     let domination = &json[0];
                     assert!(domination.id == 8100);
                     assert!(domination.key == String::from("Domination"));
-                    
+
                     let key_stones = &domination.slots[0].runes;
                     assert!(key_stones[0].id == 8112);
                     assert!(key_stones[0].key == String::from("Electrocute"));
                 }
-                Err(_) => panic!()
+                Err(_) => panic!(),
             }
         }
-        Err(_) => panic!()
+        Err(_) => panic!(),
     }
 }

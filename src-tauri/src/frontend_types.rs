@@ -1,4 +1,4 @@
-use crate::extensions::ugg::structs::{ItemsMap, AbilitiesMap, Shards};
+use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards};
 
 /// Frontend type for packing data from the ranking JSON into a map
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -22,7 +22,7 @@ pub struct RuneImages {
 
 impl RuneImages {
     /// Requires the intial struct to be mutable.
-    /// 
+    ///
     /// Returns slots from PrimaryTree and SecondaryTree
     /// as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 7] {
@@ -34,11 +34,11 @@ impl RuneImages {
             &mut self.secondary_runes.slot_one,
             &mut self.secondary_runes.slot_two,
             &mut self.secondary_runes.slot_three,
-        ]
+        ];
     }
 }
 
-/// A structure for the primary rune tree selected 
+/// A structure for the primary rune tree selected
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryTree {
@@ -51,16 +51,16 @@ pub struct PrimaryTree {
 impl PrimaryTree {
     /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
-        return PrimaryTree { 
-            slot_one: Vec::new(), 
-            slot_two: Vec::new(), 
+        return PrimaryTree {
+            slot_one: Vec::new(),
+            slot_two: Vec::new(),
             slot_three: Vec::new(),
             slot_four: Vec::new(),
-        }
+        };
     }
 
     /// Requires the intial struct to be mutable.
-    /// 
+    ///
     /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 4] {
         return [
@@ -68,11 +68,11 @@ impl PrimaryTree {
             &mut self.slot_two,
             &mut self.slot_three,
             &mut self.slot_four,
-        ]
+        ];
     }
 }
 
-/// A structure for the secondary rune tree selected 
+/// A structure for the secondary rune tree selected
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecondaryTree {
@@ -84,22 +84,18 @@ pub struct SecondaryTree {
 impl SecondaryTree {
     /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
-        return SecondaryTree { 
-            slot_one: Vec::new(), 
-            slot_two: Vec::new(), 
-            slot_three: Vec::new() 
-        }
+        return SecondaryTree {
+            slot_one: Vec::new(),
+            slot_two: Vec::new(),
+            slot_three: Vec::new(),
+        };
     }
 
     /// Requires the intial struct to be mutable.
-    /// 
+    ///
     /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
-pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
-        return [
-            &mut self.slot_one,
-            &mut self.slot_two,
-            &mut self.slot_three,
-        ]
+    pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
+        return [&mut self.slot_one, &mut self.slot_two, &mut self.slot_three];
     }
 }
 
@@ -116,21 +112,15 @@ pub struct Active {
 }
 
 impl Active {
-    pub fn new(
-        name: &str, 
-        image: String, 
-        id: i64, 
-        local_image: String, 
-        description: &str
-    ) -> Self {
-        return Active { 
-            name: name.to_owned(), 
+    pub fn new(name: &str, image: String, id: i64, local_image: String, description: &str) -> Self {
+        return Active {
+            name: name.to_owned(),
             image,
-            local_image, 
-            active: false, 
+            local_image,
+            active: false,
             id,
-            description: description.to_owned() 
-        }
+            description: description.to_owned(),
+        };
     }
 }
 
@@ -154,11 +144,10 @@ pub struct ChampionNames {
     pub local_image: Option<String>,
 }
 
-/// A map containing the champions Key and Id 
+/// A map containing the champions Key and Id
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionValue {
     pub key: String,
     pub id: i64,
 }
-

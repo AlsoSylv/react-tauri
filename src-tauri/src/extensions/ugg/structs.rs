@@ -1,7 +1,7 @@
 use crate::frontend_types::ChampionNames;
 
 /// This is the Data struct for calling various methods from the UGG API
-/// this handles things like getting champ winrates, pickrates, etc, and 
+/// this handles things like getting champ winrates, pickrates, etc, and
 /// should be used in order to reduce the amount of boilerplate garbage
 pub struct Data {
     pub name: ChampionNames,
@@ -14,19 +14,19 @@ pub struct Data {
 impl Data {
     /// Returns a new instance of the Data struct
     pub fn new(
-        name: ChampionNames, 
-        role: String, 
-        rank: String, 
-        region: String, 
-        lang: String
+        name: ChampionNames,
+        role: String,
+        rank: String,
+        region: String,
+        lang: String,
     ) -> Self {
-        return Data { 
-            name, 
-            role, 
-            rank, 
+        return Data {
+            name,
+            role,
+            rank,
             region,
             lang: lang.to_string(),
-        }
+        };
     }
 }
 
@@ -42,30 +42,34 @@ impl UggRequest {
     /// Returns a new UggRequest, this also handles spawning the HTTP client
     pub fn new(id: &i64, lang: &str) -> Self {
         let client = reqwest::Client::new();
-        return UggRequest { id: *id, client, lang: lang.to_string() }
+        return UggRequest {
+            id: *id,
+            client,
+            lang: lang.to_string(),
+        };
     }
 }
 
-/// Returns the different item sets in the form of a JSON map for the frontend 
+/// Returns the different item sets in the form of a JSON map for the frontend
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ItemsMap {
     pub start: Vec<ItemValues>,
     pub core: Vec<ItemValues>,
     pub fourth: Vec<ItemValues>,
     pub fifth: Vec<ItemValues>,
-    pub sixth: Vec<ItemValues>
+    pub sixth: Vec<ItemValues>,
 }
 
 impl ItemsMap {
     /// Returns a new instance of the ItemsMap struct
     pub fn new() -> Self {
-        return ItemsMap {             
-            start: Vec::new(), 
-            core: Vec::new(), 
-            fourth: Vec::new(), 
-            fifth: Vec::new(), 
-            sixth: Vec::new()  
-        }
+        return ItemsMap {
+            start: Vec::new(),
+            core: Vec::new(),
+            fourth: Vec::new(),
+            fifth: Vec::new(),
+            sixth: Vec::new(),
+        };
     }
 }
 
@@ -82,26 +86,20 @@ pub struct ItemValues {
 
 impl ItemValues {
     /// Returns a new instance of the ItemValues struct
-    pub fn new(
-        name: &str, 
-        cost: i64, 
-        description: &str, 
-        image: &str, 
-        url: &str
-    ) -> Self {
-        return ItemValues { 
-            name: name.to_owned(), 
-            cost, 
-            description: description.to_owned(), 
-            local_image: image.to_owned(), 
-            url: url.to_owned()
-        }
+    pub fn new(name: &str, cost: i64, description: &str, image: &str, url: &str) -> Self {
+        return ItemValues {
+            name: name.to_owned(),
+            cost,
+            description: description.to_owned(),
+            local_image: image.to_owned(),
+            url: url.to_owned(),
+        };
     }
 }
 
 /// Abilities map is a struct that contains the passive as well as the abilities
 /// for a specific champion.
-/// 
+///
 /// When calling things like as_array_mut(), it will only return Q, W, E, and R
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesMap {
@@ -114,15 +112,10 @@ pub struct AbilitiesMap {
 
 impl AbilitiesMap {
     /// Requires the intial struct to be mutable
-    /// 
+    ///
     /// Returns Q, W, E, R as a mutable array
     pub fn as_array_mut(&mut self) -> [&mut AbilitiesValue; 4] {
-        return [
-            &mut self.q,
-            &mut self.w,
-            &mut self.e,
-            &mut self.r
-        ];
+        return [&mut self.q, &mut self.w, &mut self.e, &mut self.r];
     }
 }
 
@@ -138,12 +131,12 @@ pub struct AbilitiesValue {
 impl AbilitiesValue {
     /// Returns a new instance of the AbilitiesValue struct
     pub fn new(name: &str, image: &str, url: String) -> Self {
-        return AbilitiesValue { 
+        return AbilitiesValue {
             name: name.to_owned(),
-            image: image.to_owned(), 
-            order: Vec::new(), 
-            url
-        }
+            image: image.to_owned(),
+            order: Vec::new(),
+            url,
+        };
     }
 }
 
@@ -156,11 +149,11 @@ pub struct Passive {
 
 impl Passive {
     /// Returns a new instance of the Passive struct
-    pub fn new(image: &str, url: String ) -> Self {
-        return Passive { 
-            image: image.to_owned(), 
-            url 
-        }
+    pub fn new(image: &str, url: String) -> Self {
+        return Passive {
+            image: image.to_owned(),
+            url,
+        };
     }
 }
 
@@ -175,15 +168,11 @@ pub struct Shards {
 
 impl Shards {
     /// Requires that the intial struct also be mutable
-    /// 
-    /// This returns the Shards struct as an array of 
+    ///
+    /// This returns the Shards struct as an array of
     /// &mut arrays of Shards
     pub fn as_array_mut(&mut self) -> [&mut [Shard; 3]; 3] {
-        return [
-            &mut self.row_one,
-            &mut self.row_two,
-            &mut self.row_three,
-        ];
+        return [&mut self.row_one, &mut self.row_two, &mut self.row_three];
     }
 }
 
@@ -198,16 +187,12 @@ pub struct Shard {
 
 impl Shard {
     /// Returns a new instance of the Shard struct
-    pub fn create(
-        name: &str,
-        id: i64,
-        image: &str,
-    ) -> Shard {
-        return Shard { 
-            name: name.to_string(), 
-            id, 
-            image: image.to_string(), 
-            active: false 
-        }
+    pub fn create(name: &str, id: i64, image: &str) -> Shard {
+        return Shard {
+            name: name.to_string(),
+            id,
+            image: image.to_string(),
+            active: false,
+        };
     }
 }

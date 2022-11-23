@@ -2,9 +2,7 @@
 async fn ranking_structure_test() {
     use super::json;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         println!("{:#?}", json);
         assert!(json.is_array());
     } else {
@@ -14,12 +12,10 @@ async fn ranking_structure_test() {
 
 #[tokio::test]
 async fn wins_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["wins"]].is_i64());
     } else {
         panic!()
@@ -28,12 +24,10 @@ async fn wins_test() {
 
 #[tokio::test]
 async fn matches_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["matches"]].is_i64());
     } else {
         panic!()
@@ -42,12 +36,10 @@ async fn matches_test() {
 
 #[tokio::test]
 async fn rank_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["rank"]].is_i64());
     } else {
         panic!()
@@ -56,12 +48,10 @@ async fn rank_test() {
 
 #[tokio::test]
 async fn total_rank_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["total_rank"]].is_i64());
     } else {
         panic!()
@@ -70,12 +60,10 @@ async fn total_rank_test() {
 
 #[tokio::test]
 async fn bans_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["bans"]].is_i64());
     } else {
         panic!()
@@ -84,12 +72,10 @@ async fn bans_test() {
 
 #[tokio::test]
 async fn total_matches_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["total_matches"]].is_f64());
     } else {
         panic!()
@@ -98,12 +84,10 @@ async fn total_matches_test() {
 
 #[tokio::test]
 async fn real_matches_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["real_matches"]].is_i64());
     } else {
         panic!()
@@ -112,12 +96,10 @@ async fn real_matches_test() {
 
 #[tokio::test]
 async fn matchups_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json[STATS["matchups"]].is_array());
     } else {
         panic!()
@@ -126,12 +108,10 @@ async fn matchups_test() {
 
 #[tokio::test]
 async fn data_test_ranking() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::STATS;
 
-    if let Ok(json) = json::ranking(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         let wins = json[STATS["wins"]].as_f64().unwrap();
         let matches = json[STATS["matches"]].as_f64().unwrap();
         assert!(wins / matches < 1.0)
@@ -144,9 +124,7 @@ async fn data_test_ranking() {
 async fn overview_structure_test() {
     use super::json;
 
-    if let Ok(json) = json::overview(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json.is_array());
     } else {
         panic!()
@@ -155,12 +133,10 @@ async fn overview_structure_test() {
 
 #[tokio::test]
 async fn runes_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::DATA;
 
-    if let Ok(json) = json::overview(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         let runes = &json[DATA["perks"]];
         assert!(runes.is_array());
         assert!(runes[4].is_array());
@@ -173,12 +149,10 @@ async fn runes_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::DATA;
 
-    if let Ok(json) = json::overview(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         let items = &json[DATA["starting_items"]];
         assert!(items.is_array());
         assert!(items[2].is_array());
@@ -190,12 +164,10 @@ async fn items_test() {
 
 #[tokio::test]
 async fn abilities_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::DATA;
 
-    if let Ok(json) = json::overview(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         let abilities = &json[DATA["abilities"]];
         assert!(abilities.is_array());
         assert!(abilities[2].is_array());
@@ -207,12 +179,10 @@ async fn abilities_test() {
 
 #[tokio::test]
 async fn shards_test() {
-    use super::{json, constants};
+    use super::{constants, json};
     use constants::DATA;
 
-    if let Ok(json) = json::overview(
-        &498, "ADC", "Platinum Plus", "World", "en_US"
-    ).await {
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         let abilities = &json[DATA["shards"]];
         assert!(abilities.is_array());
         assert!(abilities[2].is_array());
@@ -231,7 +201,7 @@ async fn sort_test() {
         let mut used = Vec::new();
         let mut counter = 0;
         let rune_ids: [i64; 6] = [8135, 8120, 8126, 8112, 8306, 8321];
-        
+
         slots.iter_mut().for_each(|current_slot| {
             current_slot.iter_mut().for_each(|i| {
                 for n in 0..6 {

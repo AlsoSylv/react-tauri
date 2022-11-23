@@ -33,13 +33,13 @@ pub enum LCUResponses {
     LCUPushRune = 405,
 }
 
-/// Wraps the existing errors inside of an error map to be able 
+/// Wraps the existing errors inside of an error map to be able
 /// to pass them all the way down to the final tauri command
 #[derive(Debug, Clone)]
 pub enum ErrorMap {
     DataDragonErrors(DataDragonError),
     UGGError(UGGDataError),
-    LCUReponse(LCUResponses)
+    LCUReponse(LCUResponses),
 }
 
 impl From<ErrorMap> for i64 {
@@ -48,7 +48,7 @@ impl From<ErrorMap> for i64 {
         return match error {
             ErrorMap::DataDragonErrors(data_dragon) => data_dragon as i64,
             ErrorMap::UGGError(ugg) => ugg as i64,
-            ErrorMap::LCUReponse(lcu) =>lcu as i64,
-        }
+            ErrorMap::LCUReponse(lcu) => lcu as i64,
+        };
     }
 }

@@ -4,7 +4,7 @@ use crate::errors;
 
 use errors::{ErrorMap, UGGDataError};
 
-use super::{structs, constants};
+use super::{constants, structs};
 
 use constants::STATS;
 
@@ -12,12 +12,12 @@ impl structs::Data {
     //The format is used here to get an exact result from the floating point math
 
     /// Returns the winrate from the UGG API, errors if it is None
-    /// 
+    ///
     /// ```rs
     /// format!("{:.1$}%", &win_rate * 100.0, 1)
     /// ```
-    /// 
-    /// This line is used to make sure that it's displayable information, 
+    ///
+    /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
     pub async fn winrate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
@@ -33,20 +33,18 @@ impl structs::Data {
                 let win_rate = wins / matches;
                 Ok(format!("{:.1$}%", &win_rate * 100.0, 1))
             }
-            Err(err) => {
-                Err(err)
-            }
+            Err(err) => Err(err),
         }
     }
-    
-    /// Returns the banrate from the UGG API, returns "-" if 
+
+    /// Returns the banrate from the UGG API, returns "-" if
     /// bans is None, this follows UGGs pattern on their site
-    /// 
+    ///
     /// ```rs
     /// format!("{:.1$}%", &ban_rate * 100.0, 1)
     /// ```
-    /// 
-    /// This line is used to make sure that it's displayable information, 
+    ///
+    /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
     pub async fn ban_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
@@ -61,17 +59,17 @@ impl structs::Data {
                 let ban_rate = bans / matches;
                 Ok(format!("{:.1$}%", &ban_rate * 100.0, 1))
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 
     /// Returns the pickrate from the UGG API, errors if it is None
-    /// 
+    ///
     /// ```rs
     /// format!("{:.1$}%", &pick_rate * 100.0, 1)
     /// ```
-    /// 
-    /// This line is used to make sure that it's displayable information, 
+    ///
+    /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
     pub async fn pick_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
@@ -87,12 +85,12 @@ impl structs::Data {
                 let pick_rate = picks / matches;
                 Ok(format!("{:.1$}%", &pick_rate * 100.0, 1))
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 
     /// This currently returns the characters rank as an int,
-    /// but this will change in the future and will be a string of 
+    /// but this will change in the future and will be a string of
     /// "{} / {}" rank, total_rank
     /// and will return a ? if it is not ranked
     pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
@@ -104,7 +102,7 @@ impl structs::Data {
                 };
                 Ok(rank)
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 }

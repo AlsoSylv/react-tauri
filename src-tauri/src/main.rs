@@ -5,13 +5,13 @@
 
 use extensions::ugg::constants;
 
-use constants::{TIERS, REGIONS, ROLES};
+use constants::{REGIONS, ROLES, TIERS};
 
-mod extensions;
 mod core;
-mod logic;
-pub mod frontend_types;
 pub mod errors;
+mod extensions;
+pub mod frontend_types;
+mod logic;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
@@ -39,7 +39,7 @@ fn roles() -> Vec<String> {
     for (key, _value) in &ROLES {
         roles.push(key.to_string());
     }
-    return roles
+    return roles;
 }
 
 /// Generates a list and sends it to the front end
@@ -49,7 +49,7 @@ fn tiers() -> Vec<String> {
     for (key, _value) in &TIERS {
         tiers.push(key.to_string());
     }
-    return tiers
+    return tiers;
 }
 
 /// Generates a list and sends it to the front end
@@ -59,5 +59,5 @@ fn regions() -> Vec<String> {
     for (key, _value) in &REGIONS {
         regions.push(key.to_string());
     }
-    return regions
+    return regions;
 }

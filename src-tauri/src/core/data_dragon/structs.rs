@@ -1,9 +1,9 @@
-use tokio::sync::Mutex;
-use once_cell::sync::Lazy;
 use linked_hash_map::LinkedHashMap;
 use moka::future::Cache;
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::sync::Mutex;
 
 use crate::errors::DataDragonError;
 
@@ -15,18 +15,16 @@ pub struct DataDragon {
 }
 
 /// Version Cache
-/// 
+///
 /// TODO: Figure out a timing system
 /// Does not need to invalidate on lang change
-static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
-    Mutex::new(Cache::new(1))
-});
+static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
 impl DataDragon {
     /// A chached function to generate a new http client for Data Dragon
     /// this also gives a version string as a result, and can fail creation
     /// if there is no internet connection available
-    /// 
+    ///
     /// # Examples
     /// ```
     /// let data_dragon = DataDragon::new(None).await;
@@ -40,30 +38,31 @@ impl DataDragon {
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
         if let Some(cache) = cache.get("version") {
-            return Ok(
-                DataDragon { 
-                    version: cache.clone(), 
-                    language: lang.to_string(), 
-                    client 
-                });
+            return Ok(DataDragon {
+                version: cache.clone(),
+                language: lang.to_string(),
+                client,
+            });
         }
 
-        let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
+        let version = client
+            .get("https://ddragon.leagueoflegends.com/api/versions.json")
+            .send()
+            .await;
         match version {
             Ok(response) => {
                 if let Ok(json) = response.json::<Vec<String>>().await {
                     let version = json[0].clone();
                     cache.insert("version".to_string(), version.clone()).await;
-                    Ok(
-                        DataDragon { 
-                            version, 
-                            language: lang.to_string(), 
-                            client
-                        })
+                    Ok(DataDragon {
+                        version,
+                        language: lang.to_string(),
+                        client,
+                    })
                 } else {
                     unreachable!()
                 }
-            },
+            }
             Err(err) => {
                 if err.is_body() {
                     Err(DataDragonError::DataDragonMissing)

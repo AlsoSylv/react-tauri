@@ -6,20 +6,18 @@ use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
 
 /// A cache for the `champions.json` file, needs to be changed on lang change
-static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> = {
-    Lazy::new(|| Mutex::new(Cache::new(3)))
-};
+static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> =
+    Lazy::new(|| Mutex::new(Cache::new(3)));
 
 /// A cache for the champion specific JSON files
 /// this needs to be changed on champion name, and on lang chang
-static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> = {
-    Lazy::new(|| Mutex::new(Cache::new(3)))
-};
+static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
+    Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl structs::DataDragon {
     /// A chached function to get the DataDragon champion.json and return it
     /// searialized as a struct for the rest of the code
-    /// 
+    ///
     /// # Example
     /// ```
     /// let data_dragon = DataDragon::new(None).await.unwrap();
@@ -42,7 +40,9 @@ impl structs::DataDragon {
                 let Ok(champ_json) = response.json::<ChampJson>().await else {
                     return Err(DataDragonError::ChampMissingError);
                 };
-                cache.insert(self.language.clone(), champ_json.clone()).await;
+                cache
+                    .insert(self.language.clone(), champ_json.clone())
+                    .await;
                 cache.sync();
                 Ok(champ_json)
             }
@@ -60,7 +60,7 @@ impl structs::DataDragon {
     /// A chached function to get the json files for specific
     /// champions from DataDragon, this requires an extra
     /// argument for the champions Key from champions.json
-    /// 
+    ///
     /// # Example
     /// ```
     /// let data_dragon = DataDragon::new(None).await.unwrap();
@@ -84,11 +84,11 @@ impl structs::DataDragon {
                     return Err(DataDragonError::ChampMissingError);
                 };
                 cache
-                .insert((self.language.clone(), key.clone()), champ_full.clone())
-                .await;
+                    .insert((self.language.clone(), key.clone()), champ_full.clone())
+                    .await;
                 cache.sync();
                 Ok(champ_full)
-            },
+            }
             Err(err) => {
                 if err.is_body() {
                     Err(DataDragonError::DataDragonMissing)

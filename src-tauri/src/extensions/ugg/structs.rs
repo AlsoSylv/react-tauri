@@ -9,7 +9,14 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(name: ChampionNames, role: String, rank: String, region: String, lang: String) -> Self {
+    /// Returns a new instance of the Data struct
+    pub fn new(
+        name: ChampionNames, 
+        role: String, 
+        rank: String, 
+        region: String, 
+        lang: String
+    ) -> Self {
         return Data { 
             name, 
             role, 
@@ -27,6 +34,7 @@ pub struct UggRequest {
 }
 
 impl UggRequest {
+    /// Returns a new UggRequest, this also handles spawning the HTTP client
     pub fn new(id: &i64, lang: &str) -> Self {
         let client = reqwest::Client::new();
         return UggRequest { id: *id, client, lang: lang.to_string() }
@@ -43,6 +51,7 @@ pub struct ItemsMap {
 }
 
 impl ItemsMap {
+    /// Returns a new instance of the ItemsMap struct
     pub fn new() -> Self {
         return ItemsMap {             
             start: Vec::new(), 
@@ -65,6 +74,7 @@ pub struct ItemValues {
 }
 
 impl ItemValues {
+    /// Returns a new instance of the ItemValues struct
     pub fn new(
         name: &str, 
         cost: i64, 
@@ -92,6 +102,9 @@ pub struct AbilitiesMap {
 }
 
 impl AbilitiesMap {
+    /// Requires the intial struct to be mutable
+    /// 
+    /// Returns q, w, e, r as a mutable array
     pub fn as_array_mut(&mut self) -> [&mut AbilitiesValue; 4] {
         return [
             &mut self.q,
@@ -111,6 +124,7 @@ pub struct AbilitiesValue {
 }
 
 impl AbilitiesValue {
+    /// Returns a new instance of the AbilitiesValue struct
     pub fn new(name: &str, image: &str, url: String) -> Self {
         return AbilitiesValue { 
             name: name.to_owned(),
@@ -128,6 +142,7 @@ pub struct Passive {
 }
 
 impl Passive {
+    /// Returns a new instance of the Passive struct
     pub fn new(image: &str, url: String ) -> Self {
         return Passive { 
             image: image.to_owned(), 
@@ -145,6 +160,10 @@ pub struct Shards {
 }
 
 impl Shards {
+    /// Requires that the intial struct also be mutable
+    /// 
+    /// This returns the Shards struct as an array of 
+    /// &mut arrays of Shards
     pub fn as_array_mut(&mut self) -> [&mut [Shard; 3]; 3] {
         return [
             &mut self.row_one,
@@ -163,6 +182,7 @@ pub struct Shard {
 }
 
 impl Shard {
+    /// Returns a new instance of the Shard struct
     pub fn create(
         name: &str,
         id: i64,

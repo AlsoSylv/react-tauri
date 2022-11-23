@@ -23,6 +23,8 @@ static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Value>>> = Lazy::new(|| {
 });
  
 impl structs::UggRequest {
+    /// Handles making the request to get the default roles for every champ 
+    /// from the UGG api
     pub async fn default_role(&self) -> Result<String, ErrorMap> {
         let cache = CACHED_DEFAULT_ROLE.lock().await;
         if let Some(role) = cache.get(&self.id) {
@@ -70,9 +72,14 @@ impl structs::UggRequest {
         }
     }
 
-    // Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
-    // UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
-    // Further investigation is needed into finding out which champs this is offered for automatically
+    /// Handles making the network request for the UGG overview JSON file
+    /// This contians things like rune IDs, item IDs, spell IDs, etc
+    /// 
+    /// 
+    /// TODO: Investigate wrapping https://stats2.u.gg/lol/1.5/ap-overview/12_20/ranked_solo_5x5/21/1.5.0.json
+    /// 
+    /// UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
+    /// Further investigation is needed into finding out which champs this is offered for automatically
     pub async fn overview_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
         if let Some(overview) = cache.get(&self.id) {
@@ -122,6 +129,8 @@ impl structs::UggRequest {
         }
     }
 
+    /// This handles making the request for the UGG ranking JSON for specific champs
+    /// this contians things like pickrate, winrate, banrate, and matchups
     pub async fn ranking_json(&self) -> Result<Value, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
         if let Some(ranking) = cache.get(&self.id) {

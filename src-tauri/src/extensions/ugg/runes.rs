@@ -8,6 +8,9 @@ use serde_json::Value;
 use super::{structs, constants};
 
 impl structs::Data {
+    /// Returns runes from the UGG API
+    /// this heavily uses mutability to
+    /// avoid duplication of variables
     pub async fn rune_tuple(&self, request: Result<Value, ErrorMap>) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
         match request {
             Ok(json) => {

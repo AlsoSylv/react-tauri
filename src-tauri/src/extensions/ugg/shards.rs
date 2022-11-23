@@ -9,6 +9,10 @@ use structs::{Shard, Shards};
 use constants::DATA;
 
 impl structs::Data {
+    /// Returns stat shards from the UGG API
+    /// 
+    /// This requires Community Dragon to work
+    /// without being hardcoded
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
         // TODO: Use Community Dragon to get shard data
         let armor = Shard::create(

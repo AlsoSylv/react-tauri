@@ -96,13 +96,13 @@ impl structs::Data {
                                         {
                                             fifth.iter().for_each(|y| {
                                                 if y.is_array() && &y[0].to_string() == key {
-                                                        items_map.fifth.push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
+                                                    items_map.fifth.push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ))
                                                 }
                                             })
                                         };
@@ -111,13 +111,13 @@ impl structs::Data {
                                         {
                                             sixth.iter().for_each(|y| {
                                                 if y.is_array() && &y[0].to_string() == key {
-                                                        items_map.sixth.push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
+                                                    items_map.sixth.push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ))
                                                 }
                                             })
                                         };

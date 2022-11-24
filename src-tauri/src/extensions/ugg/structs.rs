@@ -51,7 +51,7 @@ impl UggRequest {
 }
 
 /// Returns the different item sets in the form of a JSON map for the frontend
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ItemsMap {
     pub start: Vec<ItemValues>,
     pub core: Vec<ItemValues>,
@@ -74,7 +74,7 @@ impl ItemsMap {
 }
 
 /// This returns an items value struct containing things like cost and description
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemValues {
     pub name: String,
@@ -101,7 +101,7 @@ impl ItemValues {
 /// for a specific champion.
 ///
 /// When calling things like as_array_mut(), it will only return Q, W, E, and R
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesMap {
     pub passive: Passive,
     pub q: AbilitiesValue,
@@ -120,7 +120,7 @@ impl AbilitiesMap {
 }
 
 /// Returns an abilities value struct, with the order in which you level that specific ability
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
     pub name: String,
     pub image: String,
@@ -141,7 +141,7 @@ impl AbilitiesValue {
 }
 
 // Returns the data for the passive
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Passive {
     pub image: String,
     pub url: String,
@@ -158,7 +158,7 @@ impl Passive {
 }
 
 /// Returns a map of arrays of Shards
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Shards {
     pub row_one: [Shard; 3],
@@ -177,7 +177,7 @@ impl Shards {
 }
 
 /// Returns the data for specific shards
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Shard {
     pub name: String,
     pub id: i64,

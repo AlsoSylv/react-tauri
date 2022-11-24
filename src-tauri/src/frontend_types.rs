@@ -1,7 +1,7 @@
 use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards};
 
 /// Frontend type for packing data from the ranking JSON into a map
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
     pub url: String,
@@ -13,7 +13,7 @@ pub struct ChampionInfo {
 }
 
 /// Map to display runes in the same way that U.GG and the LoL client do
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RuneImages {
     pub primary_runes: PrimaryTree,
@@ -39,7 +39,7 @@ impl RuneImages {
 }
 
 /// A structure for the primary rune tree selected
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryTree {
     pub slot_one: Vec<Active>,
@@ -73,7 +73,7 @@ impl PrimaryTree {
 }
 
 /// A structure for the secondary rune tree selected
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecondaryTree {
     pub slot_one: Vec<Active>,
@@ -95,16 +95,12 @@ impl SecondaryTree {
     ///
     /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
-        [
-            &mut self.slot_one, 
-            &mut self.slot_two, 
-            &mut self.slot_three
-        ]
+        [&mut self.slot_one, &mut self.slot_two, &mut self.slot_three]
     }
 }
 
 /// A structure for all active runes
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Active {
     pub name: String,
@@ -129,7 +125,7 @@ impl Active {
 }
 
 /// Struct for packing runes, items, abilities, etc, into a JSON map for the frontend
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunesAndAbilities {
     pub runes: RuneImages,
@@ -139,7 +135,7 @@ pub struct RunesAndAbilities {
 }
 
 /// Struct for passing champion names, and champ values into a JSON map for the frontend
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionNames {
     pub label: String,
@@ -149,7 +145,7 @@ pub struct ChampionNames {
 }
 
 /// A map containing the champions Key and Id
-#[derive(Default, Debug, Clone, PartialEq, Eq,  serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionValue {
     pub key: String,

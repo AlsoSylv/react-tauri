@@ -136,7 +136,7 @@ impl structs::UggRequest {
 
         match data_dragon_version {
             Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split(".").collect();
+                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
                 let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
                 let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
                 let request = client.get(url).send().await;

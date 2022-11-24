@@ -72,7 +72,7 @@ impl DataDragon {
 }
 
 /// Searalize `runesReforged.json` to a struct
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuneTree {
     pub id: i64,
     pub key: String,
@@ -81,12 +81,12 @@ pub struct RuneTree {
     pub slots: Vec<Slot>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Slot {
     pub runes: Vec<Rune>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Rune {
     pub id: i64,
@@ -121,7 +121,7 @@ pub struct ChampData {
     pub stats: ChampStats,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChampInfo {
     pub attack: i64,
     pub defense: i64,
@@ -129,7 +129,7 @@ pub struct ChampInfo {
     pub difficulty: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChampImage {
     pub full: String,
     pub sprite: String,
@@ -180,7 +180,7 @@ impl Default for StatValue {
 }
 
 /// Searalize `championFull.json` to a struct
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionFull {
     #[serde(rename = "type")]

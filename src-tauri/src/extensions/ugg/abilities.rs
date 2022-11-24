@@ -122,7 +122,7 @@ impl structs::Data {
 
 /// Splits the abilities that U.GG provides into sub arrays so that
 /// it's easier for the frontend to handle.
-fn split_abilities(maps: &mut [&mut AbilitiesValue; 4], abilities: &Vec<Value>) {
+fn split_abilities(maps: &mut [&mut AbilitiesValue; 4], abilities: &[Value]) {
     abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {
             maps.iter_mut().for_each(|ability| {

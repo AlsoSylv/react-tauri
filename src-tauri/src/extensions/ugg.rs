@@ -7,4 +7,3 @@ mod requests;
 mod runes;
 mod shards;
 pub mod structs;
-mod tests;

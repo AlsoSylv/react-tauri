@@ -1,6 +1,6 @@
 #[tokio::test]
 async fn champion_full_test() {
-    use super::structs::DataDragon;
+    use crate::core::data_dragon::structs::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -23,7 +23,7 @@ async fn champion_full_test() {
 
 #[tokio::test]
 async fn champion_json_test() {
-    use super::structs::DataDragon;
+    use crate::core::data_dragon::structs::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -42,7 +42,7 @@ async fn champion_json_test() {
 
 #[tokio::test]
 async fn new_test() {
-    use super::structs::DataDragon;
+    use crate::core::data_dragon::structs::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -56,7 +56,7 @@ async fn new_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use super::structs::DataDragon;
+    use crate::core::data_dragon::structs::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -79,7 +79,7 @@ async fn items_test() {
 
 #[tokio::test]
 async fn runes_test() {
-    use super::structs::DataDragon;
+    use crate::core::data_dragon::structs::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {

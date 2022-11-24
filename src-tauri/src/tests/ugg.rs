@@ -1,6 +1,6 @@
 #[tokio::test]
 async fn ranking_structure_test() {
-    use super::json;
+    use crate::extensions::ugg::json;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         println!("{:#?}", json);
@@ -12,7 +12,7 @@ async fn ranking_structure_test() {
 
 #[tokio::test]
 async fn wins_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -24,7 +24,7 @@ async fn wins_test() {
 
 #[tokio::test]
 async fn matches_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -36,7 +36,7 @@ async fn matches_test() {
 
 #[tokio::test]
 async fn rank_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -48,7 +48,7 @@ async fn rank_test() {
 
 #[tokio::test]
 async fn total_rank_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -60,7 +60,7 @@ async fn total_rank_test() {
 
 #[tokio::test]
 async fn bans_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -72,7 +72,7 @@ async fn bans_test() {
 
 #[tokio::test]
 async fn total_matches_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -84,7 +84,7 @@ async fn total_matches_test() {
 
 #[tokio::test]
 async fn real_matches_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -96,7 +96,7 @@ async fn real_matches_test() {
 
 #[tokio::test]
 async fn matchups_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -108,7 +108,7 @@ async fn matchups_test() {
 
 #[tokio::test]
 async fn data_test_ranking() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::STATS;
 
     if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -122,7 +122,7 @@ async fn data_test_ranking() {
 
 #[tokio::test]
 async fn overview_structure_test() {
-    use super::json;
+    use crate::extensions::ugg::json;
 
     if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
         assert!(json.is_array());
@@ -133,7 +133,7 @@ async fn overview_structure_test() {
 
 #[tokio::test]
 async fn runes_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::DATA;
 
     if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -149,7 +149,7 @@ async fn runes_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::DATA;
 
     if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -164,7 +164,7 @@ async fn items_test() {
 
 #[tokio::test]
 async fn abilities_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::DATA;
 
     if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
@@ -179,7 +179,7 @@ async fn abilities_test() {
 
 #[tokio::test]
 async fn shards_test() {
-    use super::{constants, json};
+    use crate::extensions::ugg::{constants, json};
     use constants::DATA;
 
     if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {

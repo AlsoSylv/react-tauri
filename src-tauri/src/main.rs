@@ -12,6 +12,8 @@ pub mod errors;
 mod extensions;
 pub mod frontend_types;
 mod logic;
+#[cfg(test)]
+mod tests;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]

@@ -126,7 +126,7 @@ fn split_abilities(maps: &mut [&mut AbilitiesValue; 4], abilities: &Vec<Value>) 
     abilities.iter().for_each(|y| {
         if let Some(y) = y.as_str() {
             maps.iter_mut().for_each(|ability| {
-                if &ability.name == y {
+                if ability.name == y {
                     ability.order.push(String::from(y));
                 } else {
                     ability.order.push(String::from(""));

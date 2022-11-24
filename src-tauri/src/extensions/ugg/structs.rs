@@ -20,13 +20,13 @@ impl Data {
         region: String,
         lang: String,
     ) -> Self {
-        return Data {
+        Data {
             name,
             role,
             rank,
             region,
-            lang: lang.to_string(),
-        };
+            lang,
+        }
     }
 }
 
@@ -42,11 +42,11 @@ impl UggRequest {
     /// Returns a new UggRequest, this also handles spawning the HTTP client
     pub fn new(id: &i64, lang: &str) -> Self {
         let client = reqwest::Client::new();
-        return UggRequest {
+        UggRequest {
             id: *id,
             client,
             lang: lang.to_string(),
-        };
+        }
     }
 }
 
@@ -63,13 +63,13 @@ pub struct ItemsMap {
 impl ItemsMap {
     /// Returns a new instance of the ItemsMap struct
     pub fn new() -> Self {
-        return ItemsMap {
+        ItemsMap {
             start: Vec::new(),
             core: Vec::new(),
             fourth: Vec::new(),
             fifth: Vec::new(),
             sixth: Vec::new(),
-        };
+        }
     }
 }
 
@@ -87,13 +87,13 @@ pub struct ItemValues {
 impl ItemValues {
     /// Returns a new instance of the ItemValues struct
     pub fn new(name: &str, cost: i64, description: &str, image: &str, url: &str) -> Self {
-        return ItemValues {
+        ItemValues {
             name: name.to_owned(),
             cost,
             description: description.to_owned(),
             local_image: image.to_owned(),
             url: url.to_owned(),
-        };
+        }
     }
 }
 
@@ -115,7 +115,7 @@ impl AbilitiesMap {
     ///
     /// Returns Q, W, E, R as a mutable array
     pub fn as_array_mut(&mut self) -> [&mut AbilitiesValue; 4] {
-        return [&mut self.q, &mut self.w, &mut self.e, &mut self.r];
+        [&mut self.q, &mut self.w, &mut self.e, &mut self.r]
     }
 }
 
@@ -131,12 +131,12 @@ pub struct AbilitiesValue {
 impl AbilitiesValue {
     /// Returns a new instance of the AbilitiesValue struct
     pub fn new(name: &str, image: &str, url: String) -> Self {
-        return AbilitiesValue {
+        AbilitiesValue {
             name: name.to_owned(),
             image: image.to_owned(),
             order: Vec::new(),
             url,
-        };
+        }
     }
 }
 
@@ -150,10 +150,10 @@ pub struct Passive {
 impl Passive {
     /// Returns a new instance of the Passive struct
     pub fn new(image: &str, url: String) -> Self {
-        return Passive {
+        Passive {
             image: image.to_owned(),
             url,
-        };
+        }
     }
 }
 
@@ -172,7 +172,7 @@ impl Shards {
     /// This returns the Shards struct as an array of
     /// &mut arrays of Shards
     pub fn as_array_mut(&mut self) -> [&mut [Shard; 3]; 3] {
-        return [&mut self.row_one, &mut self.row_two, &mut self.row_three];
+        [&mut self.row_one, &mut self.row_two, &mut self.row_three]
     }
 }
 
@@ -188,11 +188,11 @@ pub struct Shard {
 impl Shard {
     /// Returns a new instance of the Shard struct
     pub fn create(name: &str, id: i64, image: &str) -> Shard {
-        return Shard {
+        Shard {
             name: name.to_string(),
             id,
             image: image.to_string(),
             active: false,
-        };
+        }
     }
 }

@@ -27,7 +27,7 @@ pub async fn all_rune_images(
             match request {
                 Ok(json) => {
                     for rune in json.iter() {
-                        if &rune.id == &tree_id_one {
+                        if rune.id == tree_id_one {
                             for (position, slots) in rune.slots.iter().enumerate() {
                                 for runes in &slots.runes {
                                     tree_one_array[position].push(Active::new(
@@ -42,7 +42,7 @@ pub async fn all_rune_images(
                                     ));
                                 }
                             }
-                        } else if &rune.id == &tree_id_two {
+                        } else if rune.id == tree_id_two {
                             for i in 1..4 {
                                 let slot = &rune.slots[i];
                                 for runes in &slot.runes {

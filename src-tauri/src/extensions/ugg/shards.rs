@@ -65,7 +65,7 @@ impl structs::Data {
                         shards.as_array_mut().iter_mut().enumerate().for_each(
                             |(pos, shard_array)| {
                                 shard_array.iter_mut().for_each(|shard| {
-                                    if shard.id.to_string() == active_shards[pos] {
+                                    if shard.id == active_shards[pos] {
                                         shard.active = true;
                                     }
                                 });

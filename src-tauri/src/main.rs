@@ -39,7 +39,7 @@ fn roles() -> Vec<String> {
     for (key, _value) in &ROLES {
         roles.push(key.to_string());
     }
-    return roles;
+    roles
 }
 
 /// Generates a list and sends it to the front end
@@ -49,7 +49,7 @@ fn tiers() -> Vec<String> {
     for (key, _value) in &TIERS {
         tiers.push(key.to_string());
     }
-    return tiers;
+    tiers
 }
 
 /// Generates a list and sends it to the front end
@@ -59,5 +59,5 @@ fn regions() -> Vec<String> {
     for (key, _value) in &REGIONS {
         regions.push(key.to_string());
     }
-    return regions;
+    regions
 }

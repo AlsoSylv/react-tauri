@@ -45,10 +45,10 @@ pub enum ErrorMap {
 impl From<ErrorMap> for i64 {
     /// Retuns the enum as an i64 for easy sending to the front end
     fn from(error: ErrorMap) -> Self {
-        return match error {
+        match error {
             ErrorMap::DataDragonErrors(data_dragon) => data_dragon as i64,
             ErrorMap::UGGError(ugg) => ugg as i64,
             ErrorMap::LCUReponse(lcu) => lcu as i64,
-        };
+        }
     }
 }

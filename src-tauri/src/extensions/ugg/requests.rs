@@ -36,7 +36,7 @@ impl structs::UggRequest {
         let (data_dragon_version,) = futures::join!(future_data_dragon_version,);
         match data_dragon_version {
             Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split(".").collect();
+                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
                 let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
                 let url = format!("{base_role_url}/{stat_version}/primary_roles/{ugg_lol_version}/{role_version}.json");
                 let request = client.get(url).send().await;
@@ -44,7 +44,7 @@ impl structs::UggRequest {
                     Ok(json) => {
                         if let Ok(json) = json.json::<HashMap<String, Vec<i64>>>().await {
                             let role = &json[&self.id.to_string()][0].to_string();
-                            cache.insert(self.id.clone(), role.to_string()).await;
+                            cache.insert(self.id, role.to_string()).await;
                             cache.sync();
                             Ok(role.to_string())
                         } else {
@@ -90,14 +90,14 @@ impl structs::UggRequest {
 
         match data_dragon_version {
             Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split(".").collect();
+                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
                 let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
                 let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
                 let request = client.get(url).send().await;
                 match request {
                     Ok(json) => {
                         if let Ok(overview) = json.json::<Value>().await {
-                            cache.insert(self.id.clone(), overview.clone()).await;
+                            cache.insert(self.id, overview.clone()).await;
                             cache.sync();
                             Ok(overview)
                         } else {
@@ -143,7 +143,7 @@ impl structs::UggRequest {
                 match request {
                     Ok(json) => {
                         if let Ok(ranking) = json.json::<Value>().await {
-                            cache.insert(self.id.clone(), ranking.clone()).await;
+                            cache.insert(self.id, ranking.clone()).await;
                             cache.sync();
                             Ok(ranking)
                         } else {

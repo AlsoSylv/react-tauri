@@ -30,16 +30,13 @@ impl DataDragon {
     /// let data_dragon = DataDragon::new(None).await;
     /// ```
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let lang = match language {
-            Some(lang) => lang,
-            None => "en_US",
-        };
+        let lang = language.unwrap_or("en_US");
 
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
         if let Some(cache) = cache.get("version") {
             return Ok(DataDragon {
-                version: cache.clone(),
+                version: cache,
                 language: lang.to_string(),
                 client,
             });

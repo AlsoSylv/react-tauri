@@ -26,7 +26,7 @@ impl RuneImages {
     /// Returns slots from PrimaryTree and SecondaryTree
     /// as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 7] {
-        return [
+        [
             &mut self.primary_runes.slot_one,
             &mut self.primary_runes.slot_two,
             &mut self.primary_runes.slot_three,
@@ -34,7 +34,7 @@ impl RuneImages {
             &mut self.secondary_runes.slot_one,
             &mut self.secondary_runes.slot_two,
             &mut self.secondary_runes.slot_three,
-        ];
+        ]
     }
 }
 
@@ -51,24 +51,24 @@ pub struct PrimaryTree {
 impl PrimaryTree {
     /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
-        return PrimaryTree {
+        PrimaryTree {
             slot_one: Vec::new(),
             slot_two: Vec::new(),
             slot_three: Vec::new(),
             slot_four: Vec::new(),
-        };
+        }
     }
 
     /// Requires the intial struct to be mutable.
     ///
     /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 4] {
-        return [
+        [
             &mut self.slot_one,
             &mut self.slot_two,
             &mut self.slot_three,
             &mut self.slot_four,
-        ];
+        ]
     }
 }
 
@@ -84,18 +84,22 @@ pub struct SecondaryTree {
 impl SecondaryTree {
     /// Creates a new PrimaryTree struct
     pub fn new() -> Self {
-        return SecondaryTree {
+        SecondaryTree {
             slot_one: Vec::new(),
             slot_two: Vec::new(),
             slot_three: Vec::new(),
-        };
+        }
     }
 
     /// Requires the intial struct to be mutable.
     ///
     /// Returns slots SecondaryTree as an array of mutabily barrowed vectors
     pub fn as_array_mut(&mut self) -> [&mut Vec<Active>; 3] {
-        return [&mut self.slot_one, &mut self.slot_two, &mut self.slot_three];
+        [
+            &mut self.slot_one, 
+            &mut self.slot_two, 
+            &mut self.slot_three
+        ]
     }
 }
 
@@ -113,14 +117,14 @@ pub struct Active {
 
 impl Active {
     pub fn new(name: &str, image: String, id: i64, local_image: String, description: &str) -> Self {
-        return Active {
+        Active {
             name: name.to_owned(),
             image,
             local_image,
             active: false,
             id,
             description: description.to_owned(),
-        };
+        }
     }
 }
 

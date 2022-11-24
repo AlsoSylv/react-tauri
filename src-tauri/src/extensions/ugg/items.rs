@@ -48,16 +48,14 @@ impl structs::Data {
                                             json[DATA["starting_items"]][2].as_array()
                                         {
                                             start.iter().for_each(|i| {
-                                                if i.is_array() {
-                                                    if &i.to_string() == key {
-                                                        items_map.start.push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
-                                                    }
+                                                if i.is_array() && &i.to_string() == key {
+                                                    items_map.start.push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ))
                                                 }
                                             })
                                         };
@@ -66,16 +64,14 @@ impl structs::Data {
                                             json[DATA["mythic_and_core"]][2].as_array()
                                         {
                                             mythic.iter().for_each(|i| {
-                                                if i.is_array() {
-                                                    if &i.to_string() == key {
-                                                        items_map.core.push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
-                                                    }
+                                                if i.is_array() && &i.to_string() == key {
+                                                    items_map.core.push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ))
                                                 }
                                             })
                                         };
@@ -84,16 +80,14 @@ impl structs::Data {
                                             json[DATA["other_items"]][0].as_array()
                                         {
                                             fourth.iter().for_each(|y| {
-                                                if y.is_array() {
-                                                    if &y[0].to_string() == key {
-                                                        items_map.fourth.push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
-                                                    }
+                                                if y.is_array() && &y[0].to_string() == key {
+                                                    items_map.fourth.push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ))
                                                 }
                                             })
                                         };
@@ -101,8 +95,7 @@ impl structs::Data {
                                         if let Some(fifth) = json[DATA["other_items"]][1].as_array()
                                         {
                                             fifth.iter().for_each(|y| {
-                                                if y.is_array() {
-                                                    if &y[0].to_string() == key {
+                                                if y.is_array() && &y[0].to_string() == key {
                                                         items_map.fifth.push(ItemValues::new(
                                                             name,
                                                             cost,
@@ -110,7 +103,6 @@ impl structs::Data {
                                                             image,
                                                             &url,
                                                         ))
-                                                    }
                                                 }
                                             })
                                         };
@@ -118,8 +110,7 @@ impl structs::Data {
                                         if let Some(sixth) = json[DATA["other_items"]][2].as_array()
                                         {
                                             sixth.iter().for_each(|y| {
-                                                if y.is_array() {
-                                                    if &y[0].to_string() == key {
+                                                if y.is_array() && &y[0].to_string() == key {
                                                         items_map.sixth.push(ItemValues::new(
                                                             name,
                                                             cost,
@@ -127,7 +118,6 @@ impl structs::Data {
                                                             image,
                                                             &url,
                                                         ))
-                                                    }
                                                 }
                                             })
                                         };

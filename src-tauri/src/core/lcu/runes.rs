@@ -17,27 +17,25 @@ pub async fn push_runes_to_client(page: Value) -> Result<LCUResponses, LCURespon
             .is_ok()
         {
             Ok(LCUResponses::LCUPushRune)
-        } else {
-            if let Ok(response) = client.get("/lol-perks/v1/currentpage".to_string()).await {
-                let Some(id) = &response["id"].as_i64() else {
-                    panic!();
-                };
-                if client
-                    .delete(format!("{0}/{1}", pages_endpoint, id))
-                    .await
-                    .is_ok()
-                {
-                    if client.put(pages_endpoint, page).await.is_ok() {
-                        Ok(LCUResponses::LCUPushRune)
-                    } else {
-                        Err(LCUResponses::LCUCreateRune)
-                    }
+        } else if let Ok(response) = client.get("/lol-perks/v1/currentpage".to_string()).await {
+            let Some(id) = &response["id"].as_i64() else {
+                panic!();
+            };
+            if client
+                .delete(format!("{0}/{1}", pages_endpoint, id))
+                .await
+                .is_ok()
+            {
+                if client.put(pages_endpoint, page).await.is_ok() {
+                    Ok(LCUResponses::LCUPushRune)
                 } else {
-                    Err(LCUResponses::LCUDeleteRune)
+                    Err(LCUResponses::LCUCreateRune)
                 }
             } else {
-                Err(LCUResponses::LCUGetRune)
+                Err(LCUResponses::LCUDeleteRune)
             }
+        } else {
+            Err(LCUResponses::LCUGetRune)
         }
     } else {
         Err(LCUResponses::LCUConnect)

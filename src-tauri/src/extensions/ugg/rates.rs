@@ -54,7 +54,7 @@ impl structs::Data {
                 };
 
                 let Some(bans)= &json[STATS["bans"]].as_f64() else {
-                    return Ok(format!("-"));
+                    return Ok("-".to_string());
                 };
                 let ban_rate = bans / matches;
                 Ok(format!("{:.1$}%", &ban_rate * 100.0, 1))

@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::errors;
+use crate::{errors, core::community_dragon::structs::CommunityDragon};
 use errors::{ErrorMap, UGGDataError};
 
 use super::{constants, structs};
@@ -14,7 +14,6 @@ impl structs::Data {
     /// This requires Community Dragon to work
     /// without being hardcoded
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
-        // TODO: Use Community Dragon to get shard data
         let armor = Shard::create(
             "Armor",
             5002,
@@ -57,19 +56,37 @@ impl structs::Data {
             row_three: [health, armor, magic_resist],
         };
 
-        match request {
+        let community_dragon = CommunityDragon::new_with_client(&self.lang);
+        let rune_json = community_dragon.runes().await;
+        match rune_json {
             Ok(json) => {
-                let active_shards = json[DATA["shards"]][2].as_array();
-                match active_shards {
-                    Some(active_shards) => {
-                        sort_shards(&mut shards, active_shards);
-                        Ok(shards)
+                for n in shards.as_array_mut() {
+                    for i in n {
+                        for x in &json {
+                            if x.id == i.id {
+                                i.name = x.name.clone();
+                            }
+                        }
                     }
-                    None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
+                }
+                
+                match request {
+                    Ok(json) => {
+                        let active_shards = json[DATA["shards"]][2].as_array();
+                        match active_shards {
+                            Some(active_shards) => {
+                                sort_shards(&mut shards, active_shards);
+                                Ok(shards)
+                            }
+                            None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
+                        }
+                    }
+                    Err(err) => Err(err),
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => todo!()
         }
+        // TODO: Use Community Dragon to get shard data
     }
 }
 

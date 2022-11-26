@@ -7,6 +7,11 @@ pub enum DataDragonError {
     CannotConnect = 102,
 }
 
+#[derive(Debug, Clone)]
+pub enum CommunityDragonError {
+    
+}
+
 /// Returns specific errors for the UGG module, like connection, or
 /// specific files being missing
 #[derive(Debug, Clone)]

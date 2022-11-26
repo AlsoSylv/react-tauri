@@ -15,6 +15,7 @@ impl structs::Data {
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         let mut items_map = ItemsMap::new();
+        let items_array = items_map.as_array_mut();
 
         match data_dragon {
             Ok(data_dragon) => {
@@ -43,85 +44,34 @@ impl structs::Data {
                                             &data_dragon.version, &image
                                         );
                                         // TODO: We can get the specific win rates of each of these sets rather easily
+                                        let ugg_maps = [
+                                            &json[DATA["starting_items"]][2],
+                                            &json[DATA["mythic_and_core"]][2],
+                                            &json[DATA["other_items"]][0],
+                                            &json[DATA["other_items"]][1],
+                                            &json[DATA["other_items"]][2],
+                                        ];
 
-                                        if let Some(start) =
-                                            json[DATA["starting_items"]][2].as_array()
-                                        {
-                                            start.iter().for_each(|i| {
-                                                if i.is_array() && &i.to_string() == key {
-                                                    items_map.start.push(ItemValues::new(
-                                                        name,
-                                                        cost,
-                                                        description,
-                                                        image,
-                                                        &url,
-                                                    ))
-                                                }
-                                            })
-                                        };
-
-                                        if let Some(mythic) =
-                                            json[DATA["mythic_and_core"]][2].as_array()
-                                        {
-                                            mythic.iter().for_each(|i| {
-                                                if i.is_array() && &i.to_string() == key {
-                                                    items_map.core.push(ItemValues::new(
-                                                        name,
-                                                        cost,
-                                                        description,
-                                                        image,
-                                                        &url,
-                                                    ))
-                                                }
-                                            })
-                                        };
-
-                                        if let Some(fourth) =
-                                            json[DATA["other_items"]][0].as_array()
-                                        {
-                                            fourth.iter().for_each(|y| {
-                                                if y.is_array() && &y[0].to_string() == key {
-                                                    items_map.fourth.push(ItemValues::new(
-                                                        name,
-                                                        cost,
-                                                        description,
-                                                        image,
-                                                        &url,
-                                                    ))
-                                                }
-                                            })
-                                        };
-
-                                        if let Some(fifth) = json[DATA["other_items"]][1].as_array()
-                                        {
-                                            fifth.iter().for_each(|y| {
-                                                if y.is_array() && &y[0].to_string() == key {
-                                                    items_map.fifth.push(ItemValues::new(
-                                                        name,
-                                                        cost,
-                                                        description,
-                                                        image,
-                                                        &url,
-                                                    ))
-                                                }
-                                            })
-                                        };
-
-                                        if let Some(sixth) = json[DATA["other_items"]][2].as_array()
-                                        {
-                                            sixth.iter().for_each(|y| {
-                                                if y.is_array() && &y[0].to_string() == key {
-                                                    items_map.sixth.push(ItemValues::new(
-                                                        name,
-                                                        cost,
-                                                        description,
-                                                        image,
-                                                        &url,
-                                                    ))
-                                                }
-                                            })
-                                        };
+                                        for n in 0..5 {
+                                            if let Some(current_map) = ugg_maps[n].as_array() {
+                                                current_map.iter().for_each(|y| {
+                                                    if y.is_array()
+                                                        && (&y[0].to_string() == key
+                                                            || &y.to_string() == key)
+                                                    {
+                                                        items_array[n].push(ItemValues::new(
+                                                            name,
+                                                            cost,
+                                                            description,
+                                                            image,
+                                                            &url,
+                                                        ))
+                                                    }
+                                                })
+                                            };
+                                        }
                                     }
+
                                     Ok(items_map)
                                 } else {
                                     unreachable!()

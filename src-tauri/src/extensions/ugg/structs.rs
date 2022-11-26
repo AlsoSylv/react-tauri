@@ -71,6 +71,16 @@ impl ItemsMap {
             sixth: Vec::new(),
         }
     }
+
+    pub fn as_array_mut(&mut self) -> [&mut Vec<ItemValues>; 5] {
+        [
+            &mut self.start,
+            &mut self.core,
+            &mut self.fourth,
+            &mut self.fifth,
+            &mut self.sixth,
+        ]
+    }
 }
 
 /// This returns an items value struct containing things like cost and description

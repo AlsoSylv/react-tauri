@@ -62,16 +62,7 @@ impl structs::Data {
                 let active_shards = json[DATA["shards"]][2].as_array();
                 match active_shards {
                     Some(active_shards) => {
-                        shards.as_array_mut().iter_mut().enumerate().for_each(
-                            |(pos, shard_array)| {
-                                shard_array.iter_mut().for_each(|shard| {
-                                    let string_id = shard.id.to_string();
-                                    if string_id == active_shards[pos] {
-                                        shard.active = true;
-                                    }
-                                });
-                            },
-                        );
+                        sort_shards(&mut shards, active_shards);
                         Ok(shards)
                     }
                     None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
@@ -80,4 +71,19 @@ impl structs::Data {
             Err(err) => Err(err),
         }
     }
+}
+
+fn sort_shards(shards: &mut Shards, active_shards: &[Value]) {
+    shards
+        .as_array_mut()
+        .iter_mut()
+        .enumerate()
+        .for_each(|(pos, shard_array)| {
+            shard_array.iter_mut().for_each(|shard| {
+                let string_id = shard.id.to_string();
+                if string_id == active_shards[pos] {
+                    shard.active = true;
+                }
+            });
+        })
 }

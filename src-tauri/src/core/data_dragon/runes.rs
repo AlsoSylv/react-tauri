@@ -9,7 +9,7 @@ static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl structs::DataDragon {
-    /// A chached function to get `runesReforged.json` from data dragon
+    /// A cached function to get `runesReforged.json` from data dragon
     ///
     /// # Example
     /// ```

@@ -15,8 +15,8 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl structs::DataDragon {
-    /// A chached function to get the DataDragon champion.json and return it
-    /// searialized as a struct for the rest of the code
+    /// A cached function to get the DataDragon champion.json and return it
+    /// serialized as a struct for the rest of the code
     ///
     /// # Example
     /// ```
@@ -57,7 +57,7 @@ impl structs::DataDragon {
         }
     }
 
-    /// A chached function to get the json files for specific
+    /// A cached function to get the json files for specific
     /// champions from DataDragon, this requires an extra
     /// argument for the champions Key from champions.json
     ///

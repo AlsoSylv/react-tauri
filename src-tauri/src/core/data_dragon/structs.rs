@@ -21,7 +21,7 @@ pub struct DataDragon {
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
 impl DataDragon {
-    /// A chached function to generate a new http client for Data Dragon
+    /// A cached function to generate a new http client for Data Dragon
     /// this also gives a version string as a result, and can fail creation
     /// if there is no internet connection available
     ///
@@ -71,7 +71,7 @@ impl DataDragon {
     }
 }
 
-/// Searalize `runesReforged.json` to a struct
+/// Serialize `runesReforged.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuneTree {
     pub id: i64,
@@ -97,7 +97,7 @@ pub struct Rune {
     pub long_desc: String,
 }
 
-/// Searalize `champions.json` to a struct
+/// Serialize `champions.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ChampJson {
     #[serde(rename = "type")]
@@ -164,7 +164,7 @@ pub struct ChampStats {
     pub attackspeed: StatValue,
 }
 
-/// Used for more specfic info on champions, because it is not garenteed to be an int or a float
+/// Used for more specific info on champions, because it is not guaranteed to be an int or a float
 /// this could be replaced with a value, and probably should be in the future.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -179,7 +179,7 @@ impl Default for StatValue {
     }
 }
 
-/// Searalize `championFull.json` to a struct
+/// Serialize `championFull.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionFull {

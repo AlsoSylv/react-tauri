@@ -11,7 +11,7 @@ static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl structs::DataDragon {
-    /// A chached function to get `item.json` from Data Dragon
+    /// A cached function to get `item.json` from Data Dragon
     ///
     /// # Example
     /// ```

@@ -9,7 +9,7 @@ use super::{constants, structs};
 use constants::{REGIONS, ROLES, TIERS};
 use structs::UggRequest;
 
-/// This handles accessing JSON for the champ, specifically for things like it's winrate
+/// This handles accessing JSON for the champ, specifically for things like it's win rate
 /// this is important because it handles key checking, which will need to get more
 /// intense in the future
 pub async fn ranking(

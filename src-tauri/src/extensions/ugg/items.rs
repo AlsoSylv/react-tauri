@@ -42,7 +42,7 @@ impl structs::Data {
                                             "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
                                             &data_dragon.version, &image
                                         );
-                                        // TODO: We can get the specfic winrates of each of these sets rather easily
+                                        // TODO: We can get the specific win rates of each of these sets rather easily
 
                                         if let Some(start) =
                                             json[DATA["starting_items"]][2].as_array()

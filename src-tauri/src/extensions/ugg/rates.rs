@@ -11,7 +11,7 @@ use constants::STATS;
 impl structs::Data {
     //The format is used here to get an exact result from the floating point math
 
-    /// Returns the winrate from the UGG API, errors if it is None
+    /// Returns the win rate from the UGG API, errors if it is None
     ///
     /// ```rs
     /// format!("{:.1$}%", &win_rate * 100.0, 1)
@@ -37,7 +37,7 @@ impl structs::Data {
         }
     }
 
-    /// Returns the banrate from the UGG API, returns "-" if
+    /// Returns the ban rate from the UGG API, returns "-" if
     /// bans is None, this follows UGGs pattern on their site
     ///
     /// ```rs
@@ -63,7 +63,7 @@ impl structs::Data {
         }
     }
 
-    /// Returns the pickrate from the UGG API, errors if it is None
+    /// Returns the pick rate from the UGG API, errors if it is None
     ///
     /// ```rs
     /// format!("{:.1$}%", &pick_rate * 100.0, 1)

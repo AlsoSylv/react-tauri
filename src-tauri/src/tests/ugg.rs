@@ -219,3 +219,76 @@ async fn sort_test() {
         panic!()
     };
 }
+
+#[test]
+fn abilities_split_test() {
+    #[derive(Debug, PartialEq, Eq)]
+    struct DummyAbilities<'a> {
+        name: &'a str,
+        order: Vec<&'a str>,
+    }
+
+    let mut maps: [DummyAbilities; 4] = [
+        DummyAbilities {
+            name: "Q",
+            order: Vec::new(),
+        },
+        DummyAbilities {
+            name: "W",
+            order: Vec::new(),
+        },
+        DummyAbilities {
+            name: "E",
+            order: Vec::new(),
+        },
+        DummyAbilities {
+            name: "R",
+            order: Vec::new(),
+        },
+    ];
+
+    let abilities = [
+        "Q", "E", "W", "E", "E", "R", "E", "W", "E", "W", "R", "W", "W", "Q", "Q", "R", "Q", "Q",
+    ];
+
+    abilities.iter().for_each(|y| {
+        maps.iter_mut().for_each(|ability| {
+            if &ability.name == y {
+                ability.order.push(y);
+            } else {
+                ability.order.push("");
+            }
+        });
+    });
+
+    assert!(
+        maps == [
+            DummyAbilities {
+                name: "Q",
+                order: [
+                    "Q", "", "", "", "", "", "", "", "", "", "", "", "", "Q", "Q", "", "Q", "Q"
+                ]
+                .to_vec()
+            },
+            DummyAbilities {
+                name: "W",
+                order: [
+                    "", "", "W", "", "", "", "", "W", "", "W", "", "W", "W", "", "", "", "", ""
+                ]
+                .to_vec()
+            },
+            DummyAbilities {
+                name: "E",
+                order: [
+                    "", "E", "", "E", "E", "", "E", "", "E", "", "", "", "", "", "", "", "", ""
+                ]
+                .to_vec()
+            },
+            DummyAbilities {
+                name: "R",
+                order: ["", "", "", "", "", "R", "", "", "", "", "R", "", "", "", "", "R", "", ""]
+                    .to_vec()
+            }
+        ]
+    )
+}

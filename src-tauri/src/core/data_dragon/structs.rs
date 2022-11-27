@@ -6,6 +6,7 @@ use serde_json::Value;
 use tokio::sync::Mutex;
 
 use crate::errors::DataDragonError;
+use super::templates::request;
 
 /// A new struct for getting data from Data Dragon
 pub struct DataDragon {
@@ -41,32 +42,19 @@ impl DataDragon {
                 client,
             });
         }
-
-        let version = client
-            .get("https://ddragon.leagueoflegends.com/api/versions.json")
-            .send()
-            .await;
-        match version {
-            Ok(response) => {
-                if let Ok(json) = response.json::<Vec<String>>().await {
-                    let version = json[0].clone();
-                    cache.insert("version".to_string(), version.clone()).await;
-                    Ok(DataDragon {
-                        version,
-                        language: lang.to_string(),
-                        client,
-                    })
-                } else {
-                    unreachable!()
-                }
+        let url = "https://ddragon.leagueoflegends.com/api/versions.json";
+        let request = request::<Vec<String>>(url, &client).await;
+        match request {
+            Ok(json) => {
+                let version = json[0].clone();
+                cache.insert("version".to_string(), version.clone()).await;
+                Ok(DataDragon {
+                    version,
+                    language: lang.to_string(),
+                    client,
+                })
             }
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::CannotConnect)
-                }
-            }
+            Err(err) => Err(err)
         }
     }
 }

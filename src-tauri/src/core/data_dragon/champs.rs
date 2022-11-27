@@ -1,4 +1,4 @@
-use super::structs::{self, ChampJson, ChampionFull};
+use super::{structs::{self, ChampJson, ChampionFull}, templates::request};
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -33,13 +33,10 @@ impl structs::DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
-        let request = self.client.get(url).send().await;
+        let request = request::<ChampJson>(&url, &self.client).await;
 
         match request {
-            Ok(response) => {
-                let Ok(champ_json) = response.json::<ChampJson>().await else {
-                    return Err(DataDragonError::ChampMissingError);
-                };
+            Ok(champ_json) => {
                 cache
                     .insert(self.language.clone(), champ_json.clone())
                     .await;
@@ -47,13 +44,7 @@ impl structs::DataDragon {
                 Ok(champ_json)
             }
 
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::ChampMissingError)
-                }
-            }
+            Err(err) => Err(err)
         }
     }
 
@@ -76,26 +67,17 @@ impl structs::DataDragon {
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &key
         );
-        let request = self.client.get(url).send().await;
+        let request = request::<ChampionFull>(&url, &self.client).await;
 
         match request {
-            Ok(response) => {
-                let Ok(champ_full) = response.json::<ChampionFull>().await else {
-                    return Err(DataDragonError::ChampMissingError);
-                };
+            Ok(champ_full) => {
                 cache
                     .insert((self.language.clone(), key.clone()), champ_full.clone())
                     .await;
                 cache.sync();
                 Ok(champ_full)
             }
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::ChampMissingError)
-                }
-            }
+            Err(err) => Err(err)
         }
     }
 }

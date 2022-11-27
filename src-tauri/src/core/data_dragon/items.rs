@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use super::structs;
+use super::{structs, templates::request};
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -28,23 +28,14 @@ impl structs::DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
             &self.version, &self.language
         );
-        let request = self.client.get(url).send().await;
+        let request = request::<Value>(&url, &self.client).await;
         match request {
-            Ok(response) => {
-                let Ok(item_json) = response.json::<Value>().await else {
-                    return Err(DataDragonError::CannotConnect);
-                };
+            Ok(item_json) => {
                 cache.insert(self.language.clone(), item_json.clone()).await;
                 cache.sync();
                 Ok(item_json)
             }
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::CannotConnect)
-                }
-            }
+            Err(err) => Err(err)
         }
     }
 }

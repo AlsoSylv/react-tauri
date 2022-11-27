@@ -5,6 +5,8 @@ use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
 
+use super::templates::request;
+
 static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
@@ -26,23 +28,14 @@ impl structs::DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
             &self.version, &self.language
         );
-        let request = self.client.get(url).send().await;
+        let request = request::<Vec<RuneTree>>(&url, &self.client).await;
         match request {
-            Ok(response) => {
-                let Ok(rune_json) = response.json::<Vec<RuneTree>>().await else {
-                    return Err(DataDragonError::DataDragonMissing);
-                };
+            Ok(rune_json) => {
                 cache.insert(self.language.clone(), rune_json.clone()).await;
                 cache.sync();
                 Ok(rune_json)
             }
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::CannotConnect)
-                }
-            }
+            Err(err) => Err(err)
         }
     }
 }

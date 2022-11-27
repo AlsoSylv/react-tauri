@@ -9,7 +9,7 @@ pub enum DataDragonError {
 
 #[derive(Debug, Clone)]
 pub enum CommunityDragonError {
-    
+    CommunityDragonMissing = 105,
 }
 
 /// Returns specific errors for the UGG module, like connection, or
@@ -45,6 +45,7 @@ pub enum ErrorMap {
     DataDragonErrors(DataDragonError),
     UGGError(UGGDataError),
     LCUResponse(LCUResponses),
+    CommunityDragonErrors(CommunityDragonError),
 }
 
 impl From<ErrorMap> for i64 {
@@ -54,6 +55,7 @@ impl From<ErrorMap> for i64 {
             ErrorMap::DataDragonErrors(data_dragon) => data_dragon as i64,
             ErrorMap::UGGError(ugg) => ugg as i64,
             ErrorMap::LCUResponse(lcu) => lcu as i64,
+            ErrorMap::CommunityDragonErrors(community_dragon) => community_dragon as i64,
         }
     }
 }

@@ -193,16 +193,19 @@ pub struct Shard {
     pub id: i64,
     pub image: String,
     pub active: bool,
+    pub description: String,
 }
 
 impl Shard {
     /// Returns a new instance of the Shard struct
-    pub fn create(name: &str, id: i64, image: &str) -> Shard {
+    pub fn new(id: i64, image: &str) -> Shard {
+        let base_url = "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods";
         Shard {
-            name: name.to_string(),
+            name: "".to_string(),
             id,
-            image: image.to_string(),
+            image: format!("{}/{}", &base_url, image),
             active: false,
+            description: "".to_string(),
         }
     }
 }

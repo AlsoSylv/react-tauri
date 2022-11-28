@@ -14,6 +14,7 @@ impl structs::CommunityDragon {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn runes_style(&self) -> Result<RunesStyle, CommunityDragonError> {
         let url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json";
         let request = request::<RunesStyle>(url, &self.client).await;

@@ -7,6 +7,7 @@ pub struct CommunityDragon {
 }
 
 impl CommunityDragon {
+    #[allow(dead_code)]
     pub fn new(client: reqwest::Client, lang: &str) -> Self {
         let binding = lang.to_lowercase();
         let language = match lang {
@@ -31,7 +32,7 @@ impl CommunityDragon {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Runes {
     pub id: i64,
@@ -43,18 +44,18 @@ pub struct Runes {
     pub recommendation_descriptor: String,
     pub icon_path: String,
     pub end_of_game_stat_descs: Vec<String>,
-    // This is always empty, so I just make it optional
+    /// This is always empty, so I just make it optional
     pub recommendation_descriptor_attributes: Option<Value>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunesStyle {
     pub schema_version: i64,
     pub styles: Vec<Style>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Style {
     pub id: i64,
@@ -73,14 +74,14 @@ pub struct Style {
     pub default_stat_mods_per_sub_style: Vec<DefaultStatModsPerSubStyle>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubStyleBonu {
     pub style_id: i64,
     pub perk_id: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Slot {
     #[serde(rename = "type")]
@@ -89,7 +90,7 @@ pub struct Slot {
     pub perks: Vec<i64>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DefaultStatModsPerSubStyle {
     pub id: String,

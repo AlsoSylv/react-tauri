@@ -1,4 +1,7 @@
-use super::{structs::{self, ChampJson, ChampionFull}, templates::request};
+use super::{
+    structs::{self, ChampJson, ChampionFull},
+    templates::request,
+};
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -44,7 +47,7 @@ impl structs::DataDragon {
                 Ok(champ_json)
             }
 
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 
@@ -77,7 +80,7 @@ impl structs::DataDragon {
                 cache.sync();
                 Ok(champ_full)
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 }

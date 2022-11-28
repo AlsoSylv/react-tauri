@@ -1,5 +1,6 @@
 use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
+use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
@@ -29,39 +30,33 @@ impl structs::UggRequest {
         };
 
         let stat_version = "1.5";
-        let base_role_url = "https://stats2.u.gg/lol";
         let role_version = "1.5.0";
-        let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
+        let base_role_url = "https://stats2.u.gg/lol";
+        let lol_version = lol_version().await;
         let client = &self.client;
-        let (data_dragon_version,) = futures::join!(future_data_dragon_version,);
-        match data_dragon_version {
-            Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
-                let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+        match lol_version {
+            Ok(ugg_lol_version) => {
                 let url = format!("{base_role_url}/{stat_version}/primary_roles/{ugg_lol_version}/{role_version}.json");
-                let request = client.get(url).send().await;
-                match request {
+                let role_json = request::<HashMap<String, Vec<i64>>>(
+                    &url,
+                    client,
+                    UGGDataError::RoleMissing,
+                    UGGDataError::RoleConnect,
+                )
+                .await;
+
+                match role_json {
                     Ok(json) => {
-                        if let Ok(json) = json.json::<HashMap<String, Vec<i64>>>().await {
-                            let role = &json[&self.id.to_string()][0].to_string();
-                            cache.insert(self.id, role.to_string()).await;
-                            cache.sync();
-                            Ok(role.to_string())
-                        } else {
-                            Err(UGGError(UGGDataError::RoleMissing))
-                        }
+                        let role = &json[&self.id.to_string()][0].to_string();
+                        cache.insert(self.id, role.to_string()).await;
+                        cache.sync();
+                        Ok(role.to_string())
                     }
 
-                    Err(err) => {
-                        if err.is_body() {
-                            Err(UGGError(UGGDataError::RoleConnect))
-                        } else {
-                            Err(UGGError(UGGDataError::RoleMissing))
-                        }
-                    }
+                    Err(err) => Err(err),
                 }
             }
-            Err(err) => Err(DataDragonErrors(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -83,37 +78,30 @@ impl structs::UggRequest {
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";
         let game_mode = "ranked_solo_5x5";
-
-        let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
+        let lol_version = lol_version().await;
         let client = &self.client;
-        let (data_dragon_version,) = futures::join!(future_data_dragon_version,);
 
-        match data_dragon_version {
-            Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
-                let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+        match lol_version {
+            Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let request = client.get(url).send().await;
-                match request {
+                let overview = request::<Value>(
+                    &url,
+                    client,
+                    UGGDataError::OverviewMissing,
+                    UGGDataError::OverviewConnect,
+                )
+                .await;
+
+                match overview {
                     Ok(json) => {
-                        if let Ok(overview) = json.json::<Value>().await {
-                            cache.insert(self.id, overview.clone()).await;
-                            cache.sync();
-                            Ok(overview)
-                        } else {
-                            Err(UGGError(UGGDataError::OverviewMissing))
-                        }
+                        cache.insert(self.id, json.clone()).await;
+                        cache.sync();
+                        Ok(json)
                     }
-                    Err(err) => {
-                        if err.is_connect() {
-                            Err(UGGError(UGGDataError::OverviewConnect))
-                        } else {
-                            Err(UGGError(UGGDataError::OverviewMissing))
-                        }
-                    }
+                    Err(err) => Err(err),
                 }
             }
-            Err(err) => Err(DataDragonErrors(err)),
+            Err(err) => Err(err),
         }
     }
 
@@ -130,36 +118,66 @@ impl structs::UggRequest {
         let base_overview_url = "https://stats2.u.gg/lol";
         let game_mode = "ranked_solo_5x5";
 
-        let future_data_dragon_version = data_dragon::structs::DataDragon::new(None);
+        let lol_version = lol_version().await;
         let client = &self.client;
-        let (data_dragon_version,) = futures::join!(future_data_dragon_version,);
 
-        match data_dragon_version {
-            Ok(data_dragon) => {
-                let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
-                let ugg_lol_version = format!("{0}_{1}", lol_version[0], lol_version[1]);
+        match lol_version {
+            Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let request = client.get(url).send().await;
-                match request {
+                let ranking = request::<Value>(
+                    &url,
+                    client,
+                    UGGDataError::RankingMissing,
+                    UGGDataError::RankingConnect,
+                )
+                .await;
+
+                match ranking {
                     Ok(json) => {
-                        if let Ok(ranking) = json.json::<Value>().await {
-                            cache.insert(self.id, ranking.clone()).await;
-                            cache.sync();
-                            Ok(ranking)
-                        } else {
-                            Err(UGGError(UGGDataError::RankingMissing))
-                        }
+                        cache.insert(self.id, json.clone()).await;
+                        cache.sync();
+                        Ok(json)
                     }
-                    Err(err) => {
-                        if err.is_connect() {
-                            Err(UGGError(UGGDataError::RankingConnect))
-                        } else {
-                            Err(UGGError(UGGDataError::RankingMissing))
-                        }
-                    }
+                    Err(err) => Err(err),
                 }
             }
-            Err(err) => Err(DataDragonErrors(err)),
+            Err(err) => Err(err),
         }
+    }
+}
+
+async fn request<R: for<'de> Deserialize<'de>>(
+    url: &str,
+    client: &reqwest::Client,
+    error_one: UGGDataError,
+    error_two: UGGDataError,
+) -> Result<R, ErrorMap> {
+    let request = client.get(url).send().await;
+    match request {
+        Ok(json) => {
+            if let Ok(ranking) = json.json::<R>().await {
+                Ok(ranking)
+            } else {
+                Err(UGGError(error_one))
+            }
+        }
+        Err(err) => {
+            if err.is_connect() {
+                Err(UGGError(error_two))
+            } else {
+                Err(UGGError(error_one))
+            }
+        }
+    }
+}
+
+async fn lol_version() -> Result<String, ErrorMap> {
+    let data_dragon_version = data_dragon::structs::DataDragon::new(None).await;
+    match data_dragon_version {
+        Ok(data_dragon) => {
+            let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
+            Ok(format!("{0}_{1}", lol_version[0], lol_version[1]))
+        }
+        Err(err) => Err(DataDragonErrors(err)),
     }
 }

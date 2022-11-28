@@ -35,7 +35,7 @@ impl structs::DataDragon {
                 cache.sync();
                 Ok(rune_json)
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 }

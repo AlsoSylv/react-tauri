@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::sync::Mutex;
 
-use crate::errors::DataDragonError;
 use super::templates::request;
+use crate::errors::DataDragonError;
 
 /// A new struct for getting data from Data Dragon
 pub struct DataDragon {
@@ -54,7 +54,7 @@ impl DataDragon {
                     client,
                 })
             }
-            Err(err) => Err(err)
+            Err(err) => Err(err),
         }
     }
 }

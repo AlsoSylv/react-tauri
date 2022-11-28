@@ -11,8 +11,8 @@ use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;
 use ErrorMap::{DataDragonErrors, UGGError};
 
-static CACHED_DEFAULT_ROLE: Lazy<Mutex<Cache<i64, String>>> =
-    Lazy::new(|| Mutex::new(Cache::new(10)));
+static CACHED_DEFAULT_ROLE: Lazy<Mutex<HashMap<String, Vec<i64>>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
 static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Value>>> =
     Lazy::new(|| Mutex::new(Cache::new(10)));
@@ -24,8 +24,9 @@ impl structs::UggRequest {
     /// Handles making the request to get the default roles for every champ
     /// from the UGG api
     pub async fn default_role(&self) -> Result<String, ErrorMap> {
-        let cache = CACHED_DEFAULT_ROLE.lock().await;
-        if let Some(role) = cache.get(&self.id) {
+        let mut cache = CACHED_DEFAULT_ROLE.lock().await;
+        if let Some(role) = cache.get(&self.id.to_string()) {
+            let role = role[0].to_string();
             return Ok(role);
         };
 
@@ -48,8 +49,7 @@ impl structs::UggRequest {
                 match role_json {
                     Ok(json) => {
                         let role = &json[&self.id.to_string()][0].to_string();
-                        cache.insert(self.id, role.to_string()).await;
-                        cache.sync();
+                        cache.extend(json.into_iter());
                         Ok(role.to_string())
                     }
 
@@ -146,6 +146,7 @@ impl structs::UggRequest {
     }
 }
 
+/// Template for a network request for UGGs servers, this removes a ton of duplicated code
 async fn request<R: for<'de> Deserialize<'de>>(
     url: &str,
     client: &reqwest::Client,
@@ -171,6 +172,7 @@ async fn request<R: for<'de> Deserialize<'de>>(
     }
 }
 
+/// This returns the ugg lol version, this removes a ton of duplicated code
 async fn lol_version() -> Result<String, ErrorMap> {
     let data_dragon_version = data_dragon::structs::DataDragon::new(None).await;
     match data_dragon_version {

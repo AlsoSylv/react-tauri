@@ -14,7 +14,7 @@ function SecondaryRunes(props: SecondaryRunesProps) {
   } = props;
 
   return (
-    <Grid container>
+    <Grid container xs={12}>
       <Grid container sm={12}>
         {slotOne.map(Rune)}
       </Grid>

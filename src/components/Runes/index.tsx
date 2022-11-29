@@ -5,11 +5,17 @@ import type { Runes as IRunes, Shards as IShards } from 'interfaces';
 import { PrimaryRunes, SecondaryRunes, Shards } from './components';
 import RunesLoading from './components/RunesLoading';
 
-interface RunesProps {
-  runes: IRunes | undefined;
-  shards: IShards | undefined;
-  loading: boolean;
-}
+type RunesProps =
+  | {
+      runes: IRunes;
+      shards: IShards;
+      loading: false;
+    }
+  | {
+      runes: undefined;
+      shards: undefined;
+      loading: true;
+    };
 
 function Runes(props: RunesProps) {
   const { runes, shards, loading } = props;
@@ -19,15 +25,15 @@ function Runes(props: RunesProps) {
   }
 
   return (
-    <Paper elevation={3} sx={{ padding: '10px', maxHeight: '425px', maxWidth: '475px' }}>
-      <Grid container>
-        <PrimaryRunes primaryRunes={runes!.primaryRunes} />
-        <Grid container sm={6}>
-          <SecondaryRunes secondaryRunes={runes!.secondaryRunes} />
-          <Grid sm={12}>
+    <Paper elevation={3} sx={{ padding: '10px', aspectRatio: '16 / 9', height: '375px' }}>
+      <Grid container xs={12} sx={{ flexDirection: 'row', height: '100%' }}>
+        <PrimaryRunes primaryRunes={runes.primaryRunes} />
+        <Grid container xs={6}>
+          <SecondaryRunes secondaryRunes={runes.secondaryRunes} />
+          <Grid xs={12} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Divider />
           </Grid>
-          <Shards shards={shards!} />
+          <Shards shards={shards} />
         </Grid>
       </Grid>
     </Paper>

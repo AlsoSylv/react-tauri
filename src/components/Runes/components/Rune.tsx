@@ -11,11 +11,13 @@ function Rune({ name, localImage, image, active }: RuneData | Shard): ReactNode 
   const [url, setUrl] = useState(localImage ? `../runes${localImage}` : image);
 
   return (
-    <Grid key={name} sm sx={{ display: 'flex', alignSelf: 'center', justifyContent: 'center' }}>
+    <Grid key={name} xs sx={{ display: 'flex', alignSelf: 'center', justifyContent: 'center' }}>
       <Avatar
         src={url}
         alt={name}
-        sx={{ ...(!active && { filter: 'grayscale(100%)', opacity: '.3' }) }}
+        sx={(theme) => ({
+          ...(!active ? { filter: 'grayscale(100%)', opacity: '.3' } : { border: `solid .1rem ${theme.palette.success.main}` }),
+        })}
         {...bindHover(popupState)}
         imgProps={{
           onError: () => setUrl(image),

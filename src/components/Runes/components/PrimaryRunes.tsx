@@ -18,7 +18,7 @@ function PrimaryRunes(props: PrimaryRunesProps) {
       <Grid container sm={12} justifyContent="center">
         {slotOne.map(Rune)}
       </Grid>
-      <Grid sm={12}>
+      <Grid sm={12} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <Divider />
       </Grid>
       <Grid container sm={12}>

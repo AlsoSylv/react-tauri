@@ -9,3 +9,19 @@ body #root {
   height: 100%;
   width: 100%;
 }
+
+/*Scroll-bar custom*/
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+*::-webkit-scrollbar {
+  background: transparent;
+  width: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}

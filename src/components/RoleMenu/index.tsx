@@ -29,7 +29,7 @@ function RoleMenu() {
         onChange={handleChangeRank}
         disableClearable
         isOptionEqualToValue={(option, value) => option?.value === value?.value}
-        renderInput={(params) => <TextField {...params} label="Select a role" />}
+        renderInput={(params) => <TextField {...params} label="Select a role" size="small" />}
       />
     </Box>
   );

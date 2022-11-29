@@ -50,7 +50,7 @@ function ChampionOptions() {
         loading={isLoading}
         id="champions-select"
         options={championList}
-        renderInput={(params) => <TextField {...params} label="Select a champion" />}
+        renderInput={(params) => <TextField {...params} placeholder="Search" size="small" />}
         renderOption={(props, option) => (
           <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
             <img

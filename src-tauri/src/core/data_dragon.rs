@@ -1,4 +1,5 @@
-pub mod structs;
-mod runes;
 mod champs;
 mod items;
+mod runes;
+pub mod structs;
+mod templates;

@@ -6,13 +6,16 @@ use errors::ErrorMap;
 
 use super::{constants, structs};
 
+use constants::{REGIONS, ROLES, TIERS};
 use structs::UggRequest;
-use constants::{TIERS, REGIONS, ROLES};
 
+/// This handles accessing JSON for the champ, specifically for things like it's win rate
+/// this is important because it handles key checking, which will need to get more
+/// intense in the future
 pub async fn ranking(
-    name: &i64, 
-    role: &str, 
-    rank: &str, 
+    name: &i64,
+    role: &str,
+    rank: &str,
     region: &str,
     lang: &str,
 ) -> Result<Value, ErrorMap> {
@@ -25,7 +28,7 @@ pub async fn ranking(
             match role {
                 Ok(role) => {
                     //TODO: Check keys before reading, this can cause errors
-                    let json_read: &Value = &ranking[REGIONS[&region]][TIERS[&rank]][&role];
+                    let json_read: &Value = &ranking[REGIONS[region]][TIERS[rank]][&role];
                     Ok(json_read.to_owned())
                 }
                 Err(err) => Err(err),
@@ -35,6 +38,9 @@ pub async fn ranking(
     }
 }
 
+/// This handles accessing JSON for the champ, specifically for
+/// things such as runes and items, this is important because
+/// it handles error catching, which will get more intense
 pub async fn overview(
     name: &i64,
     role: &str,
@@ -45,20 +51,14 @@ pub async fn overview(
     let ugg = UggRequest::new(name, lang);
     let fut_request = ugg.overview_json();
     let fut_role = position(name, role, lang);
-    let (
-        request, 
-        role
-    ) = futures::join!(
-        fut_request, 
-        fut_role
-    );
-    
+    let (request, role) = futures::join!(fut_request, fut_role);
+
     match request {
         Ok(overview) => {
             match role {
                 Ok(role) => {
                     //TODO: Check keys before reading, this can cause errors
-                    let json_read: &Value = &overview[REGIONS[&region]][TIERS[&rank]][&role][0];
+                    let json_read: &Value = &overview[REGIONS[region]][TIERS[rank]][&role][0];
                     Ok(json_read.to_owned())
                 }
                 Err(err) => Err(err),
@@ -68,11 +68,8 @@ pub async fn overview(
     }
 }
 
-async fn position(
-    name: &i64, 
-    role: &str,
-    lang: &str,
-) -> Result<String, ErrorMap> {
+/// Gets the default position of the character as a string
+async fn position(name: &i64, role: &str, lang: &str) -> Result<String, ErrorMap> {
     let ugg = UggRequest::new(name, lang);
     if role == "Default" {
         let role = ugg.default_role().await;
@@ -81,7 +78,7 @@ async fn position(
             Err(err) => Err(err),
         }
     } else {
-    let role = ROLES[&role];
+        let role: &str = ROLES[role];
         Ok(role.to_string())
     }
 }

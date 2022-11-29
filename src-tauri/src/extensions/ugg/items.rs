@@ -5,23 +5,18 @@ use crate::{core::data_dragon, errors};
 use data_dragon::structs::DataDragon;
 use errors::ErrorMap;
 
-use super::{structs, constants};
+use super::{constants, structs};
 
 use constants::DATA;
-use structs::{ItemsMap, ItemValues};
+use structs::{ItemValues, ItemsMap};
 
 impl structs::Data {
+    /// Returns items from the UGG API these can be empty
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
-        let mut items_map = 
-        ItemsMap { 
-            start: Vec::new(), 
-            core: Vec::new(), 
-            fourth: Vec::new(), 
-            fifth: Vec::new(), 
-            sixth: Vec::new() 
-        };
-        
+        let mut items_map = ItemsMap::new();
+        let items_array = items_map.as_array_mut();
+
         match data_dragon {
             Ok(data_dragon) => {
                 let items = data_dragon.item_json().await;
@@ -30,144 +25,64 @@ impl structs::Data {
                     Ok(json) => {
                         match items {
                             Ok(items) => {
-                                //TODO We can get the specfic winrates of each of these sets rather easily
-                                let start = json[DATA["starting_items"]][2].as_array();
-                                let mythic = json[DATA["mythic_and_core"]][2].as_array();
-                                let fourth = json[DATA["other_items"]][0].as_array();
-                                let fifth = json[DATA["other_items"]][1].as_array();
-                                let sixth = json[DATA["other_items"]][2].as_array();
-                                    for (key, item_data) in items["data"].as_object().unwrap()  {
-                                        match start {
-                                            Some(start) => {
-                                                for i in start {
-                                                    if &i.to_string() == key {
-                                                        let image = item_data["image"]["full"].as_str().unwrap().to_string();
-                                                        items_map.start.push(
-                                                            ItemValues { 
-                                                            name: item_data["name"].as_str().unwrap().to_string(), 
-                                                            cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                            description: item_data["description"].as_str().unwrap().to_string(), 
-                                                            local_image: image.clone(), 
-                                                            url: format!(
-                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                &data_dragon.version,
-                                                                &image
-                                                            ),
-                                                        })
+                                if let Some(map) = items["data"].as_object() {
+                                    for (key, item_data) in map {
+                                        let Some(image) = item_data["image"]["full"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let Some(name) = item_data["name"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let Some(cost) = item_data["gold"]["base"].as_i64() else {
+                                            unreachable!();
+                                        };
+                                        let Some(description) = item_data["description"].as_str() else {
+                                            unreachable!();
+                                        };
+                                        let url = format!(
+                                            "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                            &data_dragon.version, &image
+                                        );
+                                        // TODO: We can get the specific win rates of each of these sets rather easily
+                                        let ugg_maps = [
+                                            &json[DATA["starting_items"]][2],
+                                            &json[DATA["mythic_and_core"]][2],
+                                            &json[DATA["other_items"]][0],
+                                            &json[DATA["other_items"]][1],
+                                            &json[DATA["other_items"]][2],
+                                        ];
+
+                                        for n in 0..5 {
+                                            if let Some(current_map) = ugg_maps[n].as_array() {
+                                                current_map.iter().for_each(|y| {
+                                                    if y.is_array()
+                                                        && (&y[0].to_string() == key
+                                                            || &y.to_string() == key)
+                                                    {
+                                                        items_array[n].push(ItemValues::new(
+                                                            name,
+                                                            cost,
+                                                            description,
+                                                            image,
+                                                            &url,
+                                                        ))
                                                     }
-                                                }
-                                            },
-                                            None => (),
-                                        }
-                                        match mythic {
-                                            Some(mythic) => {
-                                                for i in mythic {
-                                                    if &i.to_string() == key {
-                                                        let image = item_data["image"]["full"].as_str().unwrap().to_string();
-                                                        items_map.core.push(
-                                                            ItemValues { 
-                                                            name: item_data["name"].as_str().unwrap().to_string(), 
-                                                            cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                            description: item_data["description"].as_str().unwrap().to_string(), 
-                                                            local_image: image.clone(), 
-                                                            url: format!(
-                                                                "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                &data_dragon.version,
-                                                                &image
-                                                            ),
-                                                        })
-                                                    }
-                                                }
-                                            },
-                                            None => (),
-                                        }
-                                        match fourth {
-                                            Some(fouth) => {
-                                                for y in fouth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
-                                                            items_map.fourth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
-                                                        }
-                                                    } else {
-                                                        break;
-                                                    }
-                                                }
-                                            },
-                                            None => (),
-                                        }
-                                        match fifth {
-                                            Some(fifth) => {
-                                                for y in fifth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
-                                                            items_map.fifth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
-                                                        }
-                                                    } else {
-                                                        break;
-                                                    }
-                                                }
-                                            },
-                                            None => (),
-                                        }
-                                        match sixth {
-                                            Some(sixth) => {
-                                                for y in sixth {
-                                                    if y.is_array() {
-                                                        if &y[0].to_string() == key {
-                                                            let image = item_data["image"]["full"].as_str().unwrap().to_string();
-                                                            items_map.sixth.push(
-                                                                ItemValues { 
-                                                                name: item_data["name"].as_str().unwrap().to_string(), 
-                                                                cost: item_data["gold"]["base"].as_i64().unwrap().to_string(), 
-                                                                description: item_data["description"].as_str().unwrap().to_string(), 
-                                                                local_image: image.clone(), 
-                                                                url: format!(
-                                                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                                                    &data_dragon.version,
-                                                                    &image
-                                                                ),
-                                                            })
-                                                        }
-                                                    } else {
-                                                        break;
-                                                    }
-                                                }
-                                            },
-                                            None => (),
+                                                })
+                                            };
                                         }
                                     }
-                                Ok(items_map)
-                            },
-                            Err(err) => Err(ErrorMap::DataDragonErrors(err))
+
+                                    Ok(items_map)
+                                } else {
+                                    unreachable!()
+                                }
+                            }
+                            Err(err) => Err(ErrorMap::DataDragonErrors(err)),
                         }
-                    },
+                    }
                     Err(err) => Err(err),
                 }
-            },
+            }
             Err(err) => Err(ErrorMap::DataDragonErrors(err)),
         }
     }

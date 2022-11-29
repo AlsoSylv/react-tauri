@@ -3,97 +3,67 @@ use serde_json::Value;
 use crate::errors;
 use errors::{ErrorMap, UGGDataError};
 
-use super::{structs, constants};
+use super::{constants, structs};
 
-use structs::{Shard, Shards};
 use constants::DATA;
+use structs::{Shard, Shards};
 
 impl structs::Data {
+    /// Returns stat shards from the UGG API
+    ///
+    /// This requires Community Dragon to work
+    /// without being hardcoded
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
-        //TODO: Use Community Dragon to get shard data
+        // TODO: Use Community Dragon to get shard data
         let armor = Shard::create(
-            "Armor", 
-            5002, 
-            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png"
+            "Armor",
+            5002,
+            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png",
         );
-    
+
         let magic_resist = Shard::create(
             "Magic Resist", 
-            5003, 
+            5003,
             "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.png"
         );
-    
+
         let health = Shard::create(
             "Health", 
             5001,
             "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png"
         );
-    
+
         let adaptive_force = Shard::create(
             "Adaptive Force",
-            5008, 
+            5008,
             "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png"
         );
-    
-        let attack_speed = Shard {
-            name: "Attack Speed".to_owned(),
-            id: 5005,
-            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png".to_owned(),
-            active: false
-        };
-    
-        let ability_haste = Shard {
-            name: "Ability Haste".to_owned(),
-            id: 5007,
-            image: "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png".to_owned(),
-            active: false
-        };
-    
-        let shards: Shards = Shards {
+
+        let attack_speed = Shard::create(
+            "Attack Speed", 
+            5005,
+            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png"
+        );
+
+        let ability_haste = Shard::create(
+            "Ability Haste", 
+            5007,
+            "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png"
+        );
+
+        let mut shards: Shards = Shards {
             row_one: [adaptive_force.clone(), attack_speed, ability_haste],
             row_two: [adaptive_force, armor.clone(), magic_resist.clone()],
             row_three: [health, armor, magic_resist],
         };
-    
-        let mut mutable_shards = shards.clone();
+
         match request {
             Ok(json) => {
                 let active_shards = json[DATA["shards"]][2].as_array();
                 match active_shards {
                     Some(active_shards) => {
-                        for (y, shard) in shards.row_one.iter().enumerate() {
-                            if shard.id.to_string() == active_shards[0] {
-                                mutable_shards.row_one[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
-                            }
-                        }
-    
-                        for (y, shard) in shards.row_two.iter().enumerate() {
-                            if shard.id.to_string() == active_shards[1] {
-                                mutable_shards.row_two[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
-                            }
-                        }
-    
-                        for (y, shard) in shards.row_three.iter().enumerate() {
-                            if shard.id.to_string() == active_shards[2] {
-                                mutable_shards.row_three[y] = Shard {
-                                    name: shard.name.clone(),
-                                    id: shard.id,
-                                    image: shard.image.clone(),
-                                    active: true,
-                                }
-                            }
-                        }
-                        Ok(mutable_shards)
+                        sort_shards(&mut shards, active_shards);
+                        Ok(shards)
                     }
                     None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
                 }
@@ -101,4 +71,19 @@ impl structs::Data {
             Err(err) => Err(err),
         }
     }
+}
+
+fn sort_shards(shards: &mut Shards, active_shards: &[Value]) {
+    shards
+        .as_array_mut()
+        .iter_mut()
+        .enumerate()
+        .for_each(|(pos, shard_array)| {
+            shard_array.iter_mut().for_each(|shard| {
+                let string_id = shard.id.to_string();
+                if string_id == active_shards[pos] {
+                    shard.active = true;
+                }
+            });
+        })
 }

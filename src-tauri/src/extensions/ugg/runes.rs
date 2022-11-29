@@ -1,14 +1,20 @@
-use crate::{frontend_types, core::helpers, errors};
+use crate::{core::helpers, errors, frontend_types};
 
-use frontend_types::{Active, RuneImages};
 use errors::{ErrorMap, UGGDataError};
-use ErrorMap::DataDragonErrors;
+use frontend_types::RuneImages;
 use serde_json::Value;
+use ErrorMap::DataDragonErrors;
 
-use super::{structs, constants};
+use super::{constants, structs};
 
 impl structs::Data {
-    pub async fn rune_tuple(&self, request: Result<Value, ErrorMap>) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap>{
+    /// Returns runes from the UGG API
+    /// this heavily uses mutability to
+    /// avoid duplication of variables
+    pub async fn rune_tuple(
+        &self,
+        request: Result<Value, ErrorMap>,
+    ) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap> {
         match request {
             Ok(json) => {
                 let json = &json[constants::DATA["perks"]];
@@ -21,36 +27,19 @@ impl structs::Data {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let all_runes = helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, &self.lang).await;
+                let all_runes =
+                    helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, &self.lang).await;
                 match all_runes {
-                    Ok(immutable_all_runes) => {
+                    Ok(mut all_runes) => {
                         let mut used_rune_ids = Vec::new();
-                        let mut all_runes = immutable_all_runes.clone();
-                        let mut slots: [&mut Vec<Active>; 7] = [
-                            &mut all_runes.primary_runes.slot_one,
-                            &mut all_runes.primary_runes.slot_two,
-                            &mut all_runes.primary_runes.slot_three,
-                            &mut all_runes.primary_runes.slot_four,
-                            &mut all_runes.secondary_runes.slot_one,
-                            &mut all_runes.secondary_runes.slot_two,
-                            &mut all_runes.secondary_runes.slot_three,
-                        ];
-                        
+                        let mut slots = all_runes.as_array_mut();
+
                         for n in 0..6 {
                             slots.iter_mut().for_each(|current_slot| {
-                                current_slot.clone().iter().enumerate().for_each(|i| {
-                                    let pos = i.0;
-                                    let rune = i.1;
-                                    if rune_ids[n] == rune.id {
-                                        current_slot[pos] = Active {
-                                            name: rune.name.clone(),
-                                            image: rune.image.clone(),
-                                            active: true,
-                                            id: rune.id,
-                                            local_image: rune.local_image.clone(),
-                                            description: rune.description.clone(),
-                                        };
-                                        used_rune_ids.push(rune.id);
+                                current_slot.iter_mut().for_each(|i| {
+                                    if rune_ids[n] == i.id {
+                                        i.active = true;
+                                        used_rune_ids.push(i.id);
                                     }
                                 });
                             });
@@ -61,6 +50,6 @@ impl structs::Data {
                 }
             }
             Err(err) => Err(err),
-        }    
+        }
     }
 }

@@ -1,68 +1,66 @@
-use tokio::sync::Mutex;
-use once_cell::sync::Lazy;
 use linked_hash_map::LinkedHashMap;
 use moka::future::Cache;
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::sync::Mutex;
 
+use super::templates::request;
 use crate::errors::DataDragonError;
 
+/// A new struct for getting data from Data Dragon
 pub struct DataDragon {
     pub version: String,
     pub language: String,
     pub client: reqwest::Client,
 }
 
-static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| {
-    Mutex::new(Cache::new(1))
-});
+/// Version Cache
+///
+/// TODO: Figure out a timing system
+/// Does not need to invalidate on lang change
+static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
 impl DataDragon {
+    /// A cached function to generate a new http client for Data Dragon
+    /// this also gives a version string as a result, and can fail creation
+    /// if there is no internet connection available
+    ///
+    /// # Examples
+    /// ```
+    /// let data_dragon = DataDragon::new(None).await;
+    /// ```
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let lang = match language {
-            Some(lang) => lang,
-            None => "en_US",
-        };
+        let lang = language.unwrap_or("en_US");
 
         let client = reqwest::Client::new();
         let cache = CACHED_VERSION.lock().await;
         if let Some(cache) = cache.get("version") {
-            return Ok(
-                DataDragon { 
-                    version: cache.clone(), 
-                    language: lang.to_string(), 
-                    client 
-                });
+            return Ok(DataDragon {
+                version: cache,
+                language: lang.to_string(),
+                client,
+            });
         }
-
-        let version = client.get("https://ddragon.leagueoflegends.com/api/versions.json").send().await;
-        match version {
-            Ok(response) => {
-                if let Ok(json) = response.json::<Vec<String>>().await {
-                    let version = json[0].clone();
-                    cache.insert("version".to_string(), version.clone()).await;
-                    Ok(
-                        DataDragon { 
-                            version, 
-                            language: lang.to_string(), 
-                            client
-                        })
-                } else {
-                    unreachable!()
-                }
-            },
-            Err(err) => {
-                if err.is_body() {
-                    Err(DataDragonError::DataDragonMissing)
-                } else {
-                    Err(DataDragonError::CannotConnect)
-                }
+        let url = "https://ddragon.leagueoflegends.com/api/versions.json";
+        let request = request::<Vec<String>>(url, &client).await;
+        match request {
+            Ok(json) => {
+                let version = json[0].clone();
+                cache.insert("version".to_string(), version.clone()).await;
+                Ok(DataDragon {
+                    version,
+                    language: lang.to_string(),
+                    client,
+                })
             }
+            Err(err) => Err(err),
         }
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// Serialize `runesReforged.json` to a struct
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuneTree {
     pub id: i64,
     pub key: String,
@@ -71,12 +69,12 @@ pub struct RuneTree {
     pub slots: Vec<Slot>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Slot {
     pub runes: Vec<Rune>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Rune {
     pub id: i64,
@@ -87,6 +85,7 @@ pub struct Rune {
     pub long_desc: String,
 }
 
+/// Serialize `champions.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ChampJson {
     #[serde(rename = "type")]
@@ -110,7 +109,7 @@ pub struct ChampData {
     pub stats: ChampStats,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChampInfo {
     pub attack: i64,
     pub defense: i64,
@@ -118,7 +117,7 @@ pub struct ChampInfo {
     pub difficulty: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChampImage {
     pub full: String,
     pub sprite: String,
@@ -153,6 +152,8 @@ pub struct ChampStats {
     pub attackspeed: StatValue,
 }
 
+/// Used for more specific info on champions, because it is not guaranteed to be an int or a float
+/// this could be replaced with a value, and probably should be in the future.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum StatValue {
@@ -166,7 +167,8 @@ impl Default for StatValue {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// Serialize `championFull.json` to a struct
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionFull {
     #[serde(rename = "type")]

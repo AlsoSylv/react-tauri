@@ -144,6 +144,24 @@ pub struct ChampionNames {
     pub local_image: Option<String>,
 }
 
+impl ChampionNames {
+    pub fn new(label: &str, key: &str, id: i64, version: Option<&str>) -> Self {
+        let url = match version {
+            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png", version, id),
+            None => format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/{}.png", id),
+        };
+        ChampionNames {
+            label: label.to_owned(),
+            value: ChampionValue {
+                key: key.to_owned(),
+                id,
+            },
+            url: Some(url),
+            local_image: Some(format!("/{0}/{0}.png", id)),
+        }
+    }
+}
+
 /// A map containing the champions Key and Id
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

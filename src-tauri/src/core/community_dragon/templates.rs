@@ -1,5 +1,5 @@
-use serde::Deserialize;
 use crate::errors::CommunityDragonError;
+use serde::Deserialize;
 
 pub async fn request<T: for<'de> Deserialize<'de>>(
     url: String,

@@ -1,4 +1,4 @@
-use crate::core::helpers::champs::{names_from_data_dragon, names_from_community_dragon};
+use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_dragon};
 use crate::core::{data_dragon, lcu};
 use crate::errors::DataDragonError;
 use crate::extensions::ugg::json::{overview, ranking};
@@ -176,7 +176,7 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
             } else {
                 match names_from_community_dragon(lang, &mut champions).await {
                     Ok(()) => Ok(champions),
-                    Err(err) => Err(err as i64)
+                    Err(err) => Err(err as i64),
                 }
             }
         }

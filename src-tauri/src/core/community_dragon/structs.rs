@@ -101,7 +101,7 @@ pub struct DefaultStatModsPerSubStyle {
 pub struct ChampionData {
     pub id: i64,
     pub name: String,
-    #[serde(rename="alias")]
+    #[serde(rename = "alias")]
     pub key: String,
     pub square_portrait_path: String,
     pub roles: Vec<String>,

@@ -5,9 +5,9 @@ use frontend_types::RuneImages;
 use serde_json::Value;
 use ErrorMap::DataDragonErrors;
 
-use super::{constants, structs};
+use super::constants;
 
-impl structs::Data {
+impl super::Data {
     /// Returns runes from the UGG API
     /// this heavily uses mutability to
     /// avoid duplication of variables

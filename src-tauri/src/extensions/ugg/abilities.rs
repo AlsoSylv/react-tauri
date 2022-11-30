@@ -12,7 +12,7 @@ use super::{constants, structs};
 use constants::DATA;
 use structs::{AbilitiesMap, AbilitiesValue, Passive};
 
-impl structs::Data {
+impl super::Data {
     /// Returns abilities from the UGG API
     pub async fn abilities(
         &self,

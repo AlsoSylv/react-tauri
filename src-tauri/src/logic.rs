@@ -11,7 +11,7 @@ use frontend_types::ChampionInfo;
 use serde_json::json;
 
 use lcu::runes::push_runes_to_client;
-use ugg::structs::Data;
+use ugg::Data;
 
 //TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 /// Returns the current pick rate, win rate, ban rate, and tier for each champ as requested by the FE

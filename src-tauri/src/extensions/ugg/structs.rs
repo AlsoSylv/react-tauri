@@ -1,35 +1,3 @@
-use crate::frontend_types::ChampionNames;
-
-/// This is the Data struct for calling various methods from the UGG API
-/// this handles things like getting champ winrates, pickrates, etc, and
-/// should be used in order to reduce the amount of boilerplate garbage
-pub struct Data {
-    pub name: ChampionNames,
-    pub role: String,
-    pub rank: String,
-    pub region: String,
-    pub lang: String,
-}
-
-impl Data {
-    /// Returns a new instance of the Data struct
-    pub fn new(
-        name: ChampionNames,
-        role: String,
-        rank: String,
-        region: String,
-        lang: String,
-    ) -> Self {
-        Data {
-            name,
-            role,
-            rank,
-            region,
-            lang,
-        }
-    }
-}
-
 /// Handles making a new reques for the UGG extension, this should be changed
 /// to pass a barrowed reqwest client instead of using an owned reqwest client
 pub struct UggRequest {

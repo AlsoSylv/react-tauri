@@ -4,11 +4,11 @@ use crate::errors;
 
 use errors::{ErrorMap, UGGDataError};
 
-use super::{constants, structs};
+use super::constants;
 
 use constants::STATS;
 
-impl structs::Data {
+impl super::Data {
     //The format is used here to get an exact result from the floating point math
 
     /// Returns the win rate from the UGG API, errors if it is None

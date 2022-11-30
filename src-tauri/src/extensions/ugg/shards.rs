@@ -8,7 +8,7 @@ use super::{constants, structs};
 use constants::DATA;
 use structs::{Shard, Shards};
 
-impl structs::Data {
+impl super::Data {
     /// Returns stat shards from the UGG API
     ///
     /// This requires Community Dragon to work

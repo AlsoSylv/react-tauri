@@ -10,7 +10,7 @@ use super::{constants, structs};
 use constants::DATA;
 use structs::{ItemValues, ItemsMap};
 
-impl structs::Data {
+impl super::Data {
     /// Returns items from the UGG API these can be empty
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;

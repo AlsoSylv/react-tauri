@@ -1,7 +1,5 @@
 use serde_json::Value;
 
-use super::structs;
-
 use crate::templates::request;
 
 use super::DataDragon;
@@ -32,7 +30,13 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
             &self.version, &self.language
         );
-        let request = request::<Value, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
+        let request = request::<Value, DataDragonError>(
+            url.to_owned(),
+            &self.client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
         match request {
             Ok(item_json) => {
                 cache.insert(self.language.clone(), item_json.clone()).await;

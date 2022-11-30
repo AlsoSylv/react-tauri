@@ -4,8 +4,8 @@ use serde_json::Value;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 
-use crate::{core::data_dragon, errors, extensions};
 use crate::templates::request;
+use crate::{core::data_dragon, errors, extensions};
 
 use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;

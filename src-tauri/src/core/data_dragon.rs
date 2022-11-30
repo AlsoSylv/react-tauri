@@ -44,7 +44,13 @@ impl DataDragon {
             });
         }
         let url = "https://ddragon.leagueoflegends.com/api/versions.json";
-        let request = request::<Vec<String>, DataDragonError>(url.to_owned(), &client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
+        let request = request::<Vec<String>, DataDragonError>(
+            url.to_owned(),
+            &client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
         match request {
             Ok(json) => {
                 let version = json[0].clone();

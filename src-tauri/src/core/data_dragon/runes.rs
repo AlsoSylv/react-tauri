@@ -29,7 +29,13 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
             &self.version, &self.language
         );
-        let request = request::<Vec<RuneTree>, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
+        let request = request::<Vec<RuneTree>, DataDragonError>(
+            url.to_owned(),
+            &self.client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
         match request {
             Ok(rune_json) => {
                 cache.insert(self.language.clone(), rune_json.clone()).await;

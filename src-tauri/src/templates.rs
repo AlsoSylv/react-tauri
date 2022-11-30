@@ -9,10 +9,10 @@ use serde::Deserialize;
 /// use crate::templates::request;
 /// use crate::errors;
 ///
-/// 
+///
 /// async fn new_request(&self) {
 ///     let request: Result<Value, CommunityDragonError> = request::<Value, CommunityDragonError>(
-///         "<URL>", 
+///         "<URL>",
 ///         &self.client,
 ///         errors::CommunityDragonMissing,
 ///         errors::CannotConnect,

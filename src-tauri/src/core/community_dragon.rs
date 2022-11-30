@@ -6,13 +6,13 @@ mod runes;
 mod structs;
 
 /// Struct for getting data from Community Dragon
-/// 
+///
 /// This struct has a few methods, and is not meant to be used literally
-/// 
+///
 /// # Examples
 /// ```rs
 /// use crate::core::community_dragon::CommunityDragon;
-/// 
+///
 /// #[tokio::main]
 /// async fn main() -> Result<(), CommunityDragonError> {
 ///     let community_dragon = CommunityDragon::new_with_client();

@@ -1,7 +1,7 @@
-use super::structs::{self, ChampJson, ChampionFull};
+use super::structs::{ChampJson, ChampionFull};
 
-use crate::templates::request;
 use super::DataDragon;
+use crate::templates::request;
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -36,7 +36,13 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
-        let request = request::<ChampJson, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
+        let request = request::<ChampJson, DataDragonError>(
+            url.to_owned(),
+            &self.client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
 
         match request {
             Ok(champ_json) => {
@@ -70,7 +76,13 @@ impl DataDragon {
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &key
         );
-        let request = request::<ChampionFull, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
+        let request = request::<ChampionFull, DataDragonError>(
+            url.to_owned(),
+            &self.client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
 
         match request {
             Ok(champ_full) => {

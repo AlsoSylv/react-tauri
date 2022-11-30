@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::{core::community_dragon::structs::CommunityDragon, errors};
+use crate::{core::community_dragon::CommunityDragon, errors};
 use errors::{ErrorMap, UGGDataError};
 
 use super::{constants, structs};

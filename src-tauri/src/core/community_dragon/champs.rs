@@ -1,8 +1,8 @@
-use super::structs::{self, ChampionData, ChampionFull};
-use super::templates;
+use super::structs::{ChampionData, ChampionFull};
+use super::{templates, CommunityDragon};
 use crate::errors::CommunityDragonError;
 
-impl structs::CommunityDragon {
+impl CommunityDragon {
     pub async fn champs_basic(&self) -> Result<Vec<ChampionData>, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champion-summary.json", &self.language);
         let request = templates::request::<Vec<ChampionData>>(url, &self.client).await;

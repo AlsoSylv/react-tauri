@@ -1,4 +1,4 @@
-use crate::core::{community_dragon::structs::CommunityDragon, data_dragon::structs::DataDragon};
+use crate::core::{community_dragon::CommunityDragon, data_dragon::structs::DataDragon};
 use crate::errors::{CommunityDragonError, DataDragonError};
 use crate::frontend_types::ChampionNames;
 

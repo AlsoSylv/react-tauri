@@ -1,36 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-pub struct CommunityDragon {
-    pub language: String,
-    pub client: reqwest::Client,
-}
-
-impl CommunityDragon {
-    pub fn new(client: reqwest::Client, lang: &str) -> Self {
-        let binding = lang.to_lowercase();
-        let language = match lang {
-            "en_US" => "default",
-            _ => &binding,
-        }
-        .to_owned();
-
-        CommunityDragon { language, client }
-    }
-
-    pub fn new_with_client(lang: &str) -> Self {
-        let client = reqwest::Client::new();
-        let binding = lang.to_lowercase();
-        let language = match lang {
-            "en_US" => "default",
-            _ => &binding,
-        }
-        .to_owned();
-
-        CommunityDragon { language, client }
-    }
-}
-
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Runes {

@@ -10,6 +10,7 @@ pub enum DataDragonError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommunityDragonError {
     CommunityDragonMissing = 105,
+    CannotConnect = 102,
 }
 
 /// Returns specific errors for the UGG module, like connection, or

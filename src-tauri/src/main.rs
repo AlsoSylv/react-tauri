@@ -9,6 +9,7 @@ use constants::{REGIONS, ROLES, TIERS};
 
 mod core;
 pub mod errors;
+pub mod templates;
 mod extensions;
 pub mod frontend_types;
 mod logic;

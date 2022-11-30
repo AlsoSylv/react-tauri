@@ -4,7 +4,9 @@ use serde_json::Value;
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Runes {
+    /// The rune paths ID
     pub id: i64,
+    /// The rune paths name
     pub name: String,
     pub major_change_patch_version: String,
     pub tooltip: String,
@@ -69,8 +71,11 @@ pub struct DefaultStatModsPerSubStyle {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionData {
+    /// Unlike Data Dragon, this is the proper champion ID, not the Key
     pub id: i64,
+    /// This is the champs proper name, ie: "Bel'Veth"
     pub name: String,
+    /// This is the champs proper key, ie: "BelVeth"
     #[serde(rename = "alias")]
     pub key: String,
     pub square_portrait_path: String,

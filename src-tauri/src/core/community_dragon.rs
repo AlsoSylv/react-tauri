@@ -4,8 +4,6 @@ mod champs;
 mod runes;
 /// Structs to desearalize to
 mod structs;
-/// Templates for things like network requests
-mod templates;
 
 /// Struct for getting data from Community Dragon
 /// 

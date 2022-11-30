@@ -5,7 +5,7 @@ use crate::extensions::ugg::json::{overview, ranking};
 use crate::frontend_types::{ChampionNames, RunesAndAbilities};
 use crate::{extensions, frontend_types};
 
-use data_dragon::structs::DataDragon;
+use data_dragon::DataDragon;
 use extensions::ugg;
 use frontend_types::ChampionInfo;
 use serde_json::json;

@@ -2,7 +2,7 @@ use serde_json::Value;
 
 use crate::{core::data_dragon, errors};
 
-use data_dragon::structs::DataDragon;
+use data_dragon::DataDragon;
 use errors::{DataDragonError, ErrorMap, UGGDataError};
 
 use ErrorMap::{DataDragonErrors, UGGError};

@@ -1,15 +1,15 @@
 use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
-use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 use crate::{core::data_dragon, errors, extensions};
+use crate::templates::request;
 
 use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;
-use ErrorMap::{DataDragonErrors, UGGError};
+use ErrorMap::DataDragonErrors;
 
 static CACHED_DEFAULT_ROLE: Lazy<Mutex<HashMap<String, Vec<i64>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
@@ -38,8 +38,8 @@ impl structs::UggRequest {
         match lol_version {
             Ok(ugg_lol_version) => {
                 let url = format!("{base_role_url}/{stat_version}/primary_roles/{ugg_lol_version}/{role_version}.json");
-                let role_json = request::<HashMap<String, Vec<i64>>>(
-                    &url,
+                let role_json = request::<HashMap<String, Vec<i64>>, UGGDataError>(
+                    url,
                     client,
                     UGGDataError::RoleMissing,
                     UGGDataError::RoleConnect,
@@ -53,7 +53,7 @@ impl structs::UggRequest {
                         Ok(role.to_string())
                     }
 
-                    Err(err) => Err(err),
+                    Err(err) => Err(ErrorMap::UGGError(err)),
                 }
             }
             Err(err) => Err(err),
@@ -84,8 +84,8 @@ impl structs::UggRequest {
         match lol_version {
             Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let overview = request::<Value>(
-                    &url,
+                let overview = request::<Value, UGGDataError>(
+                    url,
                     client,
                     UGGDataError::OverviewMissing,
                     UGGDataError::OverviewConnect,
@@ -98,7 +98,7 @@ impl structs::UggRequest {
                         cache.sync();
                         Ok(json)
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(ErrorMap::UGGError(err)),
                 }
             }
             Err(err) => Err(err),
@@ -124,8 +124,8 @@ impl structs::UggRequest {
         match lol_version {
             Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let ranking = request::<Value>(
-                    &url,
+                let ranking = request::<Value, UGGDataError>(
+                    url,
                     client,
                     UGGDataError::RankingMissing,
                     UGGDataError::RankingConnect,
@@ -138,7 +138,7 @@ impl structs::UggRequest {
                         cache.sync();
                         Ok(json)
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(ErrorMap::UGGError(err)),
                 }
             }
             Err(err) => Err(err),
@@ -146,35 +146,9 @@ impl structs::UggRequest {
     }
 }
 
-/// Template for a network request for UGGs servers, this removes a ton of duplicated code
-async fn request<R: for<'de> Deserialize<'de>>(
-    url: &str,
-    client: &reqwest::Client,
-    error_one: UGGDataError,
-    error_two: UGGDataError,
-) -> Result<R, ErrorMap> {
-    let request = client.get(url).send().await;
-    match request {
-        Ok(json) => {
-            if let Ok(ranking) = json.json::<R>().await {
-                Ok(ranking)
-            } else {
-                Err(UGGError(error_one))
-            }
-        }
-        Err(err) => {
-            if err.is_connect() {
-                Err(UGGError(error_two))
-            } else {
-                Err(UGGError(error_one))
-            }
-        }
-    }
-}
-
 /// This returns the ugg lol version, this removes a ton of duplicated code
 async fn lol_version() -> Result<String, ErrorMap> {
-    let data_dragon_version = data_dragon::structs::DataDragon::new(None).await;
+    let data_dragon_version = data_dragon::DataDragon::new(None).await;
     match data_dragon_version {
         Ok(data_dragon) => {
             let lol_version: Vec<&str> = data_dragon.version.split('.').collect();

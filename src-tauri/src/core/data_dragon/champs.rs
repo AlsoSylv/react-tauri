@@ -1,7 +1,7 @@
-use super::{
-    structs::{self, ChampJson, ChampionFull},
-    templates::request,
-};
+use super::structs::{self, ChampJson, ChampionFull};
+
+use crate::templates::request;
+use super::DataDragon;
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -17,7 +17,7 @@ static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> =
 static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl structs::DataDragon {
+impl DataDragon {
     /// A cached function to get the DataDragon champion.json and return it
     /// serialized as a struct for the rest of the code
     ///
@@ -36,7 +36,7 @@ impl structs::DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
-        let request = request::<ChampJson>(&url, &self.client).await;
+        let request = request::<ChampJson, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
 
         match request {
             Ok(champ_json) => {
@@ -70,7 +70,7 @@ impl structs::DataDragon {
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &key
         );
-        let request = request::<ChampionFull>(&url, &self.client).await;
+        let request = request::<ChampionFull, DataDragonError>(url.to_owned(), &self.client, DataDragonError::DataDragonMissing, DataDragonError::CannotConnect).await;
 
         match request {
             Ok(champ_full) => {

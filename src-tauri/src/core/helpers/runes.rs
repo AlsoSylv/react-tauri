@@ -1,4 +1,4 @@
-use crate::{core::data_dragon::structs::DataDragon, errors::DataDragonError, frontend_types};
+use crate::{core::data_dragon::DataDragon, errors::DataDragonError, frontend_types};
 
 use frontend_types::{Active, PrimaryTree, RuneImages, SecondaryTree};
 

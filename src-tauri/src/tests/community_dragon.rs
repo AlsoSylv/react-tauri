@@ -23,3 +23,33 @@ async fn champ_full_test() {
         panic!()
     }
 }
+
+#[tokio::test]
+async fn runes_test() {
+    use crate::core::community_dragon::CommunityDragon;
+
+    let community_dragon = CommunityDragon::new_with_client("en_US");
+    if let Ok(runes) = community_dragon.runes().await {
+        runes.iter().for_each(|rune| {
+            if rune.id < 5000 {
+                panic!()
+            }
+        })
+    } else {
+        panic!()
+    }
+}
+
+#[tokio::test]
+async fn runes_style_test() {
+    use crate::core::community_dragon::CommunityDragon;
+
+    let community_dragon = CommunityDragon::new_with_client("en_US");
+    if let Ok(runes) = community_dragon.runes_style().await {
+        assert!(runes.schema_version == 2);
+        assert!(runes.styles[0].id == 8400);
+        assert!(!runes.styles[0].is_advanced);
+    } else {
+        panic!()
+    }
+}

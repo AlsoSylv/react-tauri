@@ -21,7 +21,6 @@ impl CommunityDragon {
         }
     }
 
-    /// This is panicing on JSON parsing
     pub async fn champs_full(&self, id: i64) -> Result<Value, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champions/{}.json", &self.language, id);
         println!("{}", url);

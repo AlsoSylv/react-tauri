@@ -10,3 +10,16 @@ async fn champ_basic_test() {
         panic!()
     };
 }
+
+#[tokio::test]
+async fn champ_full_test() {
+    use crate::core::community_dragon::CommunityDragon;
+
+    let community_dragon = CommunityDragon::new_with_client("en_US");
+    if let Ok(champ_full) = community_dragon.champs_full(498).await {
+        assert!(champ_full["name"] == "Xayah");
+        assert!(champ_full["alias"] == "Xayah");
+    } else {
+        panic!()
+    }
+}

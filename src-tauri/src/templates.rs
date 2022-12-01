@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use serde_json::Value;
 
 /// Template for requests that uses generics
 /// Handles deserializing the body of the
@@ -32,9 +33,10 @@ pub async fn request<T: for<'de> Deserialize<'de>, E>(
     let request = client.get(url).send().await;
     match request {
         Ok(response) => {
-            let Ok(json) = response.json::<T>().await else {
+            let Ok(json) = response.json::<Value>().await else {
                 return Err(error_one);
             };
+            let json: T = serde_json::from_value(json).unwrap();
             Ok(json)
         }
         Err(err) => {

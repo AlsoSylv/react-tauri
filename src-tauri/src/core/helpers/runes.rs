@@ -102,16 +102,20 @@ pub async fn community_dragon_all_rune_images(
                             for rune_ids in slot.perks.iter() {
                                 for rune_specifics in rune_json.iter() {
                                     if rune_ids == &rune_specifics.id {
-                                        array.push(Active::new(
+                                        if let Some(path_location) =
+                                            rune_specifics.icon_path.find("/v1/")
+                                        {
+                                            array.push(Active::new(
                                                 &rune_specifics.name,
                                                 format!(
                                                     "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default{}",
-                                                    rune_specifics.icon_path.split_at(rune_specifics.icon_path.find("/v1/").unwrap()).1.to_lowercase()
+                                                    rune_specifics.icon_path.split_at(path_location).1.to_lowercase()
                                                 ),
                                                 rune_specifics.id,
                                                 format!("/{0}/{1}.png", rune_specifics.name, rune_specifics.name),
                                                 &rune_specifics.long_desc,
                                             ));
+                                        };
                                     }
                                 }
                             }
@@ -122,16 +126,20 @@ pub async fn community_dragon_all_rune_images(
                             for rune_ids in slot.perks.iter() {
                                 for rune_specifics in rune_json.iter() {
                                     if rune_ids == &rune_specifics.id {
-                                        tree_two_array[i - 1].push(Active::new(
+                                        if let Some(path_location) =
+                                            rune_specifics.icon_path.find("/v1/")
+                                        {
+                                            tree_two_array[i - 1].push(Active::new(
                                                 &rune_specifics.name,
                                                 format!(
                                                     "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default{}",
-                                                    rune_specifics.icon_path.split_at(rune_specifics.icon_path.find("/v1/").unwrap()).1.to_lowercase()
+                                                    rune_specifics.icon_path.split_at(path_location).1.to_lowercase()
                                                 ),
                                                 rune_specifics.id,
                                                 format!("/{0}/{1}.png", rune_specifics.name, rune_specifics.name),
                                                 &rune_specifics.long_desc,
                                             ));
+                                        };
                                     }
                                 }
                             }

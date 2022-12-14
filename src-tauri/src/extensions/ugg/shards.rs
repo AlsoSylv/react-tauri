@@ -15,7 +15,7 @@ impl super::Data {
     /// without being hardcoded
     pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
-        let community_dragon = CommunityDragon::new_with_client(&self.lang);
+        let community_dragon = CommunityDragon::new(&self.lang);
         let rune_json = community_dragon.runes().await;
         match rune_json {
             Ok(json) => {

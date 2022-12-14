@@ -3,7 +3,6 @@ use crate::{core::helpers, errors, frontend_types};
 use errors::{ErrorMap, UGGDataError};
 use frontend_types::RuneImages;
 use serde_json::Value;
-use ErrorMap::DataDragonErrors;
 
 use super::constants;
 
@@ -46,7 +45,7 @@ impl super::Data {
                         }
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
-                    Err(err) => Err(DataDragonErrors(err)),
+                    Err(err) => Err(err),
                 }
             }
             Err(err) => Err(err),

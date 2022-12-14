@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 /// `perks.json` strucutre for Community Dragon
-/// 
+///
 /// Does not have an order, is not in trees
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -14,8 +14,8 @@ pub struct Runes {
     /// The last major patch that changed the rune
     pub major_change_patch_version: String,
     /// This is the Long Description with variables like "@GraceWindow.2@s"
-    /// 
-    /// Use long_desc instead 
+    ///
+    /// Use long_desc instead
     pub tooltip: String,
     /// Short explanations of runes
     pub short_desc: String,
@@ -91,7 +91,7 @@ pub struct DefaultStatModsPerSubStyle {
     pub perks: Vec<i64>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionData {
     /// Unlike Data Dragon, this is the proper champion ID, not the Key
@@ -99,7 +99,7 @@ pub struct ChampionData {
     /// This is the champs proper name, ie: "Bel'Veth"
     pub name: String,
     /// This is the champs proper key, ie: "BelVeth"
-    /// 
+    ///
     /// This is renamed from "alias"
     #[serde(rename = "alias")]
     pub key: String,

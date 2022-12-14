@@ -28,18 +28,7 @@ pub struct CommunityDragon {
 }
 
 impl CommunityDragon {
-    pub fn new(client: reqwest::Client, lang: &str) -> Self {
-        let binding = lang.to_lowercase();
-        let language = match lang {
-            "en_US" => "default",
-            _ => &binding,
-        }
-        .to_owned();
-
-        CommunityDragon { language, client }
-    }
-
-    pub fn new_with_client(lang: &str) -> Self {
+    pub fn new(lang: &str) -> Self {
         let client = reqwest::Client::new();
         let binding = lang.to_lowercase();
         let language = match lang {

@@ -32,7 +32,7 @@ pub async fn names_from_community_dragon(
     lang: &str,
     champions: &mut Vec<ChampionNames>,
 ) -> Result<(), CommunityDragonError> {
-    let community_dragon = CommunityDragon::new_with_client(lang);
+    let community_dragon = CommunityDragon::new(lang);
     let champ_json = community_dragon.champs_basic().await;
     match champ_json {
         Ok(json) => json.iter().for_each(|champ| {

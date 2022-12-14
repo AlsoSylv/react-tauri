@@ -21,6 +21,8 @@ const getChampionImages = async (champions = []) => {
 
       const championFolder = `champions/${championName}`;
 
+      console.log(passiveImage);
+
       const spellImages = spells.flatMap(({ image: { full }, id }) =>
         delayedPromise(async () => saveImage(`${DDRAGON_VERSION}/img/spell/${full}`, championFolder, `${id}.png`))
       );

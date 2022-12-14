@@ -109,3 +109,73 @@ pub struct ChampionData {
     /// Roles such as "mage", "fighter", "tank", etc
     pub roles: Vec<String>,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChampFull {
+    /// Unlike Data Dragon, this is the proper champion ID, not the Key
+    pub id: i64,
+    /// This is the champs proper name, ie: "Bel'Veth"
+    pub name: String,
+    /// This is the champs proper key, ie: "BelVeth"
+    ///
+    /// This is renamed from "alias"
+    #[serde(rename = "alias")]
+    pub key: String,
+    pub title: String,
+    pub short_bio: String,
+    pub tactical_info: TacticalInfo,
+    pub playstyle_info: Value,
+    /// This path is not for raw or cdn, I reccomend using "https://cdn.communitydragon.org/latest/champion/{id}/square"
+    /// or "https://cdn.communitydragon.org/latest/champion/{key}/square" instead
+    pub square_portrait_path: String,
+    pub stinger_sfx_path: String,
+    pub choose_vo_path: String,
+    pub ban_vo_path: String,
+    /// Roles such as "mage", "fighter", "tank", etc
+    pub roles: Vec<String>,
+    pub recommended_item_defaults: Vec<Value>,
+    pub skins: Vec<Value>,
+    pub passive: Passive,
+    pub spells: Vec<Spell>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TacticalInfo {
+    pub style: i64,
+    pub difficulty: i64,
+    pub damage_type: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Passive {
+    pub name: String,
+    pub ability_icon_path: String,
+    pub ability_video_path: String,
+    pub ability_video_image_path: String,
+    pub description: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Spell {
+    /// This is lowercase, like "q", "w"
+    pub spell_key: String,
+    pub name: String,
+    pub ability_icon_path: String,
+    pub ability_video_path: String,
+    pub ability_video_image_path: String,
+    pub cost: String,
+    pub cooldown: String,
+    pub description: String,
+    pub dynamic_description: String,
+    pub range: Vec<Value>,
+    pub cost_coefficients: Vec<Value>,
+    pub cooldown_coefficients: Vec<Value>,
+    pub coefficients: Value,
+    pub effect_amounts: Value,
+    pub ammo: Value,
+    pub max_level: i64,
+}

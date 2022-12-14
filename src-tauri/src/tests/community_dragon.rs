@@ -17,8 +17,8 @@ async fn champ_full_test() {
 
     let community_dragon = CommunityDragon::new("en_US");
     if let Ok(champ_full) = community_dragon.champs_full(498).await {
-        assert!(champ_full["name"] == "Xayah");
-        assert!(champ_full["alias"] == "Xayah");
+        assert!(champ_full.name == "Xayah");
+        assert!(champ_full.key == "Xayah");
     } else {
         panic!()
     }

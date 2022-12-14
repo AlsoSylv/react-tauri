@@ -1,6 +1,4 @@
-use serde_json::Value;
-
-use super::structs::ChampionData;
+use super::structs::{ChampFull, ChampionData};
 use super::CommunityDragon;
 use crate::errors::CommunityDragonError;
 use crate::templates;
@@ -21,10 +19,10 @@ impl CommunityDragon {
         }
     }
 
-    pub async fn champs_full(&self, id: i64) -> Result<Value, CommunityDragonError> {
+    pub async fn champs_full(&self, id: i64) -> Result<ChampFull, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champions/{}.json", &self.language, id);
         println!("{}", url);
-        let request: Result<Value, CommunityDragonError> = templates::request(
+        let request: Result<ChampFull, CommunityDragonError> = templates::request(
             url,
             &self.client,
             CommunityDragonError::CommunityDragonMissing,

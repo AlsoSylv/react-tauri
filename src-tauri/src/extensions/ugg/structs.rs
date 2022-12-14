@@ -101,7 +101,7 @@ impl AbilitiesMap {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
     pub name: String,
-    pub image: String,
+    pub image: Option<String>,
     pub order: Vec<String>,
     pub url: String,
 }
@@ -111,7 +111,18 @@ impl AbilitiesValue {
     pub fn new(name: &str, image: &str, url: String) -> Self {
         AbilitiesValue {
             name: name.to_owned(),
-            image: image.to_owned(),
+            image: Some(image.to_owned()),
+            order: Vec::new(),
+            url,
+        }
+    }
+
+    /// The current fallback system does not work with Community
+    /// Dragon, so the image is null
+    pub fn new_cd(name: &str, url: String) -> Self {
+        AbilitiesValue {
+            name: name.to_owned(),
+            image: None,
             order: Vec::new(),
             url,
         }
@@ -121,7 +132,7 @@ impl AbilitiesValue {
 // Returns the data for the passive
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Passive {
-    pub image: String,
+    pub image: Option<String>,
     pub url: String,
 }
 
@@ -129,8 +140,17 @@ impl Passive {
     /// Returns a new instance of the Passive struct
     pub fn new(image: &str, url: String) -> Self {
         Passive {
-            image: image.to_owned(),
+            image: Some(image.to_owned()),
             url,
+        }
+    }
+
+    /// The current fallback system does not work with Community
+    /// Dragon, so the image is null
+    pub fn new_cd(url: String) -> Self {
+        Passive {
+            image: None,
+            url
         }
     }
 }

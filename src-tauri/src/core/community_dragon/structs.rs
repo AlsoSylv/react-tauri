@@ -179,3 +179,26 @@ pub struct Spell {
     pub ammo: Value,
     pub max_level: i64,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Items {
+    pub id: i64,
+    pub name: String,
+    pub description: String,
+    pub active: bool,
+    pub in_store: bool,
+    pub from: Vec<i64>,
+    pub to: Vec<i64>,
+    pub categories: Vec<String>,
+    pub max_stacks: i64,
+    pub required_champion: String,
+    pub required_ally: String,
+    pub required_buff_currency_name: String,
+    pub required_buff_currency_cost: i64,
+    pub special_recipe: i64,
+    pub is_enchantment: bool,
+    pub price: i64,
+    pub price_total: i64,
+    pub icon_path: String,
+}

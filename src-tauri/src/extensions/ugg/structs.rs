@@ -148,10 +148,7 @@ impl Passive {
     /// The current fallback system does not work with Community
     /// Dragon, so the image is null
     pub fn new_cd(url: String) -> Self {
-        Passive {
-            image: None,
-            url
-        }
+        Passive { image: None, url }
     }
 }
 

@@ -1,5 +1,7 @@
 /// Package concerning getting JSON from different champion endpoints
 mod champs;
+/// Package concerning getting JSON from different item endpoints
+mod items;
 /// Package for getting JSON from different rune endpoints
 mod runes;
 /// Structs to desearalize to

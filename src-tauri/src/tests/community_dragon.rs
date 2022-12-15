@@ -81,3 +81,70 @@ async fn sort_test() {
         panic!()
     };
 }
+
+#[tokio::test]
+async fn community_dragon_item_test() {
+    use crate::core::community_dragon::CommunityDragon;
+    use crate::extensions::ugg::{constants, json, structs::ItemValues, structs::ItemsMap};
+    use constants::DATA;
+
+    let lang = "en_US";
+
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
+        let community_dragon = CommunityDragon::new(lang);
+        let items = community_dragon.item_json().await;
+        let mut items_map = ItemsMap::new();
+        let items_array = items_map.as_array_mut();
+        match items {
+            Ok(items) => {
+                let ugg_maps = [
+                    &json[DATA["starting_items"]][2],
+                    &json[DATA["mythic_and_core"]][2],
+                    &json[DATA["other_items"]][0],
+                    &json[DATA["other_items"]][1],
+                    &json[DATA["other_items"]][2],
+                ];
+
+                println!("{:?}", ugg_maps[0]);
+
+                for x in items {
+                    let name = &x.name;
+                    let cost = x.price_total;
+                    let description = &x.description;
+                    let image = &format!("{}.png", x.id);
+                    for n in 0..5 {
+                        if let Some(current_map) = ugg_maps[n].as_array() {
+                            current_map.iter().for_each(|y| {
+
+                                let url = |item_path: String| {
+                                    let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
+                                    if let Some(item_path_pos) = item_path.find("/ASSETS/") {
+                                        let split = item_path.split_at(item_path_pos);
+                                        let url = format!("{}{}", base_url, split.1);
+                                        url.to_lowercase()
+                                    } else {
+                                        unreachable!();
+                                    }
+                                };
+
+                                if (y.is_array() && y[0] == x.id) || y == x.id
+                                {
+                                    items_array[n].push(ItemValues::new(
+                                        name,
+                                        cost,
+                                        description,
+                                        image,
+                                        &url(x.icon_path.clone()),
+                                    ))
+                                }
+                            })
+                        };
+                    }
+                }
+            }
+            Err(err) => panic!("{:?}", err),
+        }
+    } else {
+        panic!()
+    }
+}

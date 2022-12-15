@@ -17,11 +17,11 @@ mod structs;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), CommunityDragonError> {
-///     let community_dragon = CommunityDragon::new_with_client();
-///     let champs_basic = community_dragon.champs_basic().await;
+///     let community_dragon: CommunityDragon = CommunityDragon::new();
+///     let champs_basic: Result<Vec<ChampionData>, CommunityDragonError> = community_dragon.champs_basic().await;
 ///     match champions_basic {
-///         Ok(json) => { ... },
-///         Err(community_dragon_error) => { ... },
+///         Ok(json: Vec<ChampionData>) => { ... },
+///         Err(community_dragon_error: CommunityDragonError) => { ... },
 ///     }
 /// }
 pub struct CommunityDragon {
@@ -30,6 +30,10 @@ pub struct CommunityDragon {
 }
 
 impl CommunityDragon {
+    /// Creates a new reqwest client for data dragon
+    /// Takes a Riot language and translates it to 
+    /// A Community Dragon language, prefered over
+    /// Using a literal struct.
     pub fn new(lang: &str) -> Self {
         let client = reqwest::Client::new();
         let binding = lang.to_lowercase();

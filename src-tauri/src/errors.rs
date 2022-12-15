@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// A list of Data Dragon specific errors with things like connections,
 /// the champion being missing, or Data Dragon being missing
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -7,10 +8,71 @@ pub enum DataDragonError {
     CannotConnect = 102,
 }
 
+trait Errors {
+    fn is_connection(&self) -> bool;
+
+    fn is_missing(&self) -> bool;
+
+    fn is_champ_missing(&self) -> bool;
+}
+
+impl Errors for DataDragonError {
+    fn is_connection(&self) -> bool {
+        if self == &DataDragonError::CannotConnect {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn is_champ_missing(&self) -> bool {
+        if self == &DataDragonError::ChampMissingError {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn is_missing(&self) -> bool {
+        if self == &DataDragonError::DataDragonMissing {
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommunityDragonError {
     CommunityDragonMissing = 105,
+    ChampMissingError = 103,
     CannotConnect = 102,
+}
+
+impl Errors for CommunityDragonError {
+    fn is_connection(&self) -> bool {
+        if self == &CommunityDragonError::CannotConnect {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn is_missing(&self) -> bool {
+        if self == &CommunityDragonError::CommunityDragonMissing {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn is_champ_missing(&self) -> bool {
+        if self == &CommunityDragonError::ChampMissingError {
+            true
+        } else {
+            false
+        }
+    }
 }
 
 /// Returns specific errors for the UGG module, like connection, or

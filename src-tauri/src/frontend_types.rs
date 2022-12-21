@@ -147,7 +147,7 @@ pub struct ChampionNames {
 impl ChampionNames {
     pub fn new(label: &str, key: &str, id: i64, version: Option<&str>) -> Self {
         let url = match version {
-            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png", version, id),
+            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png", version, key),
             None => format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/{}.png", id),
         };
         ChampionNames {
@@ -157,7 +157,7 @@ impl ChampionNames {
                 id,
             },
             url: Some(url),
-            local_image: Some(format!("/{0}/{0}.png", id)),
+            local_image: Some(format!("/{0}/{0}.png", key)),
         }
     }
 }

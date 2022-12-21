@@ -8,7 +8,7 @@ pub enum DataDragonError {
     CannotConnect = 102,
 }
 
-trait Errors {
+pub trait Errors {
     fn is_connection(&self) -> bool;
 
     fn is_missing(&self) -> bool;

@@ -1,16 +1,17 @@
+use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_dragon};
 use crate::core::{data_dragon, lcu};
-use crate::errors::DataDragonError;
+use crate::errors::{DataDragonError, Errors};
 use crate::extensions::ugg::json::{overview, ranking};
-use crate::frontend_types::{ChampionNames, ChampionValue, RunesAndAbilities};
+use crate::frontend_types::{ChampionNames, RunesAndAbilities};
 use crate::{extensions, frontend_types};
 
-use data_dragon::structs::DataDragon;
+use data_dragon::DataDragon;
 use extensions::ugg;
 use frontend_types::ChampionInfo;
 use serde_json::json;
 
 use lcu::runes::push_runes_to_client;
-use ugg::structs::Data;
+use ugg::Data;
 
 //TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 /// Returns the current pick rate, win rate, ban rate, and tier for each champ as requested by the FE
@@ -167,37 +168,17 @@ pub async fn runes_and_abilities(
 #[tauri::command]
 pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
-    let data_dragon = DataDragon::new(Some(lang)).await;
-
-    match data_dragon {
-        Ok(data_dragon) => {
-            let champ_json = data_dragon.champion_json().await;
-            match champ_json {
-                Ok(json) => {
-                    for (champ_key, champ) in json.data.iter() {
-                        if let Ok(id) = champ.key.parse::<i64>() {
-                            champions.push(ChampionNames {
-                                label: champ.name.clone(),
-                                value: ChampionValue {
-                                    key: champ_key.to_string(),
-                                    id,
-                                },
-                                url: Some(format!(
-                                  "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                                  &data_dragon.version,
-                                  &champ.id,
-                              )),
-                                local_image: Some(format!("/{0}/{0}.png", &champ.id)),
-                            });
-                        } else {
-                            unreachable!()
-                        }
-                    }
-                    Ok(champions)
+    match names_from_data_dragon(lang, &mut champions).await {
+        Ok(()) => Ok(champions),
+        Err(err) => {
+            if err.is_connection() {
+                Err(err as i64)
+            } else {
+                match names_from_community_dragon(lang, &mut champions).await {
+                    Ok(()) => Ok(champions),
+                    Err(err) => Err(err as i64),
                 }
-                Err(err) => Err(err as i64),
             }
         }
-        Err(err) => Err(err as i64),
     }
 }

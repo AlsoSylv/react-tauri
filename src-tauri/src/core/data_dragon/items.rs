@@ -1,6 +1,8 @@
 use serde_json::Value;
 
-use super::{structs, templates::request};
+use crate::templates::request;
+
+use super::DataDragon;
 
 use crate::errors::DataDragonError;
 use moka::future::{Cache, ConcurrentCacheExt};
@@ -10,7 +12,7 @@ use tokio::sync::Mutex;
 static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl structs::DataDragon {
+impl DataDragon {
     /// A cached function to get `item.json` from Data Dragon
     ///
     /// # Example
@@ -28,7 +30,13 @@ impl structs::DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
             &self.version, &self.language
         );
-        let request = request::<Value>(&url, &self.client).await;
+        let request = request::<Value, DataDragonError>(
+            url.to_owned(),
+            &self.client,
+            DataDragonError::DataDragonMissing,
+            DataDragonError::CannotConnect,
+        )
+        .await;
         match request {
             Ok(item_json) => {
                 cache.insert(self.language.clone(), item_json.clone()).await;

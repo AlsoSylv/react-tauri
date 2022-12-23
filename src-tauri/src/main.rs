@@ -12,6 +12,7 @@ pub mod errors;
 mod extensions;
 pub mod frontend_types;
 mod logic;
+pub mod templates;
 #[cfg(test)]
 mod tests;
 

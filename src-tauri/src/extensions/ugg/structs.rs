@@ -1,35 +1,3 @@
-use crate::frontend_types::ChampionNames;
-
-/// This is the Data struct for calling various methods from the UGG API
-/// this handles things like getting champ winrates, pickrates, etc, and
-/// should be used in order to reduce the amount of boilerplate garbage
-pub struct Data {
-    pub name: ChampionNames,
-    pub role: String,
-    pub rank: String,
-    pub region: String,
-    pub lang: String,
-}
-
-impl Data {
-    /// Returns a new instance of the Data struct
-    pub fn new(
-        name: ChampionNames,
-        role: String,
-        rank: String,
-        region: String,
-        lang: String,
-    ) -> Self {
-        Data {
-            name,
-            role,
-            rank,
-            region,
-            lang,
-        }
-    }
-}
-
 /// Handles making a new reques for the UGG extension, this should be changed
 /// to pass a barrowed reqwest client instead of using an owned reqwest client
 pub struct UggRequest {
@@ -133,7 +101,7 @@ impl AbilitiesMap {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct AbilitiesValue {
     pub name: String,
-    pub image: String,
+    pub image: Option<String>,
     pub order: Vec<String>,
     pub url: String,
 }
@@ -143,7 +111,18 @@ impl AbilitiesValue {
     pub fn new(name: &str, image: &str, url: String) -> Self {
         AbilitiesValue {
             name: name.to_owned(),
-            image: image.to_owned(),
+            image: Some(image.to_owned()),
+            order: Vec::new(),
+            url,
+        }
+    }
+
+    /// The current fallback system does not work with Community
+    /// Dragon, so the image is null
+    pub fn new_cd(name: &str, url: String) -> Self {
+        AbilitiesValue {
+            name: name.to_owned(),
+            image: None,
             order: Vec::new(),
             url,
         }
@@ -153,7 +132,7 @@ impl AbilitiesValue {
 // Returns the data for the passive
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Passive {
-    pub image: String,
+    pub image: Option<String>,
     pub url: String,
 }
 
@@ -161,9 +140,15 @@ impl Passive {
     /// Returns a new instance of the Passive struct
     pub fn new(image: &str, url: String) -> Self {
         Passive {
-            image: image.to_owned(),
+            image: Some(image.to_owned()),
             url,
         }
+    }
+
+    /// The current fallback system does not work with Community
+    /// Dragon, so the image is null
+    pub fn new_cd(url: String) -> Self {
+        Passive { image: None, url }
     }
 }
 
@@ -193,16 +178,19 @@ pub struct Shard {
     pub id: i64,
     pub image: String,
     pub active: bool,
+    pub description: String,
 }
 
 impl Shard {
     /// Returns a new instance of the Shard struct
-    pub fn create(name: &str, id: i64, image: &str) -> Shard {
+    pub fn new(id: i64, image: &str) -> Shard {
+        let base_url = "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods";
         Shard {
-            name: name.to_string(),
+            name: "".to_string(),
             id,
-            image: image.to_string(),
+            image: format!("{}/{}", &base_url, image),
             active: false,
+            description: "".to_string(),
         }
     }
 }

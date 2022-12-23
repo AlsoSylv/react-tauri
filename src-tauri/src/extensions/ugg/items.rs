@@ -1,8 +1,11 @@
 use serde_json::Value;
 
-use crate::{core::data_dragon, errors};
+use crate::{
+    core::{community_dragon::CommunityDragon, data_dragon},
+    errors,
+};
 
-use data_dragon::structs::DataDragon;
+use data_dragon::DataDragon;
 use errors::ErrorMap;
 
 use super::{constants, structs};
@@ -10,80 +13,131 @@ use super::{constants, structs};
 use constants::DATA;
 use structs::{ItemValues, ItemsMap};
 
-impl structs::Data {
+impl super::Data {
     /// Returns items from the UGG API these can be empty
     pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
-        let data_dragon = DataDragon::new(Some(&self.lang)).await;
-        let mut items_map = ItemsMap::new();
-        let items_array = items_map.as_array_mut();
+        // let data_dragon = DataDragon::new(Some(&self.lang)).await;
+        // let mut items_map = ItemsMap::new();
+        // let items_array = items_map.as_array_mut();
+        match request {
+            Ok(json) => {
+                if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {
+                    if let Ok(items) = data_dragon.item_json().await {
+                        let mut items_map = ItemsMap::new();
+                        let items_array = items_map.as_array_mut();
+                        if let Some(map) = items["data"].as_object() {
+                            for (key, item_data) in map {
+                                let Some(image) = item_data["image"]["full"].as_str() else {
+                                    unreachable!();
+                                };
+                                let Some(name) = item_data["name"].as_str() else {
+                                    unreachable!();
+                                };
+                                let Some(cost) = item_data["gold"]["base"].as_i64() else {
+                                    unreachable!();
+                                };
+                                let Some(description) = item_data["description"].as_str() else {
+                                    unreachable!();
+                                };
+                                let url = format!(
+                                    "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
+                                    &data_dragon.version, &image
+                                );
+                                // TODO: We can get the specific win rates of each of these sets rather easily
+                                let ugg_maps = [
+                                    &json[DATA["starting_items"]][2],
+                                    &json[DATA["mythic_and_core"]][2],
+                                    &json[DATA["other_items"]][0],
+                                    &json[DATA["other_items"]][1],
+                                    &json[DATA["other_items"]][2],
+                                ];
 
-        match data_dragon {
-            Ok(data_dragon) => {
-                let items = data_dragon.item_json().await;
-
-                match request {
-                    Ok(json) => {
-                        match items {
-                            Ok(items) => {
-                                if let Some(map) = items["data"].as_object() {
-                                    for (key, item_data) in map {
-                                        let Some(image) = item_data["image"]["full"].as_str() else {
-                                            unreachable!();
-                                        };
-                                        let Some(name) = item_data["name"].as_str() else {
-                                            unreachable!();
-                                        };
-                                        let Some(cost) = item_data["gold"]["base"].as_i64() else {
-                                            unreachable!();
-                                        };
-                                        let Some(description) = item_data["description"].as_str() else {
-                                            unreachable!();
-                                        };
-                                        let url = format!(
-                                            "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                            &data_dragon.version, &image
-                                        );
-                                        // TODO: We can get the specific win rates of each of these sets rather easily
-                                        let ugg_maps = [
-                                            &json[DATA["starting_items"]][2],
-                                            &json[DATA["mythic_and_core"]][2],
-                                            &json[DATA["other_items"]][0],
-                                            &json[DATA["other_items"]][1],
-                                            &json[DATA["other_items"]][2],
-                                        ];
-
-                                        for n in 0..5 {
-                                            if let Some(current_map) = ugg_maps[n].as_array() {
-                                                current_map.iter().for_each(|y| {
-                                                    if y.is_array()
-                                                        && (&y[0].to_string() == key
-                                                            || &y.to_string() == key)
-                                                    {
-                                                        items_array[n].push(ItemValues::new(
-                                                            name,
-                                                            cost,
-                                                            description,
-                                                            image,
-                                                            &url,
-                                                        ))
-                                                    }
-                                                })
-                                            };
-                                        }
-                                    }
-
-                                    Ok(items_map)
-                                } else {
-                                    unreachable!()
+                                for n in 0..5 {
+                                    if let Some(current_map) = ugg_maps[n].as_array() {
+                                        current_map.iter().for_each(|y| {
+                                            if (y.is_array() && &y[0].to_string() == key)
+                                                || &y.to_string() == key
+                                            {
+                                                items_array[n].push(ItemValues::new(
+                                                    name,
+                                                    cost,
+                                                    description,
+                                                    image,
+                                                    &url,
+                                                ))
+                                            }
+                                        })
+                                    };
                                 }
                             }
-                            Err(err) => Err(ErrorMap::DataDragonErrors(err)),
+
+                            Ok(items_map)
+                        } else {
+                            unreachable!()
                         }
+                    } else {
+                        community_dragon_items(&self.lang, json).await
                     }
-                    Err(err) => Err(err),
+                } else {
+                    community_dragon_items(&self.lang, json).await
                 }
             }
-            Err(err) => Err(ErrorMap::DataDragonErrors(err)),
+            Err(err) => Err(err),
         }
+    }
+}
+
+async fn community_dragon_items(lang: &str, json: Value) -> Result<ItemsMap, ErrorMap> {
+    let community_dragon = CommunityDragon::new(lang);
+    let items = community_dragon.item_json().await;
+    let mut items_map = ItemsMap::new();
+    let items_array = items_map.as_array_mut();
+    match items {
+        Ok(items) => {
+            let ugg_maps = [
+                &json[DATA["starting_items"]][2],
+                &json[DATA["mythic_and_core"]][2],
+                &json[DATA["other_items"]][0],
+                &json[DATA["other_items"]][1],
+                &json[DATA["other_items"]][2],
+            ];
+
+            for x in items {
+                let name = &x.name;
+                let cost = x.price_total;
+                let description = &x.description;
+                let image = &format!("{}.png", x.id);
+                for n in 0..5 {
+                    if let Some(current_map) = ugg_maps[n].as_array() {
+                        current_map.iter().for_each(|y| {
+
+                            let url = |item_path: String| {
+                                let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
+                                if let Some(item_path_pos) = item_path.find("/ASSETS/") {
+                                    let split = item_path.split_at(item_path_pos);
+                                    let url = format!("{}{}", base_url, split.1);
+                                    url.to_lowercase()
+                                } else {
+                                    unreachable!();
+                                }
+                            };
+
+                            if (y.is_array() && y[0] == x.id) || y == x.id
+                            {
+                                items_array[n].push(ItemValues::new(
+                                    name,
+                                    cost,
+                                    description,
+                                    image,
+                                    &url(x.icon_path.clone()),
+                                ))
+                            }
+                        })
+                    };
+                }
+            }
+            Ok(items_map)
+        }
+        Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
     }
 }

@@ -4,8 +4,6 @@ use shaco::rest;
 use crate::errors::LCUResponses;
 
 /// Attempts to push an item set to the client via the LCU API
-/// this will eventually end up wrapped in some form of struct
-/// that handles checking if the LCU is open
 ///
 /// Requires JSON as an argument
 pub async fn push_items_to_client(page: Value) -> Result<LCUResponses, LCUResponses> {

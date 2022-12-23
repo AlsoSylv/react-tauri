@@ -2,6 +2,7 @@ mod champs;
 mod items;
 mod runes;
 mod structs;
+mod summoners;
 
 use moka::future::Cache;
 use once_cell::sync::Lazy;

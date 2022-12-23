@@ -202,3 +202,15 @@ pub struct Items {
     pub price_total: i64,
     pub icon_path: String,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Summoners {
+    pub id: i64,
+    pub name: String,
+    pub description: String,
+    pub summoner_level: i64,
+    pub cooldown: i64,
+    pub game_modes: Vec<String>,
+    pub icon_path: String,
+}

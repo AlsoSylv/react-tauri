@@ -14,7 +14,12 @@ pub async fn names_from_data_dragon(
                 Ok(json) => {
                     for (champ_key, champ) in json.data.iter() {
                         if let Ok(id) = champ.key.parse::<i64>() {
-                            champions.push(ChampionNames::new(&champ.name, champ_key, id, Some(&data_dragon.version)));
+                            champions.push(ChampionNames::new(
+                                &champ.name,
+                                champ_key,
+                                id,
+                                Some(&data_dragon.version),
+                            ));
                         } else {
                             unreachable!()
                         }

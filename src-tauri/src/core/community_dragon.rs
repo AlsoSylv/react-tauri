@@ -6,6 +6,8 @@ mod items;
 mod runes;
 /// Structs to desearalize to
 mod structs;
+/// Package for getting JSON from diffferent summoner spell endpoints
+mod summoners;
 
 /// Struct for getting data from Community Dragon
 ///
@@ -31,7 +33,7 @@ pub struct CommunityDragon {
 
 impl CommunityDragon {
     /// Creates a new reqwest client for data dragon
-    /// Takes a Riot language and translates it to 
+    /// Takes a Riot language and translates it to
     /// A Community Dragon language, prefered over
     /// Using a literal struct.
     pub fn new(lang: &str) -> Self {

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -119,4 +121,52 @@ pub struct ChampionFull {
     pub format: String,
     pub version: String,
     pub data: Value,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Summoners {
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub version: String,
+    pub data: HashMap<String, SummonerSpell>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SummonerSpell {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub tooltip: String,
+    pub maxrank: i64,
+    pub cooldown: Vec<i64>,
+    pub cooldown_burn: String,
+    pub cost: Vec<i64>,
+    pub cost_burn: String,
+    pub datavalues: Option<Value>,
+    pub effect: Vec<Option<Vec<Value>>>,
+    pub effect_burn: Vec<Option<String>>,
+    pub vars: Vec<Value>,
+    pub key: String,
+    pub summoner_level: i64,
+    pub modes: Vec<String>,
+    pub cost_type: String,
+    pub maxammo: String,
+    pub range: Vec<i64>,
+    pub range_burn: String,
+    pub image: Image,
+    pub resource: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Image {
+    pub full: String,
+    pub sprite: String,
+    pub group: String,
+    pub x: i64,
+    pub y: i64,
+    pub w: i64,
+    pub h: i64,
 }

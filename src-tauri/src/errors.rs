@@ -99,6 +99,9 @@ pub enum LCUResponses {
     LCUCreateRune = 403,
     LCUGetRune = 404,
     LCUPushRune = 405,
+    LCUGetSummoner = 406,
+    LCUGetItems = 407,
+    LCUItemsPushedMaybe = 408,
 }
 
 /// Wraps the existing errors inside of an error map to be able

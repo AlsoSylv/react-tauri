@@ -5,14 +5,14 @@ use once_cell::sync::Lazy;
 
 use crate::{errors::DataDragonError, templates::request};
 
-use super::{DataDragon, structs::Summoners};
+use super::{structs::Summoners, DataDragon};
 
 static CACHED_SUMMONERS_JSON: Lazy<Mutex<Cache<String, Summoners>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl DataDragon {
     /// A cached function to get "summoner.json" from DataDragon
-    /// 
+    ///
     /// # Example
     /// ```
     /// let data_dragon = DataDragon::new(None).await.unwrap();
@@ -24,7 +24,10 @@ impl DataDragon {
             return Ok(json.clone());
         };
 
-        let url = format!("http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json", self.version, self.language);
+        let url = format!(
+            "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json",
+            self.version, self.language
+        );
         let request = request::<Summoners, DataDragonError>(
             url.to_owned(),
             &self.client,
@@ -34,7 +37,9 @@ impl DataDragon {
         .await;
         match request {
             Ok(summoners_json) => {
-                cache.insert(self.language.clone(), summoners_json.clone()).await;
+                cache
+                    .insert(self.language.clone(), summoners_json.clone())
+                    .await;
                 cache.sync();
                 Ok(summoners_json)
             }

@@ -1,4 +1,5 @@
 use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_dragon};
+use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
 use crate::errors::{DataDragonError, Errors};
 use crate::extensions::ugg::json::{overview, ranking};
@@ -147,7 +148,7 @@ pub async fn runes_and_abilities(
         Ok((runes, _, _)) => match abilities {
             Ok(abilities) => match shards {
                 Ok(shards) => match items {
-                    Ok(items) => Ok(RunesAndAbilities {
+                    Ok((items, _)) => Ok(RunesAndAbilities {
                         runes,
                         items,
                         abilities,
@@ -180,5 +181,72 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
                 }
             }
         }
+    }
+}
+
+#[tauri::command]
+pub async fn push_items(
+    name: ChampionNames,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<i64, i64> {
+    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let fut_winrate = data.winrate(request);
+    let fut_item_match = data.items(request_2);
+    let (winrate, item_match) = futures::join!(fut_winrate, fut_item_match);
+
+    match item_match {
+        Ok((_, items)) => {
+            let page_name = match winrate {
+                Ok(winrate) => {
+                    format!("{} build {} WR", name.label, winrate)
+                }
+                Err(_) => {
+                    format!("{} build", name.label)
+                }
+            };
+
+            let page = json!(
+                {
+                  "associatedChampions": [
+                    name.label
+                  ],
+                  "blocks": [
+                    {
+                      "items": items.start,
+                      "type": "Starting Items"
+                    },
+                    {
+                        "items": items.core,
+                        "type": "Core Items"
+                    },
+                    {
+                        "items": items.fourth,
+                        "type": "Fourth"
+                    },
+                    {
+                        "items": items.fifth,
+                        "type": "Fifth"
+                    },
+                    {
+                        "items": items.sixth,
+                        "type": "Sixth"
+                    }
+                  ],
+                  "title": page_name,
+                }
+            );
+
+            let result = push_items_to_client(page).await;
+            match result {
+                Ok(ok) => Ok(ok as i64),
+                Err(err) => Err(err as i64),
+            }
+        }
+        Err(err) => Err(i64::from(err)),
     }
 }

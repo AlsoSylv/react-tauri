@@ -75,6 +75,53 @@ impl ItemValues {
     }
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct LCUItemsMap {
+    pub start: Vec<LCUItemsValue>,
+    pub core: Vec<LCUItemsValue>,
+    pub fourth: Vec<LCUItemsValue>,
+    pub fifth: Vec<LCUItemsValue>,
+    pub sixth: Vec<LCUItemsValue>,
+}
+
+impl LCUItemsMap {
+    pub fn new() -> Self {
+        LCUItemsMap {
+            start: Vec::new(),
+            core: Vec::new(),
+            fourth: Vec::new(),
+            fifth: Vec::new(),
+            sixth: Vec::new(),
+        }
+    }
+
+    pub fn as_array_mut(&mut self) -> [&mut Vec<LCUItemsValue>; 5] {
+        [
+            &mut self.start,
+            &mut self.core,
+            &mut self.fourth,
+            &mut self.fifth,
+            &mut self.sixth,
+        ]
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LCUItemsValue {
+    pub id: String,
+    pub count: i64,
+}
+
+impl LCUItemsValue {
+    pub fn new(id: &str) -> Self {
+        LCUItemsValue {
+            id: id.to_owned(),
+            count: 1,
+        }
+    }
+}
+
 /// Abilities map is a struct that contains the passive as well as the abilities
 /// for a specific champion.
 ///

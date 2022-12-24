@@ -29,6 +29,7 @@ async fn main() {
             logic::runes_and_abilities,
             logic::champion_info,
             logic::push_runes,
+            logic::push_items,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

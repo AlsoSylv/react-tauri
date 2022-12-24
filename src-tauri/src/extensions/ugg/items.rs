@@ -8,14 +8,20 @@ use crate::{
 use data_dragon::DataDragon;
 use errors::ErrorMap;
 
-use super::{constants, structs};
+use super::{
+    constants,
+    structs::{self, LCUItemsMap, LCUItemsValue},
+};
 
 use constants::DATA;
 use structs::{ItemValues, ItemsMap};
 
 impl super::Data {
     /// Returns items from the UGG API these can be empty
-    pub async fn items(&self, request: Result<Value, ErrorMap>) -> Result<ItemsMap, ErrorMap> {
+    pub async fn items(
+        &self,
+        request: Result<Value, ErrorMap>,
+    ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
         // let data_dragon = DataDragon::new(Some(&self.lang)).await;
         // let mut items_map = ItemsMap::new();
         // let items_array = items_map.as_array_mut();
@@ -24,6 +30,8 @@ impl super::Data {
                 if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {
                     if let Ok(items) = data_dragon.item_json().await {
                         let mut items_map = ItemsMap::new();
+                        let mut lcu_items_map = LCUItemsMap::new();
+                        let lcu_items_array = lcu_items_map.as_array_mut();
                         let items_array = items_map.as_array_mut();
                         if let Some(map) = items["data"].as_object() {
                             for (key, item_data) in map {
@@ -64,14 +72,16 @@ impl super::Data {
                                                     description,
                                                     image,
                                                     &url,
-                                                ))
+                                                ));
+
+                                                lcu_items_array[n].push(LCUItemsValue::new(key));
                                             }
                                         })
                                     };
                                 }
                             }
 
-                            Ok(items_map)
+                            Ok((items_map, lcu_items_map))
                         } else {
                             unreachable!()
                         }
@@ -87,11 +97,16 @@ impl super::Data {
     }
 }
 
-async fn community_dragon_items(lang: &str, json: Value) -> Result<ItemsMap, ErrorMap> {
+async fn community_dragon_items(
+    lang: &str,
+    json: Value,
+) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
     let community_dragon = CommunityDragon::new(lang);
     let items = community_dragon.item_json().await;
     let mut items_map = ItemsMap::new();
     let items_array = items_map.as_array_mut();
+    let mut lcu_items_map = LCUItemsMap::new();
+    let lcu_items_array = lcu_items_map.as_array_mut();
     match items {
         Ok(items) => {
             let ugg_maps = [
@@ -103,6 +118,7 @@ async fn community_dragon_items(lang: &str, json: Value) -> Result<ItemsMap, Err
             ];
 
             for x in items {
+                let id = x.id;
                 let name = &x.name;
                 let cost = x.price_total;
                 let description = &x.description;
@@ -130,13 +146,15 @@ async fn community_dragon_items(lang: &str, json: Value) -> Result<ItemsMap, Err
                                     description,
                                     image,
                                     &url(x.icon_path.clone()),
-                                ))
+                                ));
+
+                                lcu_items_array[n].push(LCUItemsValue::new(&id.to_string()));
                             }
                         })
                     };
                 }
             }
-            Ok(items_map)
+            Ok((items_map, lcu_items_map))
         }
         Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
     }

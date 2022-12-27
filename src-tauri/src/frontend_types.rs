@@ -1,4 +1,4 @@
-use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards};
+use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards, SummonerSpellInfo};
 
 /// Frontend type for packing data from the ranking JSON into a map
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -132,6 +132,7 @@ pub struct RunesAndAbilities {
     pub items: ItemsMap,
     pub abilities: AbilitiesMap,
     pub shards: Shards,
+    pub spells: SummonerSpellInfo,
 }
 
 /// Struct for passing champion names, and champ values into a JSON map for the frontend

@@ -9,6 +9,7 @@ mod requests;
 mod runes;
 mod shards;
 pub mod structs;
+mod summoners;
 
 /// This is the Data struct for calling various methods from the UGG API
 /// this handles things like getting champ winrates, pickrates, etc, and

@@ -140,20 +140,25 @@ pub async fn runes_and_abilities(
     let fut_runes = data.rune_tuple(request.clone());
     let fut_abilities = data.abilities(request.clone());
     let fut_shards = data.shard_tuple(request.clone());
-    let fut_items = data.items(request);
-    let (runes, abilities, shards, items) =
-        futures::join!(fut_runes, fut_abilities, fut_shards, fut_items,);
+    let fut_items = data.items(request.clone());
+    let fut_spells = data.summoners(request);
+    let (runes, abilities, shards, items, spells) =
+        futures::join!(fut_runes, fut_abilities, fut_shards, fut_items, fut_spells);
 
     match runes {
         Ok((runes, _, _)) => match abilities {
             Ok(abilities) => match shards {
                 Ok(shards) => match items {
-                    Ok((items, _)) => Ok(RunesAndAbilities {
-                        runes,
-                        items,
-                        abilities,
-                        shards,
-                    }),
+                    Ok((items, _)) => match spells {
+                        Ok(spells) => Ok(RunesAndAbilities {
+                            runes,
+                            items,
+                            abilities,
+                            shards,
+                            spells,
+                        }),
+                        Err(err) => Err(i64::from(err)),
+                    },
                     Err(err) => Err(i64::from(err)),
                 },
                 Err(err) => Err(i64::from(err)),

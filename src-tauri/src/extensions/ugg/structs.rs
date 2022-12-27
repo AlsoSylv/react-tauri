@@ -241,3 +241,30 @@ impl Shard {
         }
     }
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SummonerSpellInfo {
+    pub spell_one: Spell,
+    pub spell_two: Spell,
+    pub winrate: String,
+}
+
+impl SummonerSpellInfo {
+    pub fn new(winrate: String) -> Self {
+        SummonerSpellInfo {
+            spell_one: Default::default(),
+            spell_two: Default::default(),
+            winrate,
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Spell {
+    pub name: String,
+    pub description: String,
+    pub url: String,
+    pub local_image: String,
+}

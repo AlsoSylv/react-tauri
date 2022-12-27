@@ -18,27 +18,15 @@ pub trait Errors {
 
 impl Errors for DataDragonError {
     fn is_connection(&self) -> bool {
-        if self == &DataDragonError::CannotConnect {
-            true
-        } else {
-            false
-        }
+        self == &DataDragonError::CannotConnect
     }
 
     fn is_champ_missing(&self) -> bool {
-        if self == &DataDragonError::ChampMissingError {
-            true
-        } else {
-            false
-        }
+        self == &DataDragonError::ChampMissingError
     }
 
     fn is_missing(&self) -> bool {
-        if self == &DataDragonError::DataDragonMissing {
-            true
-        } else {
-            false
-        }
+        self == &DataDragonError::DataDragonMissing
     }
 }
 
@@ -51,27 +39,15 @@ pub enum CommunityDragonError {
 
 impl Errors for CommunityDragonError {
     fn is_connection(&self) -> bool {
-        if self == &CommunityDragonError::CannotConnect {
-            true
-        } else {
-            false
-        }
+        self == &CommunityDragonError::CannotConnect
     }
 
     fn is_missing(&self) -> bool {
-        if self == &CommunityDragonError::CommunityDragonMissing {
-            true
-        } else {
-            false
-        }
+        self == &CommunityDragonError::CommunityDragonMissing
     }
 
     fn is_champ_missing(&self) -> bool {
-        if self == &CommunityDragonError::ChampMissingError {
-            true
-        } else {
-            false
-        }
+        self == &CommunityDragonError::ChampMissingError
     }
 }
 

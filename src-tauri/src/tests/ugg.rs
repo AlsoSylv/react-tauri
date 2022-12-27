@@ -292,3 +292,20 @@ fn abilities_split_test() {
         ]
     )
 }
+
+#[tokio::test]
+async fn summoners_test() {
+    use crate::extensions::ugg::{constants, json};
+    use constants::DATA;
+
+    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
+        let spell_info = &json[DATA["summoner_spells"]];
+        let spells = &spell_info[2];
+        println!("{}", spells);
+        assert!(spells.is_array());
+        assert!(spells[0].is_i64());
+        assert!(spells[1].is_i64());
+    } else {
+        panic!()
+    }
+}

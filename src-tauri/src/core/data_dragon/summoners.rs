@@ -21,7 +21,7 @@ impl DataDragon {
     pub async fn summoners_json(&self) -> Result<Summoners, DataDragonError> {
         let cache = CACHED_SUMMONERS_JSON.lock().await;
         if let Some(json) = cache.get(&self.language) {
-            return Ok(json.clone());
+            return Ok(json);
         };
 
         let url = format!(

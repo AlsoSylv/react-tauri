@@ -15,13 +15,13 @@ function SecondaryRunes(props: SecondaryRunesProps) {
 
   return (
     <Grid container xs={12}>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotOne.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotTwo.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotThree.map(Rune)}
       </Grid>
     </Grid>

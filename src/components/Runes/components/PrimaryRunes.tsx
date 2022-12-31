@@ -14,20 +14,20 @@ function PrimaryRunes(props: PrimaryRunesProps) {
   } = props;
 
   return (
-    <Grid container sm={6}>
-      <Grid container sm={12} justifyContent="center">
+    <Grid container xs={6}>
+      <Grid container xs={12} justifyContent="center">
         {slotOne.map(Rune)}
       </Grid>
-      <Grid sm={12} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <Grid xs={12} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <Divider />
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotTwo.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotThree.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {slotFour.map(Rune)}
       </Grid>
     </Grid>

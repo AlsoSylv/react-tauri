@@ -3,11 +3,10 @@ use crate::{core::helpers, errors, frontend_types};
 use errors::{ErrorMap, UGGDataError};
 use frontend_types::RuneImages;
 use serde_json::Value;
-use ErrorMap::DataDragonErrors;
 
-use super::{constants, structs};
+use super::constants;
 
-impl structs::Data {
+impl super::Data {
     /// Returns runes from the UGG API
     /// this heavily uses mutability to
     /// avoid duplication of variables
@@ -46,7 +45,7 @@ impl structs::Data {
                         }
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
-                    Err(err) => Err(DataDragonErrors(err)),
+                    Err(err) => Err(err),
                 }
             }
             Err(err) => Err(err),

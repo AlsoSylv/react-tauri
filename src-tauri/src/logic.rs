@@ -1,16 +1,18 @@
+use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_dragon};
+use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
-use crate::errors::DataDragonError;
+use crate::errors::{DataDragonError, Errors};
 use crate::extensions::ugg::json::{overview, ranking};
-use crate::frontend_types::{ChampionNames, ChampionValue, RunesAndAbilities};
+use crate::frontend_types::{ChampionNames, RunesAndAbilities};
 use crate::{extensions, frontend_types};
 
-use data_dragon::structs::DataDragon;
+use data_dragon::DataDragon;
 use extensions::ugg;
 use frontend_types::ChampionInfo;
 use serde_json::json;
 
 use lcu::runes::push_runes_to_client;
-use ugg::structs::Data;
+use ugg::Data;
 
 //TODO: This shouldn't fail if something goes wrong, it should just send the values that work
 /// Returns the current pick rate, win rate, ban rate, and tier for each champ as requested by the FE
@@ -138,20 +140,25 @@ pub async fn runes_and_abilities(
     let fut_runes = data.rune_tuple(request.clone());
     let fut_abilities = data.abilities(request.clone());
     let fut_shards = data.shard_tuple(request.clone());
-    let fut_items = data.items(request);
-    let (runes, abilities, shards, items) =
-        futures::join!(fut_runes, fut_abilities, fut_shards, fut_items,);
+    let fut_items = data.items(request.clone());
+    let fut_spells = data.summoners(request);
+    let (runes, abilities, shards, items, spells) =
+        futures::join!(fut_runes, fut_abilities, fut_shards, fut_items, fut_spells);
 
     match runes {
         Ok((runes, _, _)) => match abilities {
             Ok(abilities) => match shards {
                 Ok(shards) => match items {
-                    Ok(items) => Ok(RunesAndAbilities {
-                        runes,
-                        items,
-                        abilities,
-                        shards,
-                    }),
+                    Ok((items, _)) => match spells {
+                        Ok(spells) => Ok(RunesAndAbilities {
+                            runes,
+                            items,
+                            abilities,
+                            shards,
+                            spells,
+                        }),
+                        Err(err) => Err(i64::from(err)),
+                    },
                     Err(err) => Err(i64::from(err)),
                 },
                 Err(err) => Err(i64::from(err)),
@@ -167,37 +174,84 @@ pub async fn runes_and_abilities(
 #[tauri::command]
 pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
-    let data_dragon = DataDragon::new(Some(lang)).await;
-
-    match data_dragon {
-        Ok(data_dragon) => {
-            let champ_json = data_dragon.champion_json().await;
-            match champ_json {
-                Ok(json) => {
-                    for (champ_key, champ) in json.data.iter() {
-                        if let Ok(id) = champ.key.parse::<i64>() {
-                            champions.push(ChampionNames {
-                                label: champ.name.clone(),
-                                value: ChampionValue {
-                                    key: champ_key.to_string(),
-                                    id,
-                                },
-                                url: Some(format!(
-                                  "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                                  &data_dragon.version,
-                                  &champ.id,
-                              )),
-                                local_image: Some(format!("/{0}/{0}.png", &champ.id)),
-                            });
-                        } else {
-                            unreachable!()
-                        }
-                    }
-                    Ok(champions)
+    match names_from_data_dragon(lang, &mut champions).await {
+        Ok(()) => Ok(champions),
+        Err(err) => {
+            if err.is_connection() {
+                Err(err as i64)
+            } else {
+                match names_from_community_dragon(lang, &mut champions).await {
+                    Ok(()) => Ok(champions),
+                    Err(err) => Err(err as i64),
                 }
+            }
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn push_items(
+    name: ChampionNames,
+    role: String,
+    rank: String,
+    region: String,
+    lang: String,
+) -> Result<i64, i64> {
+    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
+    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let fut_winrate = data.winrate(request);
+    let fut_item_match = data.items(request_2);
+    let (winrate, item_match) = futures::join!(fut_winrate, fut_item_match);
+
+    match item_match {
+        Ok((_, items)) => {
+            let page_name = match winrate {
+                Ok(winrate) => {
+                    format!("{} build {} WR", name.label, winrate)
+                }
+                Err(_) => {
+                    format!("{} build", name.label)
+                }
+            };
+
+            let page = json!(
+                {
+                  "associatedChampions": [
+                    name.label
+                  ],
+                  "blocks": [
+                    {
+                      "items": items.start,
+                      "type": "Starting Items"
+                    },
+                    {
+                        "items": items.core,
+                        "type": "Core Items"
+                    },
+                    {
+                        "items": items.fourth,
+                        "type": "Fourth"
+                    },
+                    {
+                        "items": items.fifth,
+                        "type": "Fifth"
+                    },
+                    {
+                        "items": items.sixth,
+                        "type": "Sixth"
+                    }
+                  ],
+                  "title": page_name,
+                }
+            );
+
+            let result = push_items_to_client(page).await;
+            match result {
+                Ok(ok) => Ok(ok as i64),
                 Err(err) => Err(err as i64),
             }
         }
-        Err(err) => Err(err as i64),
+        Err(err) => Err(i64::from(err)),
     }
 }

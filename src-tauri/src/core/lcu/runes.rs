@@ -4,8 +4,6 @@ use shaco::rest;
 use crate::errors::LCUResponses;
 
 /// Attempts to push runes to the LoL Client Via the LCU API
-/// this will eventually end up wrapped in some sort of struct
-/// that handles checking if the LCU exists
 ///
 /// Requires JSON as an argument
 pub async fn push_runes_to_client(page: Value) -> Result<LCUResponses, LCUResponses> {

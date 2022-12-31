@@ -1,4 +1,4 @@
-use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards};
+use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards, SummonerSpellInfo};
 
 /// Frontend type for packing data from the ranking JSON into a map
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -132,6 +132,7 @@ pub struct RunesAndAbilities {
     pub items: ItemsMap,
     pub abilities: AbilitiesMap,
     pub shards: Shards,
+    pub spells: SummonerSpellInfo,
 }
 
 /// Struct for passing champion names, and champ values into a JSON map for the frontend
@@ -142,6 +143,24 @@ pub struct ChampionNames {
     pub value: ChampionValue,
     pub url: Option<String>,
     pub local_image: Option<String>,
+}
+
+impl ChampionNames {
+    pub fn new(label: &str, key: &str, id: i64, version: Option<&str>) -> Self {
+        let url = match version {
+            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png", version, key),
+            None => format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/{}.png", id),
+        };
+        ChampionNames {
+            label: label.to_owned(),
+            value: ChampionValue {
+                key: key.to_owned(),
+                id,
+            },
+            url: Some(url),
+            local_image: Some(format!("/{0}/{0}.png", key)),
+        }
+    }
 }
 
 /// A map containing the champions Key and Id

@@ -1,63 +1,8 @@
+use std::collections::HashMap;
+
 use linked_hash_map::LinkedHashMap;
-use moka::future::Cache;
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::sync::Mutex;
-
-use super::templates::request;
-use crate::errors::DataDragonError;
-
-/// A new struct for getting data from Data Dragon
-pub struct DataDragon {
-    pub version: String,
-    pub language: String,
-    pub client: reqwest::Client,
-}
-
-/// Version Cache
-///
-/// TODO: Figure out a timing system
-/// Does not need to invalidate on lang change
-static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
-
-impl DataDragon {
-    /// A cached function to generate a new http client for Data Dragon
-    /// this also gives a version string as a result, and can fail creation
-    /// if there is no internet connection available
-    ///
-    /// # Examples
-    /// ```
-    /// let data_dragon = DataDragon::new(None).await;
-    /// ```
-    pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let lang = language.unwrap_or("en_US");
-
-        let client = reqwest::Client::new();
-        let cache = CACHED_VERSION.lock().await;
-        if let Some(cache) = cache.get("version") {
-            return Ok(DataDragon {
-                version: cache,
-                language: lang.to_string(),
-                client,
-            });
-        }
-        let url = "https://ddragon.leagueoflegends.com/api/versions.json";
-        let request = request::<Vec<String>>(url, &client).await;
-        match request {
-            Ok(json) => {
-                let version = json[0].clone();
-                cache.insert("version".to_string(), version.clone()).await;
-                Ok(DataDragon {
-                    version,
-                    language: lang.to_string(),
-                    client,
-                })
-            }
-            Err(err) => Err(err),
-        }
-    }
-}
 
 /// Serialize `runesReforged.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -176,4 +121,52 @@ pub struct ChampionFull {
     pub format: String,
     pub version: String,
     pub data: Value,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Summoners {
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub version: String,
+    pub data: HashMap<String, SummonerSpell>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SummonerSpell {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub tooltip: String,
+    pub maxrank: i64,
+    pub cooldown: Vec<i64>,
+    pub cooldown_burn: String,
+    pub cost: Vec<i64>,
+    pub cost_burn: String,
+    pub datavalues: Option<Value>,
+    pub effect: Vec<Option<Vec<Value>>>,
+    pub effect_burn: Vec<Option<String>>,
+    pub vars: Vec<Value>,
+    pub key: String,
+    pub summoner_level: i64,
+    pub modes: Vec<String>,
+    pub cost_type: String,
+    pub maxammo: String,
+    pub range: Vec<i64>,
+    pub range_burn: String,
+    pub image: Image,
+    pub resource: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Image {
+    pub full: String,
+    pub sprite: String,
+    pub group: String,
+    pub x: i64,
+    pub y: i64,
+    pub w: i64,
+    pub h: i64,
 }

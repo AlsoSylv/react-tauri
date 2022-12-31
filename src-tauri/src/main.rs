@@ -12,6 +12,7 @@ pub mod errors;
 mod extensions;
 pub mod frontend_types;
 mod logic;
+pub mod templates;
 #[cfg(test)]
 mod tests;
 
@@ -28,6 +29,7 @@ async fn main() {
             logic::runes_and_abilities,
             logic::champion_info,
             logic::push_runes,
+            logic::push_items,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

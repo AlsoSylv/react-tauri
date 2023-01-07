@@ -37,33 +37,21 @@ pub async fn champion_info(
         futures::join!(fut_winrate, fut_pickrate, fut_banrate, fut_tier,);
 
     match data_dragon {
-        Ok(data_dragon) => match winrate {
-            Ok(win_rate) => match pickrate {
-                Ok(pick_rate) => match banrate {
-                    Ok(ban_rate) => {
-                        let url = format!(
-                            "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
-                            &data_dragon.version, &name.value.key
-                        );
-                        let local_image = format!("/{0}/{0}.png", &name.value.key);
-                        match tier {
-                            Ok(tier) => Ok(ChampionInfo {
-                                url,
-                                local_image,
-                                win_rate,
-                                pick_rate,
-                                ban_rate,
-                                tier,
-                            }),
-                            Err(err) => Err(i64::from(err)),
-                        }
-                    }
-                    Err(err) => Err(i64::from(err)),
-                },
-                Err(err) => Err(i64::from(err)),
-            },
-            Err(err) => Err(i64::from(err)),
-        },
+        Ok(data_dragon) => {
+            let url = format!(
+                "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
+                &data_dragon.version, &name.value.key
+            );
+            let local_image = format!("/{0}/{0}.png", &name.value.key);
+            Ok(ChampionInfo {
+                url,
+                local_image,
+                win_rate: winrate.map_err(i64::from),
+                pick_rate: pickrate.map_err(i64::from),
+                ban_rate: banrate.map_err(i64::from),
+                tier: tier.map_err(i64::from),
+            })
+        }
         Err(err) => Err(err as i64),
     }
 }
@@ -145,28 +133,24 @@ pub async fn runes_and_abilities(
     let (runes, abilities, shards, items, spells) =
         futures::join!(fut_runes, fut_abilities, fut_shards, fut_items, fut_spells);
 
-    match runes {
-        Ok((runes, _, _)) => match abilities {
-            Ok(abilities) => match shards {
-                Ok(shards) => match items {
-                    Ok((items, _)) => match spells {
-                        Ok(spells) => Ok(RunesAndAbilities {
-                            runes,
-                            items,
-                            abilities,
-                            shards,
-                            spells,
-                        }),
-                        Err(err) => Err(i64::from(err)),
-                    },
-                    Err(err) => Err(i64::from(err)),
-                },
-                Err(err) => Err(i64::from(err)),
-            },
+    let shards = match shards {
+        Ok(shards) => Ok(shards),
+        Err(err) => Err(i64::from(err)),
+    };
+
+    Ok(RunesAndAbilities {
+        runes: match runes {
+            Ok((obj, _, _)) => Ok(obj),
             Err(err) => Err(i64::from(err)),
         },
-        Err(err) => Err(i64::from(err)),
-    }
+        items: match items {
+            Ok((obj, _)) => Ok(obj),
+            Err(err) => Err(i64::from(err)),
+        },
+        abilities: abilities.map_err(i64::from),
+        shards: shards.map_err(i64::from),
+        spells: spells.map_err(i64::from),
+    })
 }
 
 /// Generates a list of all champion names, IDs, Keys, URLs, and a local image

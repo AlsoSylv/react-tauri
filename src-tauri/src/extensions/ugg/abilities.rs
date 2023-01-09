@@ -3,7 +3,7 @@ use serde_json::Value;
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon},
     errors,
-    frontend_types::{AbilitiesMap, AbilitiesValue, Passive}
+    frontend_types::{AbilitiesMap, AbilitiesValue, Passive},
 };
 
 use data_dragon::DataDragon;

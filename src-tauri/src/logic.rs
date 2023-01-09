@@ -2,7 +2,6 @@ use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_
 use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
 use crate::errors::{DataDragonError, Errors};
-use crate::extensions::ugg::json::{overview, ranking};
 use crate::frontend_types::{ChampionNames, RunesAndAbilities};
 use crate::{extensions, frontend_types};
 
@@ -23,10 +22,17 @@ pub async fn champion_info(
     region: String,
     lang: String,
 ) -> Result<ChampionInfo, i64> {
-    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
+    // let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
     let data_dragon = DataDragon::new(Some(&lang)).await;
 
-    let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let data = Data::new(
+        name.clone(),
+        role.clone(),
+        rank.clone(),
+        region.clone(),
+        lang.clone(),
+    );
+    let request = data.ranking().await;
     let fut_winrate = data.winrate(request.clone());
     let fut_pickrate = data.pick_rate(request.clone());
     let fut_banrate = data.ban_rate(request.clone());
@@ -65,9 +71,9 @@ pub async fn push_runes(
     region: String,
     lang: String,
 ) -> Result<i64, i64> {
-    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
-    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let request = data.ranking().await;
+    let request_2 = data.overview().await;
     let fut_winrate = data.winrate(request);
     let fut_rune_match = data.rune_tuple(request_2);
     let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
@@ -121,8 +127,8 @@ pub async fn runes_and_abilities(
     region: String,
     lang: String,
 ) -> Result<RunesAndAbilities, i64> {
-    let request = overview(&name.value.id, &role, &rank, &region, &lang).await;
     let data = Data::new(name, role, rank, region, lang);
+    let request = data.overview().await;
     let fut_runes = data.rune_tuple(request.clone());
     let fut_abilities = data.abilities(request.clone());
     let fut_shards = data.shard_tuple(request.clone());
@@ -179,9 +185,9 @@ pub async fn push_items(
     region: String,
     lang: String,
 ) -> Result<i64, i64> {
-    let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
-    let request_2 = overview(&name.value.id, &role, &rank, &region, &lang).await;
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
+    let request = data.ranking().await;
+    let request_2 = data.overview().await;
     let fut_winrate = data.winrate(request);
     let fut_item_match = data.items(request_2);
     let (winrate, item_match) = futures::join!(fut_winrate, fut_item_match);

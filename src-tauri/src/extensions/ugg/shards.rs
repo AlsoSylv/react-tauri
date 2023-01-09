@@ -1,6 +1,10 @@
 use serde_json::Value;
 
-use crate::{core::community_dragon::CommunityDragon, errors, frontend_types::{Shards, Shard}};
+use crate::{
+    core::community_dragon::CommunityDragon,
+    errors,
+    frontend_types::{Shard, Shards},
+};
 use errors::{ErrorMap, UGGDataError};
 
 use super::constants;

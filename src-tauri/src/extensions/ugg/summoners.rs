@@ -3,13 +3,10 @@ use serde_json::Value;
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon::DataDragon},
     errors::{ErrorMap, Errors},
-    frontend_types::{SummonerSpellInfo, Spell},
+    frontend_types::{Spell, SummonerSpellInfo},
 };
 
-use super::{
-    constants::DATA,
-    Data,
-};
+use super::{constants::DATA, Data};
 
 impl Data {
     pub async fn summoners(

@@ -1,3 +1,17 @@
+use once_cell::sync::Lazy;
+
+use crate::{extensions::ugg::Data, frontend_types::ChampionNames};
+
+static UGGDATA: Lazy<Data> = Lazy::new(|| {
+    Data::new(
+        ChampionNames::new("", "", 498, None),
+        "ADC".to_owned(),
+        "Platinum Plus".to_owned(),
+        "World".to_owned(),
+        "en_US".to_owned(),
+    )
+});
+
 #[tokio::test]
 async fn champ_basic_test() {
     use crate::core::community_dragon::CommunityDragon;
@@ -85,13 +99,13 @@ async fn sort_test() {
 #[tokio::test]
 async fn community_dragon_item_test() {
     use crate::core::community_dragon::CommunityDragon;
-    use crate::extensions::ugg::{constants, json};
+    use crate::extensions::ugg::constants;
     use crate::{frontend_types::ItemValues, frontend_types::ItemsMap};
     use constants::DATA;
 
     let lang = "en_US";
 
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
+    if let Ok(json) = UGGDATA.overview().await {
         let community_dragon = CommunityDragon::new(lang);
         let items = community_dragon.item_json().await;
         let mut items_map = ItemsMap::new();

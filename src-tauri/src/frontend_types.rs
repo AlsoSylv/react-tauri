@@ -57,7 +57,6 @@ impl LCUItemsValue {
     }
 }
 
-
 /// Returns a map of arrays of Shards
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -128,7 +127,6 @@ pub struct Spell {
     pub local_image: String,
 }
 
-
 /// Returns the different item sets in the form of a JSON map for the frontend
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ItemsMap {
@@ -185,7 +183,6 @@ impl ItemValues {
         }
     }
 }
-
 
 /// Abilities map is a struct that contains the passive as well as the abilities
 /// for a specific champion.

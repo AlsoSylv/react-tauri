@@ -67,7 +67,7 @@ impl Index<&str> for Regions {
             "Turkey" => &self.turkey,
             "Japan" => &self.japan,
             "World" => &self.world,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }
@@ -122,7 +122,7 @@ impl Index<&str> for Tiers {
             "Diamond Plus" => &self.diamond_plus,
             "Diamond 2 Plus" => &self.diamond_two_plus,
             "Platinum Plus" => &self.platinum_plus,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }
@@ -138,7 +138,7 @@ pub struct Roles {
     #[serde(rename = "3")]
     pub adc: Option<Value>,
     #[serde(rename = "2")]
-    pub support: Option<Value>
+    pub support: Option<Value>,
 }
 
 impl Index<&str> for Roles {

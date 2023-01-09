@@ -1,15 +1,15 @@
 use crate::extensions::ugg::structs::{AbilitiesMap, ItemsMap, Shards, SummonerSpellInfo};
 
 /// Frontend type for packing data from the ranking JSON into a map
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
     pub url: String,
     pub local_image: String,
-    pub win_rate: String,
-    pub pick_rate: String,
-    pub ban_rate: String,
-    pub tier: i64,
+    pub win_rate: Result<String, i64>,
+    pub pick_rate: Result<String, i64>,
+    pub ban_rate: Result<String, i64>,
+    pub tier: Result<String, i64>,
 }
 
 /// Map to display runes in the same way that U.GG and the LoL client do
@@ -125,14 +125,14 @@ impl Active {
 }
 
 /// Struct for packing runes, items, abilities, etc, into a JSON map for the frontend
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunesAndAbilities {
-    pub runes: RuneImages,
-    pub items: ItemsMap,
-    pub abilities: AbilitiesMap,
-    pub shards: Shards,
-    pub spells: SummonerSpellInfo,
+    pub runes: Result<RuneImages, i64>,
+    pub items: Result<ItemsMap, i64>,
+    pub abilities: Result<AbilitiesMap, i64>,
+    pub shards: Result<Shards, i64>,
+    pub spells: Result<SummonerSpellInfo, i64>,
 }
 
 /// Struct for passing champion names, and champ values into a JSON map for the frontend

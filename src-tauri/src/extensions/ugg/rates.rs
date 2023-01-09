@@ -89,18 +89,18 @@ impl super::Data {
         }
     }
 
-    /// This currently returns the characters rank as an int,
-    /// but this will change in the future and will be a string of
-    /// "{} / {}" rank, total_rank
-    /// and will return a ? if it is not ranked
-    pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
+    /// Returns the tier from the UGG API, errors if it is None
+    pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                //TODO: Return as rank/total-rank instead of just rank
                 let Some(rank) = json[STATS["rank"]].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
-                Ok(rank)
+                let Some(total_rank) = json[STATS["total_rank"]].as_i64() else {
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
+                };
+
+                Ok(format!("{} / {}", rank, total_rank))
             }
             Err(err) => Err(err),
         }

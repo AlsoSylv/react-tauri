@@ -56,6 +56,9 @@ impl Data {
                     if let Some(json_read) = &overview[&self.region] {
                         if let Some(json_read) = &json_read[&self.rank] {
                             if let Some(json_read) = &json_read[&role] {
+                                // The zero is here because the only other data here is 
+                                // The time that it was last updated, and u.gg doesn't
+                                // show that data anyways
                                 Ok(json_read[0].clone())
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))

@@ -3,7 +3,7 @@ use phf::{phf_map, phf_ordered_map};
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
 
-//TODO: These need to support translations somehow, ideally automatically
+// TODO: These need to support translations somehow, ideally automatically
 
 /// A list of different regions for LoL in the form of an ordered map to send to the FE
 /// this will be changed in the future to be a function that returns a list based

@@ -9,7 +9,7 @@ pub struct ChampionInfo {
     pub win_rate: Result<String, i64>,
     pub pick_rate: Result<String, i64>,
     pub ban_rate: Result<String, i64>,
-    pub tier: Result<i64, i64>,
+    pub tier: Result<String, i64>,
 }
 
 /// Map to display runes in the same way that U.GG and the LoL client do

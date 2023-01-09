@@ -22,9 +22,6 @@ impl super::Data {
         &self,
         request: Result<Value, ErrorMap>,
     ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
-        // let data_dragon = DataDragon::new(Some(&self.lang)).await;
-        // let mut items_map = ItemsMap::new();
-        // let items_array = items_map.as_array_mut();
         match request {
             Ok(json) => {
                 if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {

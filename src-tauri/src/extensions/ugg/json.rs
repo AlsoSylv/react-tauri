@@ -6,7 +6,7 @@ use errors::ErrorMap;
 
 use super::{constants, structs};
 
-use constants::{REGIONS, ROLES, TIERS};
+use constants::ROLES;
 use structs::UggRequest;
 
 /// This handles accessing JSON for the champ, specifically for things like it's win rate
@@ -27,9 +27,19 @@ pub async fn ranking(
         Ok(ranking) => {
             match role {
                 Ok(role) => {
-                    // TODO: Check keys before reading, this can cause errors
-                    let json_read: &Value = &ranking[REGIONS[region]][TIERS[rank]][&role];
-                    Ok(json_read.to_owned())
+                    if let Some(json_read) = &ranking[region] {
+                        if let Some(json_read) = &json_read[rank] {
+                            if let Some(json_read) = &json_read[&role] {
+                                return Ok(json_read.clone());
+                            } else {
+                                return Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND));
+                            }
+                        } else {
+                            return Err(ErrorMap::UGGError(errors::UGGDataError::RankHND));
+                        }
+                    } else {
+                        return Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND));
+                    }
                 }
                 Err(err) => Err(err),
             }
@@ -57,9 +67,19 @@ pub async fn overview(
         Ok(overview) => {
             match role {
                 Ok(role) => {
-                    // TODO: Check keys before reading, this can cause errors
-                    let json_read: &Value = &overview[REGIONS[region]][TIERS[rank]][&role][0];
-                    Ok(json_read.to_owned())
+                    if let Some(json_read) = &overview[region] {
+                        if let Some(json_read) = &json_read[rank] {
+                            if let Some(json_read) = &json_read[&role] {
+                                return Ok(json_read[0].clone());
+                            } else {
+                                return Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND));
+                            }
+                        } else {
+                            return Err(ErrorMap::UGGError(errors::UGGDataError::RankHND));
+                        }
+                    } else {
+                        return Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND));
+                    }
                 }
                 Err(err) => Err(err),
             }

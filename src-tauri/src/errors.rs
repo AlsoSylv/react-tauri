@@ -64,6 +64,9 @@ pub enum UGGDataError {
     NoAbilityOrder = 207,
     RateError = 205,
     MatchesError = 206,
+    RegionHND = 210,
+    RankHND = 211,
+    RoleHND = 212,
 }
 
 /// Returns specific errors for the LCU support, such as bing unable

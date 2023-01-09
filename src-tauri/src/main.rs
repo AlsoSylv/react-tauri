@@ -3,9 +3,13 @@
     windows_subsystem = "windows"
 )]
 
+use std::collections::HashMap;
+
 use extensions::ugg::constants;
 
 use constants::{REGIONS, ROLES, TIERS};
+use serde_json::Value;
+use once_cell::sync::Lazy;
 
 mod core;
 pub mod errors;
@@ -64,4 +68,15 @@ fn regions() -> Vec<String> {
         regions.push(key.to_string());
     }
     regions
+}
+
+pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
+    let json = include_str!("translation.json");
+    serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
+});
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Translations {
+    pub roles: Vec<Value>,
 }

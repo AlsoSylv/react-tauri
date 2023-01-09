@@ -62,6 +62,8 @@ pub static DATA: phf::Map<&'static str, usize> = phf_map! {
     "mythic_and_core" => 3,
     "abilities" => 4,
     "other_items" => 5,
+    "winrate" => 6,
+    "false" => 7,
     "shards" => 8,
 };
 

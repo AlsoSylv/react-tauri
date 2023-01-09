@@ -3,7 +3,7 @@ use crate::frontend_types::ChampionNames;
 mod abilities;
 pub mod constants;
 mod items;
-pub mod json;
+mod json;
 mod rates;
 mod requests;
 mod runes;

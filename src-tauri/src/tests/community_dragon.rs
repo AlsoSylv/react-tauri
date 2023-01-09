@@ -85,7 +85,8 @@ async fn sort_test() {
 #[tokio::test]
 async fn community_dragon_item_test() {
     use crate::core::community_dragon::CommunityDragon;
-    use crate::extensions::ugg::{constants, json, structs::ItemValues, structs::ItemsMap};
+    use crate::extensions::ugg::{constants, json};
+    use crate::{frontend_types::ItemValues, frontend_types::ItemsMap};
     use constants::DATA;
 
     let lang = "en_US";

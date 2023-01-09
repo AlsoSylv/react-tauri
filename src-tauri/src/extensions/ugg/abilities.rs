@@ -3,6 +3,7 @@ use serde_json::Value;
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon},
     errors,
+    frontend_types::{AbilitiesMap, AbilitiesValue, Passive}
 };
 
 use data_dragon::DataDragon;
@@ -10,10 +11,9 @@ use errors::{DataDragonError, ErrorMap, UGGDataError};
 
 use ErrorMap::{DataDragonErrors, UGGError};
 
-use super::{constants, structs};
+use super::constants;
 
 use constants::DATA;
-use structs::{AbilitiesMap, AbilitiesValue, Passive};
 
 impl super::Data {
     /// Returns abilities from the UGG API

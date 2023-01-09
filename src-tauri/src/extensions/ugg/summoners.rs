@@ -3,11 +3,11 @@ use serde_json::Value;
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon::DataDragon},
     errors::{ErrorMap, Errors},
+    frontend_types::{SummonerSpellInfo, Spell},
 };
 
 use super::{
     constants::DATA,
-    structs::{Spell, SummonerSpellInfo},
     Data,
 };
 

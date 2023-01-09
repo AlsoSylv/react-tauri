@@ -10,7 +10,7 @@ use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;
 use ErrorMap::DataDragonErrors;
 
-use super::constants::Regions;
+use super::structs::Regions;
 
 static CACHED_DEFAULT_ROLE: Lazy<Mutex<HashMap<String, Vec<i64>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));

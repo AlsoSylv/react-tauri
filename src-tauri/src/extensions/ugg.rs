@@ -8,7 +8,7 @@ mod rates;
 mod requests;
 mod runes;
 mod shards;
-pub mod structs;
+mod structs;
 mod summoners;
 
 /// This is the Data struct for calling various methods from the UGG API

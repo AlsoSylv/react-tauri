@@ -1,12 +1,11 @@
 use serde_json::Value;
 
-use crate::{core::community_dragon::CommunityDragon, errors};
+use crate::{core::community_dragon::CommunityDragon, errors, frontend_types::{Shards, Shard}};
 use errors::{ErrorMap, UGGDataError};
 
-use super::{constants, structs};
+use super::constants;
 
 use constants::DATA;
-use structs::{Shard, Shards};
 
 impl super::Data {
     /// Returns stat shards from the UGG API

@@ -3,18 +3,15 @@ use serde_json::Value;
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon},
     errors,
+    frontend_types::{ItemValues, ItemsMap, LCUItemsMap, LCUItemsValue},
 };
 
 use data_dragon::DataDragon;
 use errors::ErrorMap;
 
-use super::{
-    constants,
-    structs::{self, LCUItemsMap, LCUItemsValue},
-};
+use super::constants;
 
 use constants::DATA;
-use structs::{ItemValues, ItemsMap};
 
 impl super::Data {
     /// Returns items from the UGG API these can be empty

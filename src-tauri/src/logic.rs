@@ -25,13 +25,7 @@ pub async fn champion_info(
     // let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
     let data_dragon = DataDragon::new(Some(&lang)).await;
 
-    let data = Data::new(
-        name.clone(),
-        role.clone(),
-        rank.clone(),
-        region.clone(),
-        lang.clone(),
-    );
+    let data = Data::new(name.clone(), role, rank, region, lang);
     let request = data.ranking().await;
     let fut_winrate = data.winrate(request.clone());
     let fut_pickrate = data.pick_rate(request.clone());

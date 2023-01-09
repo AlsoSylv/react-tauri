@@ -71,7 +71,7 @@ pub static STATS: phf::Map<&'static str, usize> = phf_map! {
     "matches" => 1,
     "rank" => 2,
     "total_rank" => 3,
-    // ?????????????
+    // The stuff inbetween here seems worthless!
     "bans" => 10,
     "total_matches" => 11,
     "matchups" => 12, /* 2D Array, [0] = champion_id, [1] = loses, [2] = matches */

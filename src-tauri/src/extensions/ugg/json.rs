@@ -57,7 +57,7 @@ pub async fn overview(
         Ok(overview) => {
             match role {
                 Ok(role) => {
-                    //TODO: Check keys before reading, this can cause errors
+                    // TODO: Check keys before reading, this can cause errors
                     let json_read: &Value = &overview[REGIONS[region]][TIERS[rank]][&role][0];
                     Ok(json_read.to_owned())
                 }

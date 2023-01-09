@@ -9,7 +9,7 @@ use super::constants;
 use constants::STATS;
 
 impl super::Data {
-    //The format is used here to get an exact result from the floating point math
+    // The format is used here to get an exact result from the floating point math
 
     /// Returns the win rate from the UGG API, errors if it is None
     ///

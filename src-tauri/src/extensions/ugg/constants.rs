@@ -3,7 +3,7 @@ use phf::{phf_map, phf_ordered_map};
 // These are used in the U.GG JSON to map the value to the human readable name
 // This is done for the purpose of code readability, as well as sanity.
 
-//TODO: These need to support translations somehow, ideally automatically
+// TODO: These need to support translations somehow, ideally automatically
 
 /// A list of different regions for LoL in the form of an ordered map to send to the FE
 /// this will be changed in the future to be a function that returns a list based
@@ -22,6 +22,36 @@ pub static REGIONS: phf::OrderedMap<&'static str, &'static str> = phf_ordered_ma
     "Turkey" => "10",
     "Japan" => "11",
 };
+
+/* 
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Tiers {
+    #[serde_rename("1")]
+    pub north_america: Tiers
+    #[serde_rename("2")]
+    pub eu_west: Tiers
+    #[serde_rename("3")]
+    pub korea: Tiers
+    #[serde_rename("4")]
+    pub eu_north: Tiers
+    #[serde_rename("5")]
+    pub brazil: Tiers
+    #[serde_rename("6")]
+    pub la_north: Tiers
+    #[serde_rename("7")]
+    pub la_south: Tiers
+    #[serde_rename("8")]
+    pub oce: Tiers
+    #[serde_rename("9")]
+    pub russia: Tiers
+    #[serde_rename("10")]
+    pub turkey: Tiers
+    #[serde_rename("11")]
+    pub japan: Tiers
+    #[serde_rename("12")]
+    pub world: Tiers
+}
+ */
 
 /// A list of different ranks for LoL in the form of an ordered map to send to the FE
 /// this will be changed in the future to be a function that returns a list based

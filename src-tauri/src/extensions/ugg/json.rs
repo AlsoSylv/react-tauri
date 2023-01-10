@@ -1,19 +1,19 @@
-use serde_json::Value;
-
 use crate::errors;
 
 use errors::ErrorMap;
 
-use super::{constants, structs, Data};
+use super::{
+    structs::{self, Overview, Ranking},
+    Data,
+};
 
-use constants::ROLES;
 use structs::UggRequest;
 
 impl Data {
     /// This handles accessing JSON for the champ, specifically for things like it's win rate
     /// this is important because it handles key checking, which will need to get more
     /// intense in the future
-    pub async fn ranking(&self) -> Result<Value, ErrorMap> {
+    pub async fn ranking(&self) -> Result<Ranking, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
         let fut_request = ugg.ranking_json();
         let fut_role = position(&self.name.value.id, &self.role, &self.lang);
@@ -44,7 +44,7 @@ impl Data {
     /// This handles accessing JSON for the champ, specifically for
     /// things such as runes and items, this is important because
     /// it handles error catching, which will get more intense
-    pub async fn overview(&self) -> Result<Value, ErrorMap> {
+    pub async fn overview(&self) -> Result<Overview, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
         let fut_request = ugg.overview_json();
         let fut_role = position(&self.name.value.id, &self.role, &self.lang);
@@ -56,10 +56,10 @@ impl Data {
                     if let Some(json_read) = &overview[&self.region] {
                         if let Some(json_read) = &json_read[&self.rank] {
                             if let Some(json_read) = &json_read[&role] {
-                                // The zero is here because the only other data here is 
+                                // The zero is here because the only other data here is
                                 // The time that it was last updated, and u.gg doesn't
                                 // show that data anyways
-                                Ok(json_read[0].clone())
+                                Ok(json_read.overview.clone())
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
                             }
@@ -87,7 +87,14 @@ async fn position(name: &i64, role: &str, lang: &str) -> Result<String, ErrorMap
             Err(err) => Err(err),
         }
     } else {
-        let role: &str = ROLES[role];
+        let role: &str = match role {
+            "Top" => "4",
+            "Jungle" => "1",
+            "Mid" => "5",
+            "ADC" => "3",
+            "Support" => "2",
+            _ => unreachable!(),
+        };
         Ok(role.to_string())
     }
 }

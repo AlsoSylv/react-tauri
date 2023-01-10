@@ -5,9 +5,6 @@
 
 use std::collections::HashMap;
 
-use extensions::ugg::constants;
-
-use constants::ROLES;
 use linked_hash_map::LinkedHashMap;
 use once_cell::sync::Lazy;
 
@@ -46,13 +43,8 @@ async fn main() {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn roles() -> Vec<String> {
-    let mut roles = Vec::new();
-    roles.push("Default".to_string());
-    for (key, _value) in &ROLES {
-        roles.push(key.to_string());
-    }
-    roles
+fn roles() -> Vec<&'static str> {
+    vec!["Default", "Top", "Jungle", "Mid", "ADC", "Support"]
 }
 
 /// Generates a list and sends it to the front end
@@ -67,7 +59,7 @@ fn regions(lang: &str) -> LinkedHashMap<String, String> {
     get_translatiosn(lang).regions
 }
 
-fn get_translatiosn(lang: &str) -> Translations {
+pub fn get_translatiosn(lang: &str) -> Translations {
     if let Some(translation) = TRANSLATIONS.get(lang) {
         translation.clone()
     } else {
@@ -79,5 +71,5 @@ fn get_translatiosn(lang: &str) -> Translations {
 #[serde(rename_all = "camelCase")]
 pub struct Translations {
     pub regions: LinkedHashMap<String, String>,
-    pub ranks: LinkedHashMap<String, String>
+    pub ranks: LinkedHashMap<String, String>,
 }

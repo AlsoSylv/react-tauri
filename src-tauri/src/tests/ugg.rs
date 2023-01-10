@@ -14,21 +14,16 @@ static UGGDATA: Lazy<Data> = Lazy::new(|| {
 
 #[tokio::test]
 async fn ranking_structure_test() {
-    if let Ok(json) = UGGDATA.ranking().await {
-        println!("{:#?}", json);
-        assert!(json.is_array());
-    } else {
-        panic!()
-    };
+    match UGGDATA.ranking().await {
+        Ok(_) => (),
+        Err(err) => panic!("{:?}", err),
+    }
 }
 
 #[tokio::test]
 async fn wins_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["wins"]].is_i64());
+        assert!(json.wins.is_i64());
     } else {
         panic!()
     };
@@ -36,11 +31,8 @@ async fn wins_test() {
 
 #[tokio::test]
 async fn matches_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["matches"]].is_i64());
+        assert!(json.matches.is_i64());
     } else {
         panic!()
     };
@@ -48,11 +40,8 @@ async fn matches_test() {
 
 #[tokio::test]
 async fn rank_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["rank"]].is_i64());
+        assert!(json.rank.is_i64());
     } else {
         panic!()
     };
@@ -60,11 +49,8 @@ async fn rank_test() {
 
 #[tokio::test]
 async fn total_rank_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["total_rank"]].is_i64());
+        assert!(json.total_rank.is_i64());
     } else {
         panic!()
     };
@@ -72,11 +58,8 @@ async fn total_rank_test() {
 
 #[tokio::test]
 async fn bans_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["bans"]].is_i64());
+        assert!(json.bans.is_i64());
     } else {
         panic!()
     };
@@ -84,11 +67,8 @@ async fn bans_test() {
 
 #[tokio::test]
 async fn total_matches_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["total_matches"]].is_f64());
+        assert!(json.total_matches.is_f64());
     } else {
         panic!()
     };
@@ -96,11 +76,8 @@ async fn total_matches_test() {
 
 #[tokio::test]
 async fn real_matches_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["real_matches"]].is_i64());
+        assert!(json.real_matches.is_i64());
     } else {
         panic!()
     };
@@ -108,11 +85,8 @@ async fn real_matches_test() {
 
 #[tokio::test]
 async fn matchups_test() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!(json[STATS["matchups"]].is_array());
+        assert!(json.matchups.is_array());
     } else {
         panic!()
     };
@@ -120,12 +94,9 @@ async fn matchups_test() {
 
 #[tokio::test]
 async fn data_test_ranking() {
-    use crate::extensions::ugg::constants;
-    use constants::STATS;
-
     if let Ok(json) = UGGDATA.ranking().await {
-        let wins = json[STATS["wins"]].as_f64().unwrap();
-        let matches = json[STATS["matches"]].as_f64().unwrap();
+        let wins = json.wins.as_f64().unwrap();
+        let matches = json.matches.as_f64().unwrap();
         assert!(wins / matches < 1.0)
     } else {
         panic!()
@@ -134,20 +105,16 @@ async fn data_test_ranking() {
 
 #[tokio::test]
 async fn overview_structure_test() {
-    if let Ok(json) = UGGDATA.overview().await {
-        assert!(json.is_array());
-    } else {
-        panic!()
+    match UGGDATA.overview().await {
+        Ok(_) => (),
+        Err(err) => panic!("{:?}", err),
     }
 }
 
 #[tokio::test]
 async fn runes_test() {
-    use crate::extensions::ugg::constants;
-    use constants::DATA;
-
     if let Ok(json) = UGGDATA.overview().await {
-        let runes = &json[DATA["perks"]];
+        let runes = &json.perks;
         assert!(runes.is_array());
         assert!(runes[4].is_array());
         assert!(runes[4][0].is_i64());
@@ -159,11 +126,8 @@ async fn runes_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use crate::extensions::ugg::constants;
-    use constants::DATA;
-
     if let Ok(json) = UGGDATA.overview().await {
-        let items = &json[DATA["starting_items"]];
+        let items = &json.starting_items;
         assert!(items.is_array());
         assert!(items[2].is_array());
         assert!(items[2][0].is_i64());
@@ -174,11 +138,8 @@ async fn items_test() {
 
 #[tokio::test]
 async fn abilities_test() {
-    use crate::extensions::ugg::constants;
-    use constants::DATA;
-
     if let Ok(json) = UGGDATA.overview().await {
-        let abilities = &json[DATA["abilities"]];
+        let abilities = &json.abilities;
         assert!(abilities.is_array());
         assert!(abilities[2].is_array());
         assert!(abilities[2][0].is_string());
@@ -189,11 +150,8 @@ async fn abilities_test() {
 
 #[tokio::test]
 async fn shards_test() {
-    use crate::extensions::ugg::constants;
-    use constants::DATA;
-
     if let Ok(json) = UGGDATA.overview().await {
-        let abilities = &json[DATA["shards"]];
+        let abilities = &json.shards;
         assert!(abilities.is_array());
         assert!(abilities[2].is_array());
         assert!(abilities[2][0].is_string());
@@ -305,11 +263,8 @@ fn abilities_split_test() {
 
 #[tokio::test]
 async fn summoners_test() {
-    use crate::extensions::ugg::constants;
-    use constants::DATA;
-
     if let Ok(json) = UGGDATA.overview().await {
-        let spell_info = &json[DATA["summoner_spells"]];
+        let spell_info = &json.summoner_spells;
         let spells = &spell_info[2];
         println!("{}", spells);
         assert!(spells.is_array());

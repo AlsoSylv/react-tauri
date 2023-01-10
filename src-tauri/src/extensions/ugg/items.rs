@@ -1,5 +1,3 @@
-use serde_json::Value;
-
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon},
     errors,
@@ -9,15 +7,13 @@ use crate::{
 use data_dragon::DataDragon;
 use errors::ErrorMap;
 
-use super::constants;
-
-use constants::DATA;
+use super::structs::Overview;
 
 impl super::Data {
     /// Returns items from the UGG API these can be empty
     pub async fn items(
         &self,
-        request: Result<Value, ErrorMap>,
+        request: Result<Overview, ErrorMap>,
     ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
         match request {
             Ok(json) => {
@@ -47,11 +43,11 @@ impl super::Data {
                                 );
                                 // TODO: We can get the specific win rates of each of these sets rather easily
                                 let ugg_maps = [
-                                    &json[DATA["starting_items"]][2],
-                                    &json[DATA["mythic_and_core"]][2],
-                                    &json[DATA["other_items"]][0],
-                                    &json[DATA["other_items"]][1],
-                                    &json[DATA["other_items"]][2],
+                                    &json.starting_items[2],
+                                    &json.mythic_and_core[2],
+                                    &json.other_items[0],
+                                    &json.other_items[1],
+                                    &json.other_items[2],
                                 ];
 
                                 for n in 0..5 {
@@ -93,7 +89,7 @@ impl super::Data {
 
 async fn community_dragon_items(
     lang: &str,
-    json: Value,
+    json: Overview,
 ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
     let community_dragon = CommunityDragon::new(lang);
     let items = community_dragon.item_json().await;
@@ -104,11 +100,11 @@ async fn community_dragon_items(
     match items {
         Ok(items) => {
             let ugg_maps = [
-                &json[DATA["starting_items"]][2],
-                &json[DATA["mythic_and_core"]][2],
-                &json[DATA["other_items"]][0],
-                &json[DATA["other_items"]][1],
-                &json[DATA["other_items"]][2],
+                &json.starting_items[2],
+                &json.mythic_and_core[2],
+                &json.other_items[0],
+                &json.other_items[1],
+                &json.other_items[2],
             ];
 
             for x in items {

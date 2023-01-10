@@ -2,9 +2,8 @@ use crate::{core::helpers, errors, frontend_types};
 
 use errors::{ErrorMap, UGGDataError};
 use frontend_types::RuneImages;
-use serde_json::Value;
 
-use super::constants;
+use super::structs::Overview;
 
 impl super::Data {
     /// Returns runes from the UGG API
@@ -12,11 +11,11 @@ impl super::Data {
     /// avoid duplication of variables
     pub async fn rune_tuple(
         &self,
-        request: Result<Value, ErrorMap>,
+        request: Result<Overview, ErrorMap>,
     ) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap> {
         match request {
             Ok(json) => {
-                let json = &json[constants::DATA["perks"]];
+                let json = &json.perks;
                 let rune_ids = &json[4];
                 let Some(tree_id_one) = &json[2].as_i64() else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));

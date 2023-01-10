@@ -6,12 +6,12 @@ use crate::{
     frontend_types::{Spell, SummonerSpellInfo},
 };
 
-use super::{constants::DATA, Data};
+use super::{structs::Overview, Data};
 
 impl Data {
     pub async fn summoners(
         &self,
-        request: Result<Value, ErrorMap>,
+        request: Result<Overview, ErrorMap>,
     ) -> Result<SummonerSpellInfo, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match request {
@@ -19,7 +19,7 @@ impl Data {
                 // spell_info[1] -> Wins with combo
                 // spell_info[0] -> Matches with combo
                 // spell_info[2] -> Array of spells
-                let spell_info = &json[DATA["summoner_spells"]];
+                let spell_info = &json.summoner_spells;
                 let Some(games) = &spell_info[0].as_f64() else {
                     panic!()
                 };

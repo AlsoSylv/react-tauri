@@ -99,10 +99,7 @@ async fn sort_test() {
 #[tokio::test]
 async fn community_dragon_item_test() {
     use crate::core::community_dragon::CommunityDragon;
-    use crate::extensions::ugg::constants;
     use crate::{frontend_types::ItemValues, frontend_types::ItemsMap};
-    use constants::DATA;
-
     let lang = "en_US";
 
     if let Ok(json) = UGGDATA.overview().await {
@@ -113,11 +110,11 @@ async fn community_dragon_item_test() {
         match items {
             Ok(items) => {
                 let ugg_maps = [
-                    &json[DATA["starting_items"]][2],
-                    &json[DATA["mythic_and_core"]][2],
-                    &json[DATA["other_items"]][0],
-                    &json[DATA["other_items"]][1],
-                    &json[DATA["other_items"]][2],
+                    &json.starting_items[2],
+                    &json.mythic_and_core[2],
+                    &json.other_items[0],
+                    &json.other_items[1],
+                    &json.other_items[2],
                 ];
 
                 println!("{:?}", ugg_maps[0]);

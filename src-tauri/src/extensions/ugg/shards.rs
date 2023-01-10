@@ -7,16 +7,17 @@ use crate::{
 };
 use errors::{ErrorMap, UGGDataError};
 
-use super::constants;
-
-use constants::DATA;
+use super::structs::Overview;
 
 impl super::Data {
     /// Returns stat shards from the UGG API
     ///
     /// This requires Community Dragon to work
     /// without being hardcoded
-    pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
+    pub async fn shard_tuple(
+        &self,
+        request: Result<Overview, ErrorMap>,
+    ) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
         let community_dragon = CommunityDragon::new(&self.lang);
         let rune_json = community_dragon.runes().await;
@@ -35,7 +36,7 @@ impl super::Data {
 
                 match request {
                     Ok(json) => {
-                        let active_shards = json[DATA["shards"]][2].as_array();
+                        let active_shards = json.shards[2].as_array();
                         match active_shards {
                             Some(active_shards) => {
                                 sort_shards(&mut shards, active_shards);

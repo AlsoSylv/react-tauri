@@ -1,9 +1,12 @@
 export * from './Abilities';
 export * from './AutoCompleteOption';
+export { default as CachedData } from './CachedData';
 export { default as ChampionBuild } from './ChampionBuild';
 export { default as ChampionInfo } from './ChampionInfo';
 export * from './ChampionInfoResponse';
 export { default as Context } from './Context';
+export { default as InitialData } from './InitialData';
+export { default as InvokeAndCacheProps } from './InvokeAndCacheProps';
 export * from './Items';
 export * from './Runes';
 export * from './Shards';

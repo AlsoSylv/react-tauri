@@ -28,7 +28,7 @@ function RankMenu() {
         isOptionEqualToValue={(option, value) => option?.value === value?.value}
         options={rankList}
         onChange={handleChangeRank}
-        renderInput={(params) => <TextField {...params} label="Select a rank" />}
+        renderInput={(params) => <TextField {...params} label="Select a rank" size="small" />}
       />
     </Box>
   );

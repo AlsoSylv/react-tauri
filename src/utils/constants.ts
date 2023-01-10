@@ -1,3 +1,5 @@
+const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 24; // 1 DAY
+
 const errors: Record<number, { errorCode: number; error: string; message: string }> = {
   101: {
     errorCode: 101,
@@ -101,4 +103,4 @@ const errors: Record<number, { errorCode: number; error: string; message: string
   },
 };
 
-export default errors;
+export { DEFAULT_CACHE_DURATION, errors };

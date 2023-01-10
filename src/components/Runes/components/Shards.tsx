@@ -14,14 +14,14 @@ function Shards(props: ShardsProps) {
   } = props;
 
   return (
-    <Grid container>
-      <Grid container sm={12}>
+    <Grid container xs={12}>
+      <Grid container xs={12}>
         {rowOne.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {rowTwo.map(Rune)}
       </Grid>
-      <Grid container sm={12}>
+      <Grid container xs={12}>
         {rowThree.map(Rune)}
       </Grid>
     </Grid>

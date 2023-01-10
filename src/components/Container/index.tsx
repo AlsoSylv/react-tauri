@@ -8,11 +8,6 @@ function Container({ children }: PropsWithChildren) {
       sx={{
         height: '100%',
         width: '100%',
-        display: 'flex',
-        alignContent: 'center',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-        padding: '20px',
       }}
     >
       {children}

@@ -22,6 +22,7 @@ function useGlobalContext() {
 
 function GlobalStateProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(ContextReducer, initialGlobalState);
+  console.log(state);
 
   const contextValue: Context = useMemo(
     () => ({

@@ -1,5 +1,34 @@
 {
     "en_US": {
-        "roles": []
+        "regions": {
+            "World": "World",
+            "North America": "North America",
+            "EU West": "EU West",
+            "EU North": "EU North",
+            "Korea": "Korea",
+            "Brazil": "Brazil",
+            "LA North": "LA North",
+            "LA South": "LA South",
+            "OCE": "OCE",
+            "Russia": "Russia",
+            "Turkey": "Turkey",
+            "Japan": "Japan"
+        },
+        "ranks": {
+            "Challenger":  "Challenger",
+            "Grandmaster": "Grandmaster",
+            "Master": "Master",
+            "Diamond": "Diamond",
+            "Platinum": "Platinum",
+            "Gold": "Gold",
+            "Silver": "Silver",
+            "Bronze": "Bronze",
+            "Iron": "Iron",
+            "Overall": "Overall",
+            "Master Plus": "Master Plus",
+            "Diamond Plus": "Diamond Plus",
+            "Diamond 2 Plus": "Diamond 2 Plus",
+            "Platinum Plus": "Platinum Plus"
+        }
     }
 }

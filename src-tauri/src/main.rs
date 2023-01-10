@@ -7,8 +7,8 @@ use std::collections::HashMap;
 
 use extensions::ugg::constants;
 
-use constants::{REGIONS, ROLES, TIERS};
-use serde_json::Value;
+use constants::ROLES;
+use linked_hash_map::LinkedHashMap;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -19,6 +19,11 @@ mod logic;
 pub mod templates;
 #[cfg(test)]
 mod tests;
+
+pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
+    let json = include_str!("translation.json");
+    serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
+});
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
@@ -52,31 +57,27 @@ fn roles() -> Vec<String> {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn tiers() -> Vec<String> {
-    let mut tiers = Vec::new();
-    for (key, _value) in &TIERS {
-        tiers.push(key.to_string());
-    }
-    tiers
+fn tiers(lang: &str) -> LinkedHashMap<String, String> {
+    get_translatiosn(lang).ranks
 }
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn regions() -> Vec<String> {
-    let mut regions = Vec::new();
-    for (key, _value) in &REGIONS {
-        regions.push(key.to_string());
-    }
-    regions
+fn regions(lang: &str) -> LinkedHashMap<String, String> {
+    get_translatiosn(lang).regions
 }
 
-pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
-    let json = include_str!("translation.json");
-    serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
-});
+fn get_translatiosn(lang: &str) -> Translations {
+    if let Some(translation) = TRANSLATIONS.get(lang) {
+        translation.clone()
+    } else {
+        TRANSLATIONS.get("en_US").unwrap().clone()
+    }
+}
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Translations {
-    pub roles: Vec<Value>,
+    pub regions: LinkedHashMap<String, String>,
+    pub ranks: LinkedHashMap<String, String>
 }

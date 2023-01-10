@@ -18,11 +18,11 @@ impl super::Data {
     pub async fn winrate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json.matches.as_f64() else {
+                let Some(matches) = json.matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(wins) = &json.wins.as_f64() else {
+                let Some(wins) = json.wins else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
@@ -45,11 +45,11 @@ impl super::Data {
     pub async fn ban_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json.total_matches.as_f64() else {
+                let Some(matches) = &json.total_matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(bans)= &json.bans.as_f64() else {
+                let Some(bans)= &json.bans else {
                     return Ok("-".to_string());
                 };
                 let ban_rate = bans / matches;
@@ -70,11 +70,11 @@ impl super::Data {
     pub async fn pick_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json.total_matches.as_f64() else {
+                let Some(matches) = &json.total_matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(picks) = &json.matches.as_f64() else {
+                let Some(picks) = &json.matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
@@ -89,10 +89,10 @@ impl super::Data {
     pub async fn rank(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(rank) = json.rank.as_i64() else {
+                let Some(rank) = json.rank else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
-                let Some(total_rank) = json.total_rank.as_i64() else {
+                let Some(total_rank) = json.total_rank else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 

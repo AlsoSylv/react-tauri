@@ -1,5 +1,3 @@
-use serde_json::Value;
-
 use crate::{
     core::community_dragon::CommunityDragon,
     errors,
@@ -36,10 +34,10 @@ impl super::Data {
 
                 match request {
                     Ok(json) => {
-                        let active_shards = json.shards[2].as_array();
+                        let active_shards = json.shards;
                         match active_shards {
                             Some(active_shards) => {
-                                sort_shards(&mut shards, active_shards);
+                                sort_shards(&mut shards, &active_shards.shards);
                                 Ok(shards)
                             }
                             None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
@@ -54,7 +52,7 @@ impl super::Data {
     }
 }
 
-fn sort_shards(shards: &mut Shards, active_shards: &[Value]) {
+fn sort_shards(shards: &mut Shards, active_shards: &[String]) {
     shards
         .as_array_mut()
         .iter_mut()

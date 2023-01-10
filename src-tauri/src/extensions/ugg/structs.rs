@@ -21,7 +21,7 @@ impl UggRequest {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Regions<T> {
     #[serde(rename = "1")]
     pub north_america: Box<Option<Tiers<T>>>,
@@ -71,7 +71,7 @@ impl<T> Index<&str> for Regions<T> {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Tiers<T> {
     #[serde(rename = "1")]
     pub challenger: Option<Roles<T>>,
@@ -126,7 +126,7 @@ impl<T> Index<&str> for Tiers<T> {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Roles<T> {
     #[serde(rename = "4")]
     pub top: Option<T>,
@@ -158,7 +158,7 @@ impl<T> Index<&str> for Roles<T> {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct OverviewBase {
     pub overview: Overview,
-    pub time: Value,
+    pub time: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -169,32 +169,45 @@ pub struct Overview {
     pub mythic_and_core: Value,
     pub abilities: Value,
     pub other_items: Value,
-    pub winrate: Value,
-    pub _false: Value,
-    pub shards: Value,
-    pub _empty: Value,
+    pub winrate: Option<Winrate>,
+    pub _false: bool,
+    pub shards: Option<Shards>,
+    pub _empty: Vec<i8>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Winrate {
+    pub wins: i64,
+    pub matches: i64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Shards {
+    pub matches: i64,
+    pub wins: i64,
+    pub shards: Vec<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Ranking {
-    pub wins: Value,
-    pub matches: Value,
-    pub rank: Value,
-    pub total_rank: Value,
-    _4: Value,
-    _5: Value,
-    _6: Value,
-    _7: Value,
-    _8: Value,
-    _9: Value,
-    pub bans: Value,
-    pub total_matches: Value,
-    pub matchups: Value,
-    pub real_matches: Value,
-    pub stdevs: Value,
-    pub effective_winrate: Value,
-    pub distribution_count: Value,
-    pub distribution_mean: Value,
-    pub distribution_stdevs: Value,
-    pub be_all_picks: Value,
+    pub wins: Option<f64>,
+    pub matches: Option<f64>,
+    pub rank: Option<i64>,
+    pub total_rank: Option<i64>,
+    _4: i64,
+    _5: i64,
+    _6: i64,
+    _7: i64,
+    _8: i64,
+    _9: i64,
+    pub bans: Option<f64>,
+    pub total_matches: Option<f64>,
+    pub matchups: Vec<Vec<i64>>,
+    pub real_matches: Option<f64>,
+    pub stdevs: f64,
+    pub effective_winrate: f64,
+    pub distribution_count: i64,
+    pub distribution_mean: f64,
+    pub distribution_stdevs: f64,
+    pub be_all_picks: i64,
 }

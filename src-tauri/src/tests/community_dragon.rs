@@ -109,50 +109,75 @@ async fn community_dragon_item_test() {
         let items_array = items_map.as_array_mut();
         match items {
             Ok(items) => {
-                let ugg_maps = [
-                    &json.starting_items[2],
-                    &json.mythic_and_core[2],
+                let ugg_start_core = [
+                    &json.starting_items.ids,
+                    &json.mythic_and_core.ids,
+                ];
+    
+                let ugg_others = [
                     &json.other_items[0],
                     &json.other_items[1],
                     &json.other_items[2],
                 ];
-
-                println!("{:?}", ugg_maps[0]);
-
+    
                 for x in items {
                     let name = &x.name;
                     let cost = x.price_total;
                     let description = &x.description;
                     let image = &format!("{}.png", x.id);
-                    for n in 0..5 {
-                        if let Some(current_map) = ugg_maps[n].as_array() {
-                            current_map.iter().for_each(|y| {
-
-                                let url = |item_path: String| {
-                                    let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
-                                    if let Some(item_path_pos) = item_path.find("/ASSETS/") {
-                                        let split = item_path.split_at(item_path_pos);
-                                        let url = format!("{}{}", base_url, split.1);
-                                        url.to_lowercase()
-                                    } else {
-                                        unreachable!();
-                                    }
-                                };
-
-                                if (y.is_array() && y[0] == x.id) || y == x.id
-                                {
-                                    items_array[n].push(ItemValues::new(
-                                        name,
-                                        cost,
-                                        description,
-                                        image,
-                                        &url(x.icon_path.clone()),
-                                    ))
+                    for n in 0..2 {
+                        let current_map = ugg_start_core[n];
+                        current_map.as_ref().unwrap().iter().for_each(|y| {
+                            let url = |item_path: String| {
+                                let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
+                                if let Some(item_path_pos) = item_path.find("/ASSETS/") {
+                                    let split = item_path.split_at(item_path_pos);
+                                    let url = format!("{}{}", base_url, split.1);
+                                    url.to_lowercase()
+                                } else {
+                                    unreachable!();
                                 }
-                            })
-                        };
+                            };
+                            if y.unwrap() == x.id
+                            {
+                                items_array[n].push(ItemValues::new(
+                                    name,
+                                    cost,
+                                    description,
+                                    image,
+                                    &url(x.icon_path.clone()),
+                                ));
+                            }
+                        })
+                    }
+    
+                    for n in 0..3 {
+                        let current_map = ugg_others[n];
+                        current_map.iter().for_each(|y| {
+                            let url = |item_path: String| {
+                                let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
+                                if let Some(item_path_pos) = item_path.find("/ASSETS/") {
+                                    let split = item_path.split_at(item_path_pos);
+                                    let url = format!("{}{}", base_url, split.1);
+                                    url.to_lowercase()
+                                } else {
+                                    unreachable!();
+                                }
+                            };
+                            if y.id == Some(x.id)
+                            {
+                                items_array[n + 2].push(ItemValues::new(
+                                    name,
+                                    cost,
+                                    description,
+                                    image,
+                                    &url(x.icon_path.clone()),
+                                ));
+                            }
+                        })
                     }
                 }
+                println!("{:?}", items_map);
             }
             Err(err) => panic!("{:?}", err),
         }

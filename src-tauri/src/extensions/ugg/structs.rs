@@ -22,35 +22,35 @@ impl UggRequest {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Regions<T> {
+pub struct Regions {
     #[serde(rename = "1")]
-    pub north_america: Box<Option<Tiers<T>>>,
+    pub north_america: Box<Option<Tiers>>,
     #[serde(rename = "2")]
-    pub eu_west: Box<Option<Tiers<T>>>,
+    pub eu_west: Box<Option<Tiers>>,
     #[serde(rename = "3")]
-    pub korea: Box<Option<Tiers<T>>>,
+    pub korea: Box<Option<Tiers>>,
     #[serde(rename = "4")]
-    pub eu_north: Box<Option<Tiers<T>>>,
+    pub eu_north: Box<Option<Tiers>>,
     #[serde(rename = "5")]
-    pub brazil: Box<Option<Tiers<T>>>,
+    pub brazil: Box<Option<Tiers>>,
     #[serde(rename = "6")]
-    pub la_north: Box<Option<Tiers<T>>>,
+    pub la_north: Box<Option<Tiers>>,
     #[serde(rename = "7")]
-    pub la_south: Box<Option<Tiers<T>>>,
+    pub la_south: Box<Option<Tiers>>,
     #[serde(rename = "8")]
-    pub oce: Box<Option<Tiers<T>>>,
+    pub oce: Box<Option<Tiers>>,
     #[serde(rename = "9")]
-    pub russia: Box<Option<Tiers<T>>>,
+    pub russia: Box<Option<Tiers>>,
     #[serde(rename = "10")]
-    pub turkey: Box<Option<Tiers<T>>>,
+    pub turkey: Box<Option<Tiers>>,
     #[serde(rename = "11")]
-    pub japan: Box<Option<Tiers<T>>>,
+    pub japan: Box<Option<Tiers>>,
     #[serde(rename = "12")]
-    pub world: Box<Option<Tiers<T>>>,
+    pub world: Box<Option<Tiers>>,
 }
 
-impl<T> Index<&str> for Regions<T> {
-    type Output = Option<Tiers<T>>;
+impl Index<&str> for Regions {
+    type Output = Option<Tiers>;
 
     fn index(&self, index: &str) -> &Self::Output {
         match index {
@@ -66,45 +66,45 @@ impl<T> Index<&str> for Regions<T> {
             "Turkey" => &self.turkey,
             "Japan" => &self.japan,
             "World" => &self.world,
-            _ => unreachable!(),
+            _ => &None,
         }
     }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Tiers<T> {
+pub struct Tiers {
     #[serde(rename = "1")]
-    pub challenger: Option<Roles<T>>,
+    pub challenger: Option<Roles>,
     #[serde(rename = "2")]
-    pub master: Option<Roles<T>>,
+    pub master: Option<Roles>,
     #[serde(rename = "3")]
-    pub diamond: Option<Roles<T>>,
+    pub diamond: Option<Roles>,
     #[serde(rename = "4")]
-    pub platinum: Option<Roles<T>>,
+    pub platinum: Option<Roles>,
     #[serde(rename = "5")]
-    pub gold: Option<Roles<T>>,
+    pub gold: Option<Roles>,
     #[serde(rename = "6")]
-    pub silver: Option<Roles<T>>,
+    pub silver: Option<Roles>,
     #[serde(rename = "7")]
-    pub bronze: Option<Roles<T>>,
+    pub bronze: Option<Roles>,
     #[serde(rename = "8")]
-    pub overall: Option<Roles<T>>,
+    pub overall: Option<Roles>,
     #[serde(rename = "10")]
-    pub platinum_plus: Option<Roles<T>>,
+    pub platinum_plus: Option<Roles>,
     #[serde(rename = "11")]
-    pub diamond_plus: Option<Roles<T>>,
+    pub diamond_plus: Option<Roles>,
     #[serde(rename = "12")]
-    pub diamond_two_plus: Option<Roles<T>>,
+    pub diamond_two_plus: Option<Roles>,
     #[serde(rename = "13")]
-    pub grandmaster: Option<Roles<T>>,
+    pub grandmaster: Option<Roles>,
     #[serde(rename = "14")]
-    pub master_plus: Option<Roles<T>>,
+    pub master_plus: Option<Roles>,
     #[serde(rename = "15")]
-    pub iron: Option<Roles<T>>,
+    pub iron: Option<Roles>,
 }
 
-impl<T> Index<&str> for Tiers<T> {
-    type Output = Option<Roles<T>>;
+impl Index<&str> for Tiers {
+    type Output = Option<Roles>;
 
     fn index(&self, index: &str) -> &Self::Output {
         match index {
@@ -121,27 +121,27 @@ impl<T> Index<&str> for Tiers<T> {
             "Diamond Plus" => &self.diamond_plus,
             "Diamond 2 Plus" => &self.diamond_two_plus,
             "Platinum Plus" => &self.platinum_plus,
-            _ => unreachable!(),
+            _ => &None,
         }
     }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct Roles<T> {
+pub struct Roles {
     #[serde(rename = "4")]
-    pub top: Option<T>,
+    pub top: Option<JsonTypes>,
     #[serde(rename = "1")]
-    pub jungle: Option<T>,
+    pub jungle: Option<JsonTypes>,
     #[serde(rename = "5")]
-    pub mid: Option<T>,
+    pub mid: Option<JsonTypes>,
     #[serde(rename = "3")]
-    pub adc: Option<T>,
+    pub adc: Option<JsonTypes>,
     #[serde(rename = "2")]
-    pub support: Option<T>,
+    pub support: Option<JsonTypes>,
 }
 
-impl<T> Index<&str> for Roles<T> {
-    type Output = Option<T>;
+impl Index<&str> for Roles {
+    type Output = Option<JsonTypes>;
 
     fn index(&self, index: &str) -> &Self::Output {
         match index {
@@ -150,25 +150,38 @@ impl<T> Index<&str> for Roles<T> {
             "5" => &self.mid,
             "3" => &self.adc,
             "2" => &self.support,
-            _ => unreachable!(),
+            _ => &None,
         }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum JsonTypes {
+    Overview(OverviewBase),
+    Ranking(Ranking)
+}
+
+impl Default for JsonTypes {
+    fn default() -> Self {
+        Self::Overview(OverviewBase::default())
     }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct OverviewBase {
-    pub overview: Overview,
-    pub time: String,
+    pub overview: Option<Overview>,
+    pub time: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Overview {
     pub perks: Value,
     pub summoner_spells: Value,
-    pub starting_items: Value,
-    pub mythic_and_core: Value,
+    pub starting_items: CoreItems,
+    pub mythic_and_core: CoreItems,
     pub abilities: Value,
-    pub other_items: Value,
+    pub other_items: Vec<Vec<Items>>,
     pub winrate: Option<Winrate>,
     pub _false: bool,
     pub shards: Option<Shards>,
@@ -176,9 +189,23 @@ pub struct Overview {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct CoreItems {
+    pub matches: Option<i64>,
+    pub wins: Option<i64>,
+    pub ids: Option<Vec<Option<i64>>>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Items {
+    pub id: Option<i64>,
+    pub wins: Option<i64>,
+    pub matches: Option<i64>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Winrate {
-    pub wins: i64,
-    pub matches: i64,
+    pub wins: Option<i64>,
+    pub matches: Option<i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

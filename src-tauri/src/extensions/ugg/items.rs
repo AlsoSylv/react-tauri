@@ -42,32 +42,56 @@ impl super::Data {
                                     &data_dragon.version, &image
                                 );
                                 // TODO: We can get the specific win rates of each of these sets rather easily
-                                let ugg_maps = [
-                                    &json.starting_items[2],
-                                    &json.mythic_and_core[2],
+                                let ugg_start_core = [
+                                    &json.starting_items.ids,
+                                    &json.mythic_and_core.ids,
+                                ];
+
+                                let ugg_others = [
                                     &json.other_items[0],
                                     &json.other_items[1],
                                     &json.other_items[2],
                                 ];
 
-                                for n in 0..5 {
-                                    if let Some(current_map) = ugg_maps[n].as_array() {
+                                for n in 0..2 {
+                                    if let Some(current_map) = ugg_start_core[n] {
                                         current_map.iter().for_each(|y| {
-                                            if (y.is_array() && &y[0].to_string() == key)
-                                                || &y.to_string() == key
+                                            if let Some(y) = y {
+                                                if &y.to_string() == key
+                                                {
+                                                    items_array[n].push(ItemValues::new(
+                                                        name,
+                                                        cost,
+                                                        description,
+                                                        image,
+                                                        &url,
+                                                    ));
+        
+                                                    lcu_items_array[n].push(LCUItemsValue::new(key));
+                                                }
+                                            }
+                                        }) 
+                                    };
+                                }
+
+                                for n in 0..3 {
+                                    let current_map = ugg_others[n]; 
+                                    current_map.iter().for_each(|y| {
+                                        if let Some(y) = y.id {
+                                            if &y.to_string() == key
                                             {
-                                                items_array[n].push(ItemValues::new(
+                                                items_array[n + 2].push(ItemValues::new(
                                                     name,
                                                     cost,
                                                     description,
                                                     image,
                                                     &url,
                                                 ));
-
+    
                                                 lcu_items_array[n].push(LCUItemsValue::new(key));
                                             }
-                                        })
-                                    };
+                                        }
+                                    }) 
                                 }
                             }
 
@@ -99,9 +123,12 @@ async fn community_dragon_items(
     let lcu_items_array = lcu_items_map.as_array_mut();
     match items {
         Ok(items) => {
-            let ugg_maps = [
-                &json.starting_items[2],
-                &json.mythic_and_core[2],
+            let ugg_start_core = [
+                &json.starting_items.ids,
+                &json.mythic_and_core.ids,
+            ];
+
+            let ugg_others = [
                 &json.other_items[0],
                 &json.other_items[1],
                 &json.other_items[2],
@@ -113,10 +140,9 @@ async fn community_dragon_items(
                 let cost = x.price_total;
                 let description = &x.description;
                 let image = &format!("{}.png", x.id);
-                for n in 0..5 {
-                    if let Some(current_map) = ugg_maps[n].as_array() {
+                for n in 0..2 {
+                    if let Some(current_map) = ugg_start_core[n] {
                         current_map.iter().for_each(|y| {
-
                             let url = |item_path: String| {
                                 let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
                                 if let Some(item_path_pos) = item_path.find("/ASSETS/") {
@@ -127,8 +153,7 @@ async fn community_dragon_items(
                                     unreachable!();
                                 }
                             };
-
-                            if (y.is_array() && y[0] == x.id) || y == x.id
+                            if *y == Some(x.id)
                             {
                                 items_array[n].push(ItemValues::new(
                                     name,
@@ -137,11 +162,37 @@ async fn community_dragon_items(
                                     image,
                                     &url(x.icon_path.clone()),
                                 ));
-
                                 lcu_items_array[n].push(LCUItemsValue::new(&id.to_string()));
                             }
                         })
                     };
+                }
+
+                for n in 0..3 {
+                    let current_map = ugg_others[n];
+                    current_map.iter().for_each(|y| {
+                        let url = |item_path: String| {
+                            let base_url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default";
+                            if let Some(item_path_pos) = item_path.find("/ASSETS/") {
+                                let split = item_path.split_at(item_path_pos);
+                                let url = format!("{}{}", base_url, split.1);
+                                url.to_lowercase()
+                            } else {
+                                unreachable!();
+                            }
+                        };
+                        if y.id == Some(x.id)
+                        {
+                            items_array[n + 2].push(ItemValues::new(
+                                name,
+                                cost,
+                                description,
+                                image,
+                                &url(x.icon_path.clone()),
+                            ));
+                            lcu_items_array[n].push(LCUItemsValue::new(&id.to_string()));
+                        }
+                    })
                 }
             }
             Ok((items_map, lcu_items_map))

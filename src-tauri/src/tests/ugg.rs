@@ -128,9 +128,7 @@ async fn runes_test() {
 async fn items_test() {
     if let Ok(json) = UGGDATA.overview().await {
         let items = &json.starting_items;
-        assert!(items.is_array());
-        assert!(items[2].is_array());
-        assert!(items[2][0].is_i64());
+        assert!(items.wins.unwrap() > 100);
     } else {
         panic!()
     }

@@ -3,7 +3,7 @@ use crate::errors;
 use errors::ErrorMap;
 
 use super::{
-    structs::{self, Overview, Ranking},
+    structs::{self, Overview, Ranking, JsonTypes},
     Data,
 };
 
@@ -24,7 +24,11 @@ impl Data {
                     if let Some(json_read) = &ranking[&self.region] {
                         if let Some(json_read) = &json_read[&self.rank] {
                             if let Some(json_read) = &json_read[&role] {
-                                Ok(json_read.clone())
+                                if let JsonTypes::Ranking(json) = json_read {
+                                    Ok(json.to_owned())
+                                } else {
+                                    Err(ErrorMap::UGGError(errors::UGGDataError::RankingMissing))
+                                }
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
                             }
@@ -56,10 +60,15 @@ impl Data {
                     if let Some(json_read) = &overview[&self.region] {
                         if let Some(json_read) = &json_read[&self.rank] {
                             if let Some(json_read) = &json_read[&role] {
-                                // The zero is here because the only other data here is
-                                // The time that it was last updated, and u.gg doesn't
-                                // show that data anyways
-                                Ok(json_read.overview.clone())
+                                if let JsonTypes::Overview(json) = &json_read {
+                                    if let Some(json) = &json.overview {
+                                        Ok(json.to_owned())
+                                    } else {
+                                        Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
+                                    }
+                                } else {
+                                    Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
+                                }
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
                             }

@@ -86,7 +86,7 @@ async fn real_matches_test() {
 #[tokio::test]
 async fn matchups_test() {
     if let Ok(json) = UGGDATA.ranking().await {
-        assert!((json.matchups[0][1] as f64 / json.matchups[0][1] as f64) <= 1.0) ;
+        assert!((json.matchups[0][1] as f64 / json.matchups[0][1] as f64) <= 1.0);
     } else {
         panic!()
     };
@@ -115,10 +115,7 @@ async fn overview_structure_test() {
 async fn runes_test() {
     if let Ok(json) = UGGDATA.overview().await {
         let runes = &json.perks;
-        assert!(runes.is_array());
-        assert!(runes[4].is_array());
-        assert!(runes[4][0].is_i64());
-        assert!(runes[2].is_i64());
+        runes.rune_ids.as_ref().unwrap();
     } else {
         panic!()
     }
@@ -128,7 +125,7 @@ async fn runes_test() {
 async fn items_test() {
     if let Ok(json) = UGGDATA.overview().await {
         let items = &json.starting_items;
-        assert!(items.wins.unwrap() > 100);
+        assert!(items.wins.unwrap() > 100.0);
     } else {
         panic!()
     }
@@ -151,8 +148,6 @@ async fn shards_test() {
     if let Ok(json) = UGGDATA.overview().await {
         let abilities = json.shards;
         abilities.unwrap();
-        // assert!(abilities[2].is_array());
-        // assert!(abilities[2][0].is_string());
     } else {
         panic!()
     }
@@ -263,11 +258,7 @@ fn abilities_split_test() {
 async fn summoners_test() {
     if let Ok(json) = UGGDATA.overview().await {
         let spell_info = &json.summoner_spells;
-        let spells = &spell_info[2];
-        println!("{}", spells);
-        assert!(spells.is_array());
-        assert!(spells[0].is_i64());
-        assert!(spells[1].is_i64());
+        let _ = &spell_info.spells.as_ref().unwrap();
     } else {
         panic!()
     }

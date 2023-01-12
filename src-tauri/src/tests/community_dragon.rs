@@ -109,17 +109,14 @@ async fn community_dragon_item_test() {
         let items_array = items_map.as_array_mut();
         match items {
             Ok(items) => {
-                let ugg_start_core = [
-                    &json.starting_items.ids,
-                    &json.mythic_and_core.ids,
-                ];
-    
+                let ugg_start_core = [&json.starting_items.ids, &json.mythic_and_core.ids];
+
                 let ugg_others = [
                     &json.other_items[0],
                     &json.other_items[1],
                     &json.other_items[2],
                 ];
-    
+
                 for x in items {
                     let name = &x.name;
                     let cost = x.price_total;
@@ -150,7 +147,7 @@ async fn community_dragon_item_test() {
                             }
                         })
                     }
-    
+
                     for n in 0..3 {
                         let current_map = ugg_others[n];
                         current_map.iter().for_each(|y| {

@@ -16,12 +16,14 @@ impl super::Data {
         match request {
             Ok(json) => {
                 let json = &json.perks;
-                let rune_ids = &json[4];
-                let Some(tree_id_one) = &json[2].as_i64() else {
+                let Some(rune_ids) = &json.rune_ids else {
+                    return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
+                };
+                let Some(tree_id_one) = &json.tree_one_id else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(tree_id_two) = &json[3].as_i64() else {
+                let Some(tree_id_two) = &json.tree_two_id else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 

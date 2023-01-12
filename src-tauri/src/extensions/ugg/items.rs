@@ -42,10 +42,8 @@ impl super::Data {
                                     &data_dragon.version, &image
                                 );
                                 // TODO: We can get the specific win rates of each of these sets rather easily
-                                let ugg_start_core = [
-                                    &json.starting_items.ids,
-                                    &json.mythic_and_core.ids,
-                                ];
+                                let ugg_start_core =
+                                    [&json.starting_items.ids, &json.mythic_and_core.ids];
 
                                 let ugg_others = [
                                     &json.other_items[0],
@@ -57,8 +55,7 @@ impl super::Data {
                                     if let Some(current_map) = ugg_start_core[n] {
                                         current_map.iter().for_each(|y| {
                                             if let Some(y) = y {
-                                                if &y.to_string() == key
-                                                {
+                                                if &y.to_string() == key {
                                                     items_array[n].push(ItemValues::new(
                                                         name,
                                                         cost,
@@ -66,20 +63,20 @@ impl super::Data {
                                                         image,
                                                         &url,
                                                     ));
-        
-                                                    lcu_items_array[n].push(LCUItemsValue::new(key));
+
+                                                    lcu_items_array[n]
+                                                        .push(LCUItemsValue::new(key));
                                                 }
                                             }
-                                        }) 
+                                        })
                                     };
                                 }
 
                                 for n in 0..3 {
-                                    let current_map = ugg_others[n]; 
+                                    let current_map = ugg_others[n];
                                     current_map.iter().for_each(|y| {
                                         if let Some(y) = y.id {
-                                            if &y.to_string() == key
-                                            {
+                                            if &y.to_string() == key {
                                                 items_array[n + 2].push(ItemValues::new(
                                                     name,
                                                     cost,
@@ -87,11 +84,11 @@ impl super::Data {
                                                     image,
                                                     &url,
                                                 ));
-    
+
                                                 lcu_items_array[n].push(LCUItemsValue::new(key));
                                             }
                                         }
-                                    }) 
+                                    })
                                 }
                             }
 
@@ -123,10 +120,7 @@ async fn community_dragon_items(
     let lcu_items_array = lcu_items_map.as_array_mut();
     match items {
         Ok(items) => {
-            let ugg_start_core = [
-                &json.starting_items.ids,
-                &json.mythic_and_core.ids,
-            ];
+            let ugg_start_core = [&json.starting_items.ids, &json.mythic_and_core.ids];
 
             let ugg_others = [
                 &json.other_items[0],

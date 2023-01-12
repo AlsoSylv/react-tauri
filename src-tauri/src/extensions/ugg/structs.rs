@@ -159,7 +159,7 @@ impl Index<&str> for Roles {
 #[serde(untagged)]
 pub enum JsonTypes {
     Overview(OverviewBase),
-    Ranking(Ranking)
+    Ranking(Ranking),
 }
 
 impl Default for JsonTypes {
@@ -168,30 +168,46 @@ impl Default for JsonTypes {
     }
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OverviewBase {
     pub overview: Option<Overview>,
     pub time: Option<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Overview {
-    pub perks: Value,
-    pub summoner_spells: Value,
+    pub perks: Perks,
+    pub summoner_spells: SummonerSpells,
     pub starting_items: CoreItems,
     pub mythic_and_core: CoreItems,
     pub abilities: Value,
     pub other_items: Vec<Vec<Items>>,
     pub winrate: Option<Winrate>,
-    pub _false: bool,
+    _false: bool,
     pub shards: Option<Shards>,
-    pub _empty: Vec<i8>,
+    _empty: Vec<i8>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Perks {
+    pub matches: Option<f64>,
+    pub wins: Option<f64>,
+    pub tree_one_id: Option<i64>,
+    pub tree_two_id: Option<i64>,
+    pub rune_ids: Option<Vec<i64>>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SummonerSpells {
+    pub matches: Option<f64>,
+    pub wins: Option<f64>,
+    pub spells: Option<Vec<i64>>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct CoreItems {
-    pub matches: Option<i64>,
-    pub wins: Option<i64>,
+    pub matches: Option<f64>,
+    pub wins: Option<f64>,
     pub ids: Option<Vec<Option<i64>>>,
 }
 
@@ -231,10 +247,10 @@ pub struct Ranking {
     pub total_matches: Option<f64>,
     pub matchups: Vec<Vec<i64>>,
     pub real_matches: Option<f64>,
-    pub stdevs: f64,
-    pub effective_winrate: f64,
-    pub distribution_count: i64,
-    pub distribution_mean: f64,
-    pub distribution_stdevs: f64,
-    pub be_all_picks: i64,
+    _stdevs: f64,
+    _effective_winrate: f64,
+    _distribution_count: i64,
+    _distribution_mean: f64,
+    _distribution_stdevs: f64,
+    _be_all_picks: i64,
 }

@@ -1,7 +1,7 @@
-use crate::core::helpers::champs::{names_from_community_dragon, names_from_data_dragon};
+use crate::core::helpers::champs::get_champ_names;
 use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
-use crate::errors::{DataDragonError, Errors};
+use crate::errors::DataDragonError;
 use crate::frontend_types::{ChampionNames, RunesAndAbilities};
 use crate::{extensions, frontend_types};
 
@@ -156,18 +156,9 @@ pub async fn runes_and_abilities(
 #[tauri::command]
 pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
-    match names_from_data_dragon(lang, &mut champions).await {
+    match get_champ_names(lang, &mut champions).await {
         Ok(()) => Ok(champions),
-        Err(err) => {
-            if err.is_connection() {
-                Err(err as i64)
-            } else {
-                match names_from_community_dragon(lang, &mut champions).await {
-                    Ok(()) => Ok(champions),
-                    Err(err) => Err(err as i64),
-                }
-            }
-        }
+        Err(err) => Err(i64::from(err))
     }
 }
 

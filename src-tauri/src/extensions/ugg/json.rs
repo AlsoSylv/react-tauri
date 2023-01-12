@@ -3,7 +3,7 @@ use crate::errors;
 use errors::ErrorMap;
 
 use super::{
-    structs::{self, Overview, Ranking, JsonTypes},
+    structs::{self, JsonTypes, Overview, Ranking},
     Data,
 };
 
@@ -64,7 +64,9 @@ impl Data {
                                     if let Some(json) = &json.overview {
                                         Ok(json.to_owned())
                                     } else {
-                                        Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
+                                        Err(ErrorMap::UGGError(
+                                            errors::UGGDataError::OverviewMissing,
+                                        ))
                                     }
                                 } else {
                                     Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))

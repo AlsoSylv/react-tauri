@@ -31,9 +31,10 @@ pub async fn champion_info(
     let fut_pickrate = data.pick_rate(request.clone());
     let fut_banrate = data.ban_rate(request.clone());
     let fut_tier = data.rank(request);
+    let fut_role = data.default_pos();
 
-    let (winrate, pickrate, banrate, tier) =
-        futures::join!(fut_winrate, fut_pickrate, fut_banrate, fut_tier,);
+    let (winrate, pickrate, banrate, tier, role) =
+        futures::join!(fut_winrate, fut_pickrate, fut_banrate, fut_tier, fut_role,);
 
     match data_dragon {
         Ok(data_dragon) => {
@@ -49,6 +50,7 @@ pub async fn champion_info(
                 pick_rate: pickrate.map_err(i64::from),
                 ban_rate: banrate.map_err(i64::from),
                 tier: tier.map_err(i64::from),
+                role: role.map_err(i64::from)
             })
         }
         Err(err) => Err(err as i64),

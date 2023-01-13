@@ -16,7 +16,7 @@ impl Data {
     pub async fn ranking(&self) -> Result<Ranking, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
         let fut_request = ugg.ranking_json();
-        let fut_role = position(&self.name.value.id, &self.role, &self.lang);
+        let fut_role = self.default_pos();
         let (request, role) = futures::join!(fut_request, fut_role);
         match request {
             Ok(ranking) => match role {
@@ -51,7 +51,7 @@ impl Data {
     pub async fn overview(&self) -> Result<Overview, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
         let fut_request = ugg.overview_json();
-        let fut_role = position(&self.name.value.id, &self.role, &self.lang);
+        let fut_role = self.default_pos();
         let (request, role) = futures::join!(fut_request, fut_role);
 
         match request {
@@ -86,26 +86,26 @@ impl Data {
             Err(err) => Err(err),
         }
     }
-}
 
-/// Gets the default position of the character as a string
-async fn position(name: &i64, role: &str, lang: &str) -> Result<String, ErrorMap> {
-    let ugg = UggRequest::new(name, lang);
-    if role == "Default" {
-        let role = ugg.default_role().await;
-        match role {
-            Ok(role) => Ok(role),
-            Err(err) => Err(err),
+    pub async fn default_pos(&self) -> Result<String, ErrorMap> {
+        let ugg = UggRequest::new(&self.name.value.id, &self.lang);
+        if &self.role == "Default" {
+            let role = ugg.default_role().await;
+            match role {
+                Ok(role) => Ok(role),
+                Err(err) => Err(err),
+            }
+        } else {
+            let role: &str = match self.role.as_str() {
+                "Top" => "4",
+                "Jungle" => "1",
+                "Mid" => "5",
+                "ADC" => "3",
+                "Support" => "2",
+                _ => unreachable!(),
+            };
+            Ok(role.to_string())
         }
-    } else {
-        let role: &str = match role {
-            "Top" => "4",
-            "Jungle" => "1",
-            "Mid" => "5",
-            "ADC" => "3",
-            "Support" => "2",
-            _ => unreachable!(),
-        };
-        Ok(role.to_string())
     }
 }
+

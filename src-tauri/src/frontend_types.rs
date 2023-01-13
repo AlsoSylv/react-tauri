@@ -8,6 +8,7 @@ pub struct ChampionInfo {
     pub pick_rate: Result<String, i64>,
     pub ban_rate: Result<String, i64>,
     pub tier: Result<String, i64>,
+    pub role: Result<String, i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

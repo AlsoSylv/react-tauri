@@ -15,31 +15,27 @@ impl Data {
     /// intense in the future
     pub async fn ranking(&self) -> Result<Ranking, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
-        let fut_request = ugg.ranking_json();
-        let fut_role = self.default_pos();
-        let (request, role) = futures::join!(fut_request, fut_role);
+        let request = ugg.ranking_json().await;
+
         match request {
-            Ok(ranking) => match role {
-                Ok(role) => {
-                    if let Some(json_read) = &ranking[&self.region] {
-                        if let Some(json_read) = &json_read[&self.rank] {
-                            if let Some(json_read) = &json_read[&role] {
-                                if let JsonTypes::Ranking(json) = json_read {
-                                    Ok(json.to_owned())
-                                } else {
-                                    Err(ErrorMap::UGGError(errors::UGGDataError::RankingMissing))
-                                }
+            Ok(ranking) => {
+                if let Some(json_read) = &ranking[&self.region] {
+                    if let Some(json_read) = &json_read[&self.rank] {
+                        if let Some(json_read) = &json_read[&self.role] {
+                            if let JsonTypes::Ranking(json) = json_read {
+                                Ok(json.to_owned())
                             } else {
-                                Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
+                                Err(ErrorMap::UGGError(errors::UGGDataError::RankingMissing))
                             }
                         } else {
-                            Err(ErrorMap::UGGError(errors::UGGDataError::RankHND))
+                            Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
                         }
                     } else {
-                        Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
+                        Err(ErrorMap::UGGError(errors::UGGDataError::RankHND))
                     }
+                } else {
+                    Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
                 }
-                Err(err) => Err(err),
             },
             Err(err) => Err(err),
         }
@@ -50,38 +46,33 @@ impl Data {
     /// it handles error catching, which will get more intense
     pub async fn overview(&self) -> Result<Overview, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
-        let fut_request = ugg.overview_json();
-        let fut_role = self.default_pos();
-        let (request, role) = futures::join!(fut_request, fut_role);
+        let request = ugg.overview_json().await;
 
         match request {
-            Ok(overview) => match role {
-                Ok(role) => {
-                    if let Some(json_read) = &overview[&self.region] {
-                        if let Some(json_read) = &json_read[&self.rank] {
-                            if let Some(json_read) = &json_read[&role] {
-                                if let JsonTypes::Overview(json) = &json_read {
-                                    if let Some(json) = &json.overview {
-                                        Ok(json.to_owned())
-                                    } else {
-                                        Err(ErrorMap::UGGError(
-                                            errors::UGGDataError::OverviewMissing,
-                                        ))
-                                    }
+            Ok(overview) => {
+                if let Some(json_read) = &overview[&self.region] {
+                    if let Some(json_read) = &json_read[&self.rank] {
+                        if let Some(json_read) = &json_read[&self.role] {
+                            if let JsonTypes::Overview(json) = &json_read {
+                                if let Some(json) = &json.overview {
+                                    Ok(json.to_owned())
                                 } else {
-                                    Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
+                                    Err(ErrorMap::UGGError(
+                                        errors::UGGDataError::OverviewMissing,
+                                    ))
                                 }
                             } else {
-                                Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
+                                Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
                             }
                         } else {
-                            Err(ErrorMap::UGGError(errors::UGGDataError::RankHND))
+                            Err(ErrorMap::UGGError(errors::UGGDataError::RoleHND))
                         }
                     } else {
-                        Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
+                        Err(ErrorMap::UGGError(errors::UGGDataError::RankHND))
                     }
+                } else {
+                    Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
                 }
-                Err(err) => Err(err),
             },
             Err(err) => Err(err),
         }
@@ -89,22 +80,10 @@ impl Data {
 
     pub async fn default_pos(&self) -> Result<String, ErrorMap> {
         let ugg = UggRequest::new(&self.name.value.id, &self.lang);
-        if &self.role == "Default" {
-            let role = ugg.default_role().await;
-            match role {
-                Ok(role) => Ok(role),
-                Err(err) => Err(err),
-            }
-        } else {
-            let role: &str = match self.role.as_str() {
-                "Top" => "4",
-                "Jungle" => "1",
-                "Mid" => "5",
-                "ADC" => "3",
-                "Support" => "2",
-                _ => unreachable!(),
-            };
-            Ok(role.to_string())
+        let role = ugg.default_role().await;
+        match role {
+            Ok(role) => Ok(role),
+            Err(err) => Err(err),
         }
     }
 }

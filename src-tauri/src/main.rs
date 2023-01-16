@@ -8,7 +8,6 @@ use std::collections::{HashMap, BTreeMap};
 use extensions::ugg::constants;
 
 use constants::ROLES;
-// use linked_hash_map::LinkedHashMap;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -46,13 +45,42 @@ async fn main() {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn roles() -> Vec<String> {
-    let mut roles = Vec::new();
-    roles.push("Default".to_string());
-    for (key, _value) in &ROLES {
-        roles.push(key.to_string());
-    }
-    roles
+fn roles() -> Vec<Role<'static>> {
+    vec![
+        Role {
+            id: "4",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_top.png",
+        },
+        Role {
+            id: "1",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_jungle.png",
+        },
+        Role {
+            id: "5",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_mid.png",
+        },
+        Role {
+            id: "3",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_bottom.png",
+        },
+        Role {
+            id: "2",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_support.png",
+        },
+    ]
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Role<'a> {
+    id: &'a str,
+    local_path: &'a str,
+    url: &'a str,
 }
 
 /// Generates a list and sends it to the front end
@@ -67,7 +95,7 @@ fn regions(lang: &str) -> BTreeMap<String, String> {
     get_translatiosn(lang).regions
 }
 
-fn get_translatiosn(lang: &str) -> Translations {
+pub fn get_translatiosn(lang: &str) -> Translations {
     if let Some(translation) = TRANSLATIONS.get(lang) {
         translation.clone()
     } else {

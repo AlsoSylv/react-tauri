@@ -1,7 +1,6 @@
 use crate::frontend_types::ChampionNames;
 
 mod abilities;
-pub mod constants;
 mod items;
 mod json;
 mod rates;

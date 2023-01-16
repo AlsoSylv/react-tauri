@@ -11,19 +11,17 @@ use errors::{DataDragonError, ErrorMap, UGGDataError};
 
 use ErrorMap::{DataDragonErrors, UGGError};
 
-use super::constants;
-
-use constants::DATA;
+use super::structs::Overview;
 
 impl super::Data {
     /// Returns abilities from the UGG API
     pub async fn abilities(
         &self,
-        request: Result<Value, ErrorMap>,
+        request: Result<Overview, ErrorMap>,
     ) -> Result<AbilitiesMap, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(abilities_order) = json[DATA["abilities"]][2].as_array() else {
+                let Some(abilities_order) = json.abilities[2].as_array() else {
                     return Err(UGGError(UGGDataError::NoAbilityOrder))
                 };
 

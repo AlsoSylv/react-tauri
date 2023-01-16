@@ -1,17 +1,15 @@
-use serde_json::Value;
-
 use crate::{
     core::{community_dragon::CommunityDragon, data_dragon::DataDragon},
     errors::{ErrorMap, Errors},
     frontend_types::{Spell, SummonerSpellInfo},
 };
 
-use super::{constants::DATA, Data};
+use super::{structs::{Overview, SummonerSpells}, Data};
 
 impl Data {
     pub async fn summoners(
         &self,
-        request: Result<Value, ErrorMap>,
+        request: Result<Overview, ErrorMap>,
     ) -> Result<SummonerSpellInfo, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match request {
@@ -19,11 +17,11 @@ impl Data {
                 // spell_info[1] -> Wins with combo
                 // spell_info[0] -> Matches with combo
                 // spell_info[2] -> Array of spells
-                let spell_info = &json[DATA["summoner_spells"]];
-                let Some(games) = &spell_info[0].as_f64() else {
+                let spell_info = &json.summoner_spells;
+                let Some(games) = &spell_info.wins else {
                     panic!()
                 };
-                let Some(wins) = &spell_info[1].as_f64() else {
+                let Some(wins) = &spell_info.wins else {
                     panic!()
                 };
                 let winrate = format!("{}%", wins / games);
@@ -34,7 +32,9 @@ impl Data {
                         match spell_json {
                             Ok(json) => {
                                 for (_, data) in json.data.iter() {
-                                    let spell_array = &spell_info[2];
+                                    let Some(spell_array) = &spell_info.spells else {
+                                        panic!()
+                                    };
                                     let spell_one = spell_array[0].to_string();
                                     let spell_two = spell_array[1].to_string();
                                     if spell_one == data.key {
@@ -79,10 +79,12 @@ impl Data {
 
     async fn community_dragon_summoners(
         &self,
-        spell_info: &Value,
+        spell_info: &SummonerSpells,
         mut spells: SummonerSpellInfo,
     ) -> Result<SummonerSpellInfo, ErrorMap> {
-        let spell_array = &spell_info[2];
+        let Some(spell_array) = &spell_info.spells else {
+            panic!()
+        };
         let community_dragon = CommunityDragon::new(&self.lang);
         let summoner_spell_json = community_dragon.summoner_spells().await;
         match summoner_spell_json {

@@ -95,6 +95,7 @@ impl structs::UggRequest {
 
                 match overview {
                     Ok(json) => {
+                        println!("{:?}", json);
                         cache.insert(self.id, json.clone()).await;
                         cache.sync();
                         Ok(json)

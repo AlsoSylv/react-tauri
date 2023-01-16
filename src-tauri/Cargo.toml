@@ -16,7 +16,7 @@ tauri-build = { version = "1.2", features = [] }
 [dependencies]
 serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.2", features = [] }
+tauri = { version = "1.2", features = ["objc-exception", "wry"], default-features = false }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1.21", features = ["macros"] }
 once_cell = { version = "1.16" }
@@ -32,9 +32,10 @@ default = [ "custom-protocol" ]
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
 
-[profile.release]
-# lto = true
-# opt-level = "s"
-# strip = "symbols"
-# rpath = true
-# debug = false
+[profile.production]
+inherits = "release"
+lto = true
+opt-level = "s"
+strip = "symbols"
+rpath = true
+debug = false

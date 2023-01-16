@@ -3,12 +3,12 @@
     windows_subsystem = "windows"
 )]
 
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 
 use extensions::ugg::constants;
 
 use constants::ROLES;
-use linked_hash_map::LinkedHashMap;
+// use linked_hash_map::LinkedHashMap;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -57,13 +57,13 @@ fn roles() -> Vec<String> {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn tiers(lang: &str) -> LinkedHashMap<String, String> {
+fn tiers(lang: &str) -> BTreeMap<String, String> {
     get_translatiosn(lang).ranks
 }
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn regions(lang: &str) -> LinkedHashMap<String, String> {
+fn regions(lang: &str) -> BTreeMap<String, String> {
     get_translatiosn(lang).regions
 }
 
@@ -78,6 +78,6 @@ fn get_translatiosn(lang: &str) -> Translations {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Translations {
-    pub regions: LinkedHashMap<String, String>,
-    pub ranks: LinkedHashMap<String, String>
+    pub regions: BTreeMap<String, String>,
+    pub ranks: BTreeMap<String, String>
 }

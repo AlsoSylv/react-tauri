@@ -4,7 +4,10 @@ use crate::{
     frontend_types::{Spell, SummonerSpellInfo},
 };
 
-use super::{structs::{Overview, SummonerSpells}, Data};
+use super::{
+    structs::{Overview, SummonerSpells},
+    Data,
+};
 
 impl Data {
     pub async fn summoners(

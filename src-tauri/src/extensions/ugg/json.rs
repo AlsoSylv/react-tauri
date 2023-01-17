@@ -36,7 +36,7 @@ impl Data {
                 } else {
                     Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
                 }
-            },
+            }
             Err(err) => Err(err),
         }
     }
@@ -57,9 +57,7 @@ impl Data {
                                 if let Some(json) = &json.overview {
                                     Ok(json.to_owned())
                                 } else {
-                                    Err(ErrorMap::UGGError(
-                                        errors::UGGDataError::OverviewMissing,
-                                    ))
+                                    Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
                                 }
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::OverviewMissing))
@@ -73,7 +71,7 @@ impl Data {
                 } else {
                     Err(ErrorMap::UGGError(errors::UGGDataError::RegionHND))
                 }
-            },
+            }
             Err(err) => Err(err),
         }
     }
@@ -87,4 +85,3 @@ impl Data {
         }
     }
 }
-

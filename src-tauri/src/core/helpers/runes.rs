@@ -26,7 +26,7 @@ pub async fn all_rune_images(
             let mut tree_two_names = SecondaryTree::new();
             let tree_one_array = tree_one_names.as_array_mut();
             let tree_two_array = tree_two_names.as_array_mut();
-    
+
             match request {
                 Ok(json) => {
                     for rune in json.iter() {
@@ -70,19 +70,20 @@ pub async fn all_rune_images(
                 }
                 Err(err) => Err(ErrorMap::DataDragonErrors(err)),
             }
-        },
+        }
         Err(err) => {
             if err.is_connection() {
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
-                let runes = community_dragon_all_rune_images(tree_id_one, tree_id_two, language).await;
+                let runes =
+                    community_dragon_all_rune_images(tree_id_one, tree_id_two, language).await;
                 match runes {
                     Ok(runes) => Ok(runes),
                     Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
                 }
             }
         }
-    } 
+    }
 }
 
 pub async fn community_dragon_all_rune_images(

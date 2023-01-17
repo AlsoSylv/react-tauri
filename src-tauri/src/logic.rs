@@ -50,7 +50,7 @@ pub async fn champion_info(
                 pick_rate: pickrate.map_err(i64::from),
                 ban_rate: banrate.map_err(i64::from),
                 tier: tier.map_err(i64::from),
-                role: role.map_err(i64::from)
+                role: role.map_err(i64::from),
             })
         }
         Err(err) => Err(err as i64),
@@ -160,7 +160,7 @@ pub async fn all_champion_names(lang: &str) -> Result<Vec<ChampionNames>, i64> {
     let mut champions = Vec::new();
     match get_champ_names(lang, &mut champions).await {
         Ok(()) => Ok(champions),
-        Err(err) => Err(i64::from(err))
+        Err(err) => Err(i64::from(err)),
     }
 }
 

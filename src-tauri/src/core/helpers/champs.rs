@@ -1,5 +1,5 @@
 use crate::core::{community_dragon::CommunityDragon, data_dragon::DataDragon};
-use crate::errors::{Errors, ErrorMap};
+use crate::errors::{ErrorMap, Errors};
 use crate::frontend_types::ChampionNames;
 
 pub async fn get_champ_names(
@@ -32,12 +32,17 @@ pub async fn get_champ_names(
                 match champ_json {
                     Ok(json) => Ok(json.iter().for_each(|champ| {
                         if champ.id > 0 {
-                            champions.push(ChampionNames::new(&champ.name, &champ.key, champ.id, None));
+                            champions.push(ChampionNames::new(
+                                &champ.name,
+                                &champ.key,
+                                champ.id,
+                                None,
+                            ));
                         }
                     })),
                     Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
                 }
             }
-        },
+        }
     }
 }

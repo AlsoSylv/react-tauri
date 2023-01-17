@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::collections::{HashMap, BTreeMap};
+use std::collections::{BTreeMap, HashMap};
 
 use once_cell::sync::Lazy;
 
@@ -104,5 +104,5 @@ pub fn get_translatiosn(lang: &str) -> Translations {
 #[serde(rename_all = "camelCase")]
 pub struct Translations {
     pub regions: BTreeMap<String, String>,
-    pub ranks: BTreeMap<String, String>
+    pub ranks: BTreeMap<String, String>,
 }

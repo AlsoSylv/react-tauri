@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 
 import Runes from 'components/Runes';
 import type { ChampionData } from 'interfaces';
+import { colorByPercentage } from 'utils/theme';
 
 interface ChampionInformationDisplayProps {
   championInfo: ChampionData | null;
@@ -11,13 +12,13 @@ interface ChampionInformationDisplayProps {
   loading: boolean;
 }
 
-function BasicInfoData(props: { label: string; value: string; loading: boolean }) {
-  const { label, value, loading } = props;
+function BasicInfoData(props: { label: string; value: string; loading: boolean; color?: string }) {
+  const { label, value, loading, color } = props;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h6" alignSelf="center" sx={{ fontWeight: 'bold' }}>
-        {loading ? <Skeleton width="4rem" /> : value}
+      <Typography variant="h6" alignSelf="center" sx={{ fontWeight: 'bold', ...(color && { color }) }}>
+        {loading ? <Skeleton width="4rem" animation="wave" /> : value}
       </Typography>
       <Typography variant="body2" alignSelf="center" display="flex">
         {label}
@@ -46,7 +47,12 @@ function ChampionInformationDisplay({ championInfo, error, loading }: ChampionIn
               <Box>
                 <Grid container xs={12} justifyContent="space-evenly">
                   <Grid xs="auto">
-                    <BasicInfoData value={championInfo?.winRate || ''} label="Win Rate" loading={loading} />
+                    <BasicInfoData
+                      value={championInfo?.winRate || ''}
+                      label="Win Rate"
+                      loading={loading}
+                      color={colorByPercentage(championInfo?.winRate || '')}
+                    />
                   </Grid>
                   <Grid xs="auto">
                     <Divider variant="fullWidth" orientation="vertical" />

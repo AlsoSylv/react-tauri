@@ -103,4 +103,12 @@ const errors: Record<number, { errorCode: number; error: string; message: string
   },
 };
 
-export { DEFAULT_CACHE_DURATION, errors };
+const performanceValues = {
+  bad: 42,
+  low: 47,
+  avg: 51.5,
+  good: 55,
+  best: 60,
+};
+
+export { DEFAULT_CACHE_DURATION, errors, performanceValues };

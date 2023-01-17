@@ -91,7 +91,7 @@ function Champion() {
           <Grid xs="auto">
             <Box sx={{ maxHeight: 120 }}>
               {loading ? (
-                <Skeleton variant="rectangular" width="120px" height="120px" sx={{ borderRadius: '.4rem' }} />
+                <Skeleton variant="rectangular" width="120px" height="120px" sx={{ borderRadius: '.4rem' }} animation="wave" />
               ) : (
                 <img
                   src={url || ''}

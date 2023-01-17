@@ -16,14 +16,12 @@ tauri-build = { version = "1.2", features = [] }
 [dependencies]
 serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.2", features = ["api-all"] }
+tauri = { version = "1.2", features = ["objc-exception", "wry"], default-features = false }
 reqwest = { version = "0.11", features = ["json"] }
-tokio = { version = "1.21", features = ["full"] }
-phf = { version = "0.11", features = ["macros"] }
-linked-hash-map = { version = "0.5", features = ["serde_impl"] }
+tokio = { version = "1.21", features = ["macros"] }
 once_cell = { version = "1.16" }
 futures = { version = "0.3" }
-shaco = { git = "https://github.com/AlsoSylv/Shaco" }
+shaco = { git = "https://github.com/AlsoSylv/Shaco", branch = "test" }
 moka = { version = "0.9", features = ["future"] }
 
 [features]
@@ -33,3 +31,11 @@ default = [ "custom-protocol" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
+
+[profile.production]
+inherits = "release"
+lto = true
+opt-level = "s"
+strip = "symbols"
+rpath = true
+debug = false

@@ -1,6 +1,5 @@
 use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
-use serde_json::Value;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 
@@ -11,13 +10,15 @@ use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;
 use ErrorMap::DataDragonErrors;
 
+use super::structs::Regions;
+
 static CACHED_DEFAULT_ROLE: Lazy<Mutex<HashMap<String, Vec<i64>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
-static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Value>>> =
+static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
     Lazy::new(|| Mutex::new(Cache::new(10)));
 
-static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Value>>> =
+static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
     Lazy::new(|| Mutex::new(Cache::new(10)));
 
 impl structs::UggRequest {
@@ -68,7 +69,7 @@ impl structs::UggRequest {
     ///
     /// UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
     /// Further investigation is needed into finding out which champs this is offered for automatically
-    pub async fn overview_json(&self) -> Result<Value, ErrorMap> {
+    pub async fn overview_json(&self) -> Result<Regions, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
         if let Some(overview) = cache.get(&self.id) {
             return Ok(overview);
@@ -84,7 +85,7 @@ impl structs::UggRequest {
         match lol_version {
             Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/overview/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let overview = request::<Value, UGGDataError>(
+                let overview = request::<Regions, UGGDataError>(
                     url,
                     client,
                     UGGDataError::OverviewMissing,
@@ -94,6 +95,7 @@ impl structs::UggRequest {
 
                 match overview {
                     Ok(json) => {
+                        // println!("{:?}", json);
                         cache.insert(self.id, json.clone()).await;
                         cache.sync();
                         Ok(json)
@@ -107,7 +109,7 @@ impl structs::UggRequest {
 
     /// This handles making the request for the UGG ranking JSON for specific champs
     /// this contians things like pickrate, winrate, banrate, and matchups
-    pub async fn ranking_json(&self) -> Result<Value, ErrorMap> {
+    pub async fn ranking_json(&self) -> Result<Regions, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
         if let Some(ranking) = cache.get(&self.id) {
             return Ok(ranking);
@@ -124,7 +126,7 @@ impl structs::UggRequest {
         match lol_version {
             Ok(ugg_lol_version) => {
                 let url = format!("{base_overview_url}/{stats_version}/rankings/{ugg_lol_version}/{game_mode}/{0}/{overview_version}.json", self.id);
-                let ranking = request::<Value, UGGDataError>(
+                let ranking = request::<Regions, UGGDataError>(
                     url,
                     client,
                     UGGDataError::RankingMissing,

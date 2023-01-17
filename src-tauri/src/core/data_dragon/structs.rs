@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
-use linked_hash_map::LinkedHashMap;
+// use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -37,7 +37,7 @@ pub struct ChampJson {
     pub type_field: String,
     pub format: String,
     pub version: String,
-    pub data: LinkedHashMap<String, ChampData>,
+    pub data: BTreeMap<String, ChampData>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -123,7 +123,7 @@ pub struct ChampionFull {
     pub data: Value,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Summoners {
     #[serde(rename = "type")]
@@ -132,7 +132,7 @@ pub struct Summoners {
     pub data: HashMap<String, SummonerSpell>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SummonerSpell {
     pub id: String,
@@ -159,7 +159,7 @@ pub struct SummonerSpell {
     pub resource: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Image {
     pub full: String,

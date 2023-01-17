@@ -1,15 +1,11 @@
-use serde_json::Value;
-
 use crate::errors;
 
 use errors::{ErrorMap, UGGDataError};
 
-use super::constants;
-
-use constants::STATS;
+use super::structs::Ranking;
 
 impl super::Data {
-    //The format is used here to get an exact result from the floating point math
+    // The format is used here to get an exact result from the floating point math
 
     /// Returns the win rate from the UGG API, errors if it is None
     ///
@@ -19,14 +15,14 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn winrate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn winrate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json[STATS["matches"]].as_f64() else {
+                let Some(matches) = json.matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(wins) = &json[STATS["wins"]].as_f64() else {
+                let Some(wins) = json.wins else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
@@ -46,14 +42,14 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn ban_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn ban_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
+                let Some(matches) = &json.total_matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(bans)= &json[STATS["bans"]].as_f64() else {
+                let Some(bans)= &json.bans else {
                     return Ok("-".to_string());
                 };
                 let ban_rate = bans / matches;
@@ -71,14 +67,14 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn pick_rate(&self, request: Result<Value, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn pick_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = &json[STATS["total_matches"]].as_f64() else {
+                let Some(matches) = &json.total_matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(picks) = &json[STATS["matches"]].as_f64() else {
+                let Some(picks) = &json.matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
@@ -89,18 +85,18 @@ impl super::Data {
         }
     }
 
-    /// This currently returns the characters rank as an int,
-    /// but this will change in the future and will be a string of
-    /// "{} / {}" rank, total_rank
-    /// and will return a ? if it is not ranked
-    pub async fn rank(&self, request: Result<Value, ErrorMap>) -> Result<i64, ErrorMap> {
+    /// Returns the tier from the UGG API, errors if it is None
+    pub async fn rank(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                //TODO: Return as rank/total-rank instead of just rank
-                let Some(rank) = json[STATS["rank"]].as_i64() else {
+                let Some(rank) = json.rank else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
-                Ok(rank)
+                let Some(total_rank) = json.total_rank else {
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
+                };
+
+                Ok(format!("{} / {}", rank, total_rank))
             }
             Err(err) => Err(err),
         }

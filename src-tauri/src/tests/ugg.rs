@@ -1,22 +1,29 @@
+use once_cell::sync::Lazy;
+
+use crate::{extensions::ugg::Data, frontend_types::ChampionNames};
+
+static UGGDATA: Lazy<Data> = Lazy::new(|| {
+    Data::new(
+        ChampionNames::new("", "", 498, None),
+        "3".to_owned(),
+        "Platinum Plus".to_owned(),
+        "World".to_owned(),
+        "en_US".to_owned(),
+    )
+});
+
 #[tokio::test]
 async fn ranking_structure_test() {
-    use crate::extensions::ugg::json;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        println!("{:#?}", json);
-        assert!(json.is_array());
-    } else {
-        panic!()
-    };
+    match UGGDATA.ranking().await {
+        Ok(_) => (),
+        Err(err) => panic!("{:?}", err),
+    }
 }
 
 #[tokio::test]
 async fn wins_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["wins"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.wins.unwrap();
     } else {
         panic!()
     };
@@ -24,11 +31,8 @@ async fn wins_test() {
 
 #[tokio::test]
 async fn matches_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["matches"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.matches.unwrap();
     } else {
         panic!()
     };
@@ -36,11 +40,8 @@ async fn matches_test() {
 
 #[tokio::test]
 async fn rank_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["rank"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.rank.unwrap();
     } else {
         panic!()
     };
@@ -48,11 +49,8 @@ async fn rank_test() {
 
 #[tokio::test]
 async fn total_rank_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["total_rank"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.total_rank.unwrap();
     } else {
         panic!()
     };
@@ -60,11 +58,8 @@ async fn total_rank_test() {
 
 #[tokio::test]
 async fn bans_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["bans"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.bans.unwrap();
     } else {
         panic!()
     };
@@ -72,11 +67,8 @@ async fn bans_test() {
 
 #[tokio::test]
 async fn total_matches_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["total_matches"]].is_f64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.total_matches.unwrap();
     } else {
         panic!()
     };
@@ -84,11 +76,8 @@ async fn total_matches_test() {
 
 #[tokio::test]
 async fn real_matches_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["real_matches"]].is_i64());
+    if let Ok(json) = UGGDATA.ranking().await {
+        json.real_matches.unwrap();
     } else {
         panic!()
     };
@@ -96,11 +85,8 @@ async fn real_matches_test() {
 
 #[tokio::test]
 async fn matchups_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json[STATS["matchups"]].is_array());
+    if let Ok(json) = UGGDATA.ranking().await {
+        assert!((json.matchups[0][1] as f64 / json.matchups[0][1] as f64) <= 1.0);
     } else {
         panic!()
     };
@@ -108,12 +94,9 @@ async fn matchups_test() {
 
 #[tokio::test]
 async fn data_test_ranking() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::STATS;
-
-    if let Ok(json) = json::ranking(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let wins = json[STATS["wins"]].as_f64().unwrap();
-        let matches = json[STATS["matches"]].as_f64().unwrap();
+    if let Ok(json) = UGGDATA.ranking().await {
+        let wins = json.wins.unwrap();
+        let matches = json.matches.unwrap();
         assert!(wins / matches < 1.0)
     } else {
         panic!()
@@ -122,26 +105,17 @@ async fn data_test_ranking() {
 
 #[tokio::test]
 async fn overview_structure_test() {
-    use crate::extensions::ugg::json;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        assert!(json.is_array());
-    } else {
-        panic!()
+    match UGGDATA.overview().await {
+        Ok(_) => (),
+        Err(err) => panic!("{:?}", err),
     }
 }
 
 #[tokio::test]
 async fn runes_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::DATA;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let runes = &json[DATA["perks"]];
-        assert!(runes.is_array());
-        assert!(runes[4].is_array());
-        assert!(runes[4][0].is_i64());
-        assert!(runes[2].is_i64());
+    if let Ok(json) = UGGDATA.overview().await {
+        let runes = &json.perks;
+        runes.rune_ids.as_ref().unwrap();
     } else {
         panic!()
     }
@@ -149,14 +123,9 @@ async fn runes_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::DATA;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let items = &json[DATA["starting_items"]];
-        assert!(items.is_array());
-        assert!(items[2].is_array());
-        assert!(items[2][0].is_i64());
+    if let Ok(json) = UGGDATA.overview().await {
+        let items = &json.starting_items;
+        assert!(items.wins.unwrap() > 100.0);
     } else {
         panic!()
     }
@@ -164,11 +133,8 @@ async fn items_test() {
 
 #[tokio::test]
 async fn abilities_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::DATA;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let abilities = &json[DATA["abilities"]];
+    if let Ok(json) = UGGDATA.overview().await {
+        let abilities = &json.abilities;
         assert!(abilities.is_array());
         assert!(abilities[2].is_array());
         assert!(abilities[2][0].is_string());
@@ -179,14 +145,9 @@ async fn abilities_test() {
 
 #[tokio::test]
 async fn shards_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::DATA;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let abilities = &json[DATA["shards"]];
-        assert!(abilities.is_array());
-        assert!(abilities[2].is_array());
-        assert!(abilities[2][0].is_string());
+    if let Ok(json) = UGGDATA.overview().await {
+        let abilities = json.shards;
+        abilities.unwrap();
     } else {
         panic!()
     }
@@ -295,16 +256,9 @@ fn abilities_split_test() {
 
 #[tokio::test]
 async fn summoners_test() {
-    use crate::extensions::ugg::{constants, json};
-    use constants::DATA;
-
-    if let Ok(json) = json::overview(&498, "ADC", "Platinum Plus", "World", "en_US").await {
-        let spell_info = &json[DATA["summoner_spells"]];
-        let spells = &spell_info[2];
-        println!("{}", spells);
-        assert!(spells.is_array());
-        assert!(spells[0].is_i64());
-        assert!(spells[1].is_i64());
+    if let Ok(json) = UGGDATA.overview().await {
+        let spell_info = &json.summoner_spells;
+        let _ = &spell_info.spells.as_ref().unwrap();
     } else {
         panic!()
     }

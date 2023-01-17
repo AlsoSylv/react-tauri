@@ -3,9 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use extensions::ugg::constants;
+use std::collections::{BTreeMap, HashMap};
 
-use constants::{REGIONS, ROLES, TIERS};
+use once_cell::sync::Lazy;
 
 mod core;
 pub mod errors;
@@ -15,6 +15,11 @@ mod logic;
 pub mod templates;
 #[cfg(test)]
 mod tests;
+
+pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
+    let json = include_str!("translation.json");
+    serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
+});
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
@@ -37,31 +42,67 @@ async fn main() {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn roles() -> Vec<String> {
-    let mut roles = Vec::new();
-    roles.push("Default".to_string());
-    for (key, _value) in &ROLES {
-        roles.push(key.to_string());
-    }
-    roles
+fn roles() -> Vec<Role<'static>> {
+    vec![
+        Role {
+            id: "4",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_top.png",
+        },
+        Role {
+            id: "1",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_jungle.png",
+        },
+        Role {
+            id: "5",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_mid.png",
+        },
+        Role {
+            id: "3",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_bottom.png",
+        },
+        Role {
+            id: "2",
+            local_path: "",
+            url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_support.png",
+        },
+    ]
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Role<'a> {
+    id: &'a str,
+    local_path: &'a str,
+    url: &'a str,
 }
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn tiers() -> Vec<String> {
-    let mut tiers = Vec::new();
-    for (key, _value) in &TIERS {
-        tiers.push(key.to_string());
-    }
-    tiers
+fn tiers(lang: &str) -> BTreeMap<String, String> {
+    get_translatiosn(lang).ranks
 }
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn regions() -> Vec<String> {
-    let mut regions = Vec::new();
-    for (key, _value) in &REGIONS {
-        regions.push(key.to_string());
+fn regions(lang: &str) -> BTreeMap<String, String> {
+    get_translatiosn(lang).regions
+}
+
+pub fn get_translatiosn(lang: &str) -> Translations {
+    if let Some(translation) = TRANSLATIONS.get(lang) {
+        translation.clone()
+    } else {
+        TRANSLATIONS.get("en_US").unwrap().clone()
     }
-    regions
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Translations {
+    pub regions: BTreeMap<String, String>,
+    pub ranks: BTreeMap<String, String>,
 }

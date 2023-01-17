@@ -1,19 +1,21 @@
-use serde_json::Value;
-
-use crate::{core::community_dragon::CommunityDragon, errors};
+use crate::{
+    core::community_dragon::CommunityDragon,
+    errors,
+    frontend_types::{Shard, Shards},
+};
 use errors::{ErrorMap, UGGDataError};
 
-use super::{constants, structs};
-
-use constants::DATA;
-use structs::{Shard, Shards};
+use super::structs::Overview;
 
 impl super::Data {
     /// Returns stat shards from the UGG API
     ///
     /// This requires Community Dragon to work
     /// without being hardcoded
-    pub async fn shard_tuple(&self, request: Result<Value, ErrorMap>) -> Result<Shards, ErrorMap> {
+    pub async fn shard_tuple(
+        &self,
+        request: Result<Overview, ErrorMap>,
+    ) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
         let community_dragon = CommunityDragon::new(&self.lang);
         let rune_json = community_dragon.runes().await;
@@ -32,10 +34,10 @@ impl super::Data {
 
                 match request {
                     Ok(json) => {
-                        let active_shards = json[DATA["shards"]][2].as_array();
+                        let active_shards = json.shards;
                         match active_shards {
                             Some(active_shards) => {
-                                sort_shards(&mut shards, active_shards);
+                                sort_shards(&mut shards, &active_shards.shards);
                                 Ok(shards)
                             }
                             None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
@@ -50,7 +52,7 @@ impl super::Data {
     }
 }
 
-fn sort_shards(shards: &mut Shards, active_shards: &[Value]) {
+fn sort_shards(shards: &mut Shards, active_shards: &[String]) {
     shards
         .as_array_mut()
         .iter_mut()

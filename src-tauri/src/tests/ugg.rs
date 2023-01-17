@@ -5,7 +5,7 @@ use crate::{extensions::ugg::Data, frontend_types::ChampionNames};
 static UGGDATA: Lazy<Data> = Lazy::new(|| {
     Data::new(
         ChampionNames::new("", "", 498, None),
-        "ADC".to_owned(),
+        "3".to_owned(),
         "Platinum Plus".to_owned(),
         "World".to_owned(),
         "en_US".to_owned(),

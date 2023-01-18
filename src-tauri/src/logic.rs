@@ -1,7 +1,7 @@
 use crate::core::helpers::champs::get_champ_names;
 use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
-use crate::errors::DataDragonError;
+use crate::errors::{DataDragonError, Errors};
 use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types};
 
@@ -60,13 +60,14 @@ pub async fn champion_info(
         fut_spells
     );
 
+    let local_image = format!("/{0}/{0}.png", &name.value.key);
+
     match data_dragon {
         Ok(data_dragon) => {
             let url = format!(
                 "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
                 &data_dragon.version, &name.value.key
             );
-            let local_image = format!("/{0}/{0}.png", &name.value.key);
             Ok(ChampionInfo {
                 url,
                 local_image,
@@ -88,7 +89,36 @@ pub async fn champion_info(
                 spells: spells.map_err(i64::from),
             })
         }
-        Err(err) => Err(err as i64),
+        Err(err) => {
+            if err.is_connection() {
+                Err(err as i64)
+            } else {
+                let url = format!(
+                    "https://cdn.communitydragon.org/latest/champion/{}/square",
+                    name.value.id
+                );
+                Ok(ChampionInfo {
+                    url,
+                    local_image,
+                    win_rate: winrate.map_err(i64::from),
+                    pick_rate: pickrate.map_err(i64::from),
+                    ban_rate: banrate.map_err(i64::from),
+                    tier: tier.map_err(i64::from),
+                    role: role.map_err(i64::from),
+                    runes: match runes {
+                        Ok((obj, _, _)) => Ok(obj),
+                        Err(err) => Err(i64::from(err)),
+                    },
+                    items: match items {
+                        Ok((obj, _)) => Ok(obj),
+                        Err(err) => Err(i64::from(err)),
+                    },
+                    abilities: abilities.map_err(i64::from),
+                    shards: shards.map_err(i64::from),
+                    spells: spells.map_err(i64::from),
+                })
+            }
+        },
     }
 }
 

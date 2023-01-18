@@ -2,7 +2,7 @@ use crate::errors;
 
 use errors::{ErrorMap, UGGDataError};
 
-use super::structs::Ranking;
+use super::structs::{Overview, Ranking};
 
 impl super::Data {
     // The format is used here to get an exact result from the floating point math
@@ -15,14 +15,17 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn winrate(&self, request: &Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn winrate(&self, request: &Result<Overview, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
-                let Some(matches) = json.matches else {
+                let Some(wr) = &json.winrate else {
+                    return Err(ErrorMap::UGGError(UGGDataError::RateError));
+                };
+                let Some(matches) = wr.matches else {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let Some(wins) = json.wins else {
+                let Some(wins) = wr.wins else {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 

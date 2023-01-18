@@ -35,7 +35,7 @@ pub async fn champion_info(
 
     let (ranking, overview) = futures::join!(data.ranking(), data.overview());
 
-    let fut_winrate = data.winrate(&ranking);
+    let fut_winrate = data.winrate(&overview);
     let fut_pickrate = data.pick_rate(&ranking);
     let fut_banrate = data.ban_rate(&ranking);
     let fut_tier = data.rank(&ranking);
@@ -103,10 +103,9 @@ pub async fn push_runes(
     lang: String,
 ) -> Result<i64, i64> {
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
-    let request = data.ranking().await;
-    let request_2 = data.overview().await;
-    let fut_winrate = data.winrate(&request);
-    let fut_rune_match = data.rune_tuple(&request_2);
+    let overview = data.overview().await;
+    let fut_winrate = data.winrate(&overview);
+    let fut_rune_match = data.rune_tuple(&overview);
     let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
 
     match rune_match {
@@ -167,10 +166,9 @@ pub async fn push_items(
     lang: String,
 ) -> Result<i64, i64> {
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
-    let request = data.ranking().await;
-    let request_2 = data.overview().await;
-    let fut_winrate = data.winrate(&request);
-    let fut_item_match = data.items(&request_2);
+    let overview = data.overview().await;
+    let fut_winrate = data.winrate(&overview);
+    let fut_item_match = data.items(&overview);
     let (winrate, item_match) = futures::join!(fut_winrate, fut_item_match);
 
     match item_match {

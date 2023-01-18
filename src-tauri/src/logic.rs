@@ -2,7 +2,7 @@ use crate::core::helpers::champs::get_champ_names;
 use crate::core::lcu::items::push_items_to_client;
 use crate::core::{data_dragon, lcu};
 use crate::errors::DataDragonError;
-use crate::frontend_types::{ChampionNames, RunesAndAbilities};
+use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types};
 
 use data_dragon::DataDragon;
@@ -17,24 +17,48 @@ use ugg::Data;
 #[tauri::command]
 pub async fn champion_info(
     name: ChampionNames,
-    role: String,
+    role: Option<String>,
     rank: String,
     region: String,
     lang: String,
 ) -> Result<ChampionInfo, i64> {
-    // let request = ranking(&name.value.id, &role, &rank, &region, &lang).await;
     let data_dragon = DataDragon::new(Some(&lang)).await;
+    let role: String = match role {
+        Some(role) => role,
+        None => match Data::no_pos(name.value.id, &lang).await {
+            Ok(role) => role,
+            Err(err) => return Err(i64::from(err)),
+        },
+    };
 
     let data = Data::new(name.clone(), role, rank, region, lang);
-    let request = data.ranking().await;
-    let fut_winrate = data.winrate(request.clone());
-    let fut_pickrate = data.pick_rate(request.clone());
-    let fut_banrate = data.ban_rate(request.clone());
-    let fut_tier = data.rank(request);
+
+    let (ranking, overview) = futures::join!(data.ranking(), data.overview());
+
+    let fut_winrate = data.winrate(&ranking);
+    let fut_pickrate = data.pick_rate(&ranking);
+    let fut_banrate = data.ban_rate(&ranking);
+    let fut_tier = data.rank(&ranking);
     let fut_role = data.default_pos();
 
-    let (winrate, pickrate, banrate, tier, role) =
-        futures::join!(fut_winrate, fut_pickrate, fut_banrate, fut_tier, fut_role,);
+    let fut_runes = data.rune_tuple(&overview);
+    let fut_abilities = data.abilities(&overview);
+    let fut_shards = data.shard_tuple(&overview);
+    let fut_items = data.items(&overview);
+    let fut_spells = data.summoners(&overview);
+
+    let (winrate, pickrate, banrate, tier, role, runes, abilities, shards, items, spells) = futures::join!(
+        fut_winrate,
+        fut_pickrate,
+        fut_banrate,
+        fut_tier,
+        fut_role,
+        fut_runes,
+        fut_abilities,
+        fut_shards,
+        fut_items,
+        fut_spells
+    );
 
     match data_dragon {
         Ok(data_dragon) => {
@@ -51,6 +75,17 @@ pub async fn champion_info(
                 ban_rate: banrate.map_err(i64::from),
                 tier: tier.map_err(i64::from),
                 role: role.map_err(i64::from),
+                runes: match runes {
+                    Ok((obj, _, _)) => Ok(obj),
+                    Err(err) => Err(i64::from(err)),
+                },
+                items: match items {
+                    Ok((obj, _)) => Ok(obj),
+                    Err(err) => Err(i64::from(err)),
+                },
+                abilities: abilities.map_err(i64::from),
+                shards: shards.map_err(i64::from),
+                spells: spells.map_err(i64::from),
             })
         }
         Err(err) => Err(err as i64),
@@ -70,8 +105,8 @@ pub async fn push_runes(
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
     let request = data.ranking().await;
     let request_2 = data.overview().await;
-    let fut_winrate = data.winrate(request);
-    let fut_rune_match = data.rune_tuple(request_2);
+    let fut_winrate = data.winrate(&request);
+    let fut_rune_match = data.rune_tuple(&request_2);
     let (winrate, rune_match) = futures::join!(fut_winrate, fut_rune_match);
 
     match rune_match {
@@ -112,47 +147,6 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
     }
 }
 
-/// Sends runes, items, abilities, and stat shards to the front end
-/// will later include summoner spells, and in the future will return
-/// in the form of a result instead of using pattern matching
-#[tauri::command]
-pub async fn runes_and_abilities(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
-    lang: String,
-) -> Result<RunesAndAbilities, i64> {
-    let data = Data::new(name, role, rank, region, lang);
-    let request = data.overview().await;
-    let fut_runes = data.rune_tuple(request.clone());
-    let fut_abilities = data.abilities(request.clone());
-    let fut_shards = data.shard_tuple(request.clone());
-    let fut_items = data.items(request.clone());
-    let fut_spells = data.summoners(request);
-    let (runes, abilities, shards, items, spells) =
-        futures::join!(fut_runes, fut_abilities, fut_shards, fut_items, fut_spells);
-
-    let shards = match shards {
-        Ok(shards) => Ok(shards),
-        Err(err) => Err(i64::from(err)),
-    };
-
-    Ok(RunesAndAbilities {
-        runes: match runes {
-            Ok((obj, _, _)) => Ok(obj),
-            Err(err) => Err(i64::from(err)),
-        },
-        items: match items {
-            Ok((obj, _)) => Ok(obj),
-            Err(err) => Err(i64::from(err)),
-        },
-        abilities: abilities.map_err(i64::from),
-        shards: shards.map_err(i64::from),
-        spells: spells.map_err(i64::from),
-    })
-}
-
 /// Generates a list of all champion names, IDs, Keys, URLs, and a local image
 /// that is used by the front end in order to generate a selection list
 #[tauri::command]
@@ -175,8 +169,8 @@ pub async fn push_items(
     let data = Data::new(name.clone(), role.clone(), rank, region, lang);
     let request = data.ranking().await;
     let request_2 = data.overview().await;
-    let fut_winrate = data.winrate(request);
-    let fut_item_match = data.items(request_2);
+    let fut_winrate = data.winrate(&request);
+    let fut_item_match = data.items(&request_2);
     let (winrate, item_match) = futures::join!(fut_winrate, fut_item_match);
 
     match item_match {

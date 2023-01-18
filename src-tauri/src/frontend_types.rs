@@ -9,6 +9,11 @@ pub struct ChampionInfo {
     pub ban_rate: Result<String, i64>,
     pub tier: Result<String, i64>,
     pub role: Result<String, i64>,
+    pub runes: Result<RuneImages, i64>,
+    pub items: Result<ItemsMap, i64>,
+    pub abilities: Result<AbilitiesMap, i64>,
+    pub shards: Result<Shards, i64>,
+    pub spells: Result<SummonerSpellInfo, i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

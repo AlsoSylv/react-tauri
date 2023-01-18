@@ -12,7 +12,7 @@ use super::{
 impl Data {
     pub async fn summoners(
         &self,
-        request: Result<Overview, ErrorMap>,
+        request: &Result<Overview, ErrorMap>,
     ) -> Result<SummonerSpellInfo, ErrorMap> {
         let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match request {
@@ -76,7 +76,7 @@ impl Data {
                     }
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 

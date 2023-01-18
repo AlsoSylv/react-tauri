@@ -13,7 +13,7 @@ impl super::Data {
     /// Returns items from the UGG API these can be empty
     pub async fn items(
         &self,
-        request: Result<Overview, ErrorMap>,
+        request: &Result<Overview, ErrorMap>,
     ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
         match request {
             Ok(json) => {
@@ -103,14 +103,14 @@ impl super::Data {
                     community_dragon_items(&self.lang, json).await
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 }
 
 async fn community_dragon_items(
     lang: &str,
-    json: Overview,
+    json: &Overview,
 ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
     let community_dragon = CommunityDragon::new(lang);
     let items = community_dragon.item_json().await;

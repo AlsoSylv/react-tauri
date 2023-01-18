@@ -15,7 +15,7 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn winrate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn winrate(&self, request: &Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
                 let Some(matches) = json.matches else {
@@ -29,7 +29,7 @@ impl super::Data {
                 let win_rate = wins / matches;
                 Ok(format!("{:.1$}%", &win_rate * 100.0, 1))
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 
@@ -42,7 +42,7 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn ban_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn ban_rate(&self, request: &Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
                 let Some(matches) = &json.total_matches else {
@@ -55,7 +55,7 @@ impl super::Data {
                 let ban_rate = bans / matches;
                 Ok(format!("{:.1$}%", &ban_rate * 100.0, 1))
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 
@@ -67,7 +67,7 @@ impl super::Data {
     ///
     /// This line is used to make sure that it's displayable information,
     /// because returning it as a float leads to the number breaking easily
-    pub async fn pick_rate(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn pick_rate(&self, request: &Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
                 let Some(matches) = &json.total_matches else {
@@ -81,12 +81,12 @@ impl super::Data {
                 let pick_rate = picks / matches;
                 Ok(format!("{:.1$}%", &pick_rate * 100.0, 1))
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 
     /// Returns the tier from the UGG API, errors if it is None
-    pub async fn rank(&self, request: Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
+    pub async fn rank(&self, request: &Result<Ranking, ErrorMap>) -> Result<String, ErrorMap> {
         match request {
             Ok(json) => {
                 let Some(rank) = json.rank else {
@@ -98,7 +98,7 @@ impl super::Data {
 
                 Ok(format!("{} / {}", rank, total_rank))
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 }

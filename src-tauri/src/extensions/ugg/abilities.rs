@@ -17,7 +17,7 @@ impl super::Data {
     /// Returns abilities from the UGG API
     pub async fn abilities(
         &self,
-        request: Result<Overview, ErrorMap>,
+        request: &Result<Overview, ErrorMap>,
     ) -> Result<AbilitiesMap, ErrorMap> {
         match request {
             Ok(json) => {
@@ -102,7 +102,7 @@ impl super::Data {
                         .await
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 }

@@ -29,6 +29,13 @@
             "Diamond Plus": "Diamond Plus",
             "Diamond 2 Plus": "Diamond 2 Plus",
             "Platinum Plus": "Platinum Plus"
+        },
+        "roles": {
+            "top" : "Top",
+            "jungle": "Jungle",
+            "mid": "Mid",
+            "adc": "ADC",
+            "supp": "Support"
         }
     }
 }

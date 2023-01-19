@@ -41,29 +41,35 @@ async fn main() {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn roles() -> Vec<Role<'static>> {
+fn roles(lang: &str) -> Vec<Role<'static>> {
+    let roles = get_translatiosn(lang).roles;
     vec![
         Role {
+            name: roles.top,
             id: "4",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_top.png",
         },
         Role {
+            name: roles.jungle,
             id: "1",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_jungle.png",
         },
         Role {
+            name: roles.mid,
             id: "5",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_mid.png",
         },
         Role {
+            name: roles.adc,
             id: "3",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_bottom.png",
         },
         Role {
+            name: roles.supp,
             id: "2",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_support.png",
@@ -74,6 +80,7 @@ fn roles() -> Vec<Role<'static>> {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Role<'a> {
+    name: String,
     id: &'a str,
     local_path: &'a str,
     url: &'a str,
@@ -104,4 +111,15 @@ pub fn get_translatiosn(lang: &str) -> Translations {
 pub struct Translations {
     pub regions: BTreeMap<String, String>,
     pub ranks: BTreeMap<String, String>,
+    pub roles: Roles,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Roles {
+    pub top: String,
+    pub jungle: String,
+    pub mid: String,
+    pub adc: String,
+    pub supp: String,
 }

@@ -23,7 +23,7 @@ impl Data {
                     if let Some(json_read) = &json_read[&self.rank] {
                         if let Some(json_read) = &json_read[&self.role] {
                             if let JsonTypes::Ranking(json) = json_read {
-                                Ok(json.to_owned())
+                                Ok(*json.to_owned())
                             } else {
                                 Err(ErrorMap::UGGError(errors::UGGDataError::RankingMissing))
                             }

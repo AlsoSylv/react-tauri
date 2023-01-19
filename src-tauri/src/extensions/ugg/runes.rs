@@ -34,19 +34,20 @@ impl super::Data {
                         let mut used_rune_ids = Vec::new();
                         let mut slots = all_runes.as_array_mut();
 
-                        for n in 0..6 {
-                            slots.iter_mut().for_each(|current_slot| {
-                                current_slot.iter_mut().for_each(|i| {
-                                    if rune_ids[n] == i.id {
+                        slots.iter_mut().for_each(|current_slot| {
+                            current_slot.iter_mut().for_each(|i| {
+                                for rune in rune_ids {
+                                    if *rune == i.id {
                                         i.active = true;
                                         used_rune_ids.push(i.id);
                                     }
-                                });
+                                }
                             });
-                        }
+                        });
+                        
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
-                    Err(err) => Err(err.to_owned()),
+                    Err(err) => Err(err),
                 }
             }
             Err(err) => Err(err.to_owned()),

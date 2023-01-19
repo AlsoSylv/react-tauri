@@ -158,13 +158,13 @@ impl Index<&str> for Roles {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum JsonTypes {
-    Overview(OverviewBase),
-    Ranking(Ranking),
+    Overview(Box<OverviewBase>),
+    Ranking(Box<Ranking>),
 }
 
 impl Default for JsonTypes {
     fn default() -> Self {
-        Self::Overview(OverviewBase::default())
+        Self::Overview(Box::default())
     }
 }
 

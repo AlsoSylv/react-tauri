@@ -9,18 +9,21 @@ pub async fn get_champ_names(
     let data_dragon = DataDragon::new(Some(lang)).await;
     match data_dragon {
         Ok(data_dragon) => match data_dragon.champion_json().await {
-            Ok(json) => Ok(for (champ_key, champ) in json.data.iter() {
-                if let Ok(id) = champ.key.parse::<i64>() {
-                    champions.push(ChampionNames::new(
-                        &champ.name,
-                        champ_key,
-                        id,
-                        Some(&data_dragon.version),
-                    ));
-                } else {
-                    unreachable!()
-                }
-            }),
+            Ok(json) => {
+                for (champ_key, champ) in json.data.iter() {
+                    if let Ok(id) = champ.key.parse::<i64>() {
+                        champions.push(ChampionNames::new(
+                            &champ.name,
+                            champ_key,
+                            id,
+                            Some(&data_dragon.version),
+                        ));
+                    } else {
+                        unreachable!()
+                    }
+                };
+                Ok(())
+            },
             Err(err) => Err(ErrorMap::DataDragonErrors(err)),
         },
         Err(err) => {
@@ -30,16 +33,19 @@ pub async fn get_champ_names(
                 let community_dragon = CommunityDragon::new(lang);
                 let champ_json = community_dragon.champs_basic().await;
                 match champ_json {
-                    Ok(json) => Ok(json.iter().for_each(|champ| {
-                        if champ.id > 0 {
-                            champions.push(ChampionNames::new(
-                                &champ.name,
-                                &champ.key,
-                                champ.id,
-                                None,
-                            ));
-                        }
-                    })),
+                    Ok(json) => {
+                        json.iter().for_each(|champ| {
+                            if champ.id > 0 {
+                                champions.push(ChampionNames::new(
+                                    &champ.name,
+                                    &champ.key,
+                                    champ.id,
+                                    None,
+                                ));
+                            }
+                        });
+                        Ok(())
+                    },
                     Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
                 }
             }

@@ -5,7 +5,7 @@ const initialData = await getInitialData();
 
 const initialGlobalState: State = {
   rank: 'Platinum Plus',
-  role: 'Default',
+  role: '',
   region: 'World',
   champion: null,
   championList: [],

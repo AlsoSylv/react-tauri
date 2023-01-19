@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "useDefineForClassFields": true,
-    "target": "es2021",
+    "target": "ESNext",
     "types": ["vite/client"],
     "allowJs": true,
     "esModuleInterop": true,

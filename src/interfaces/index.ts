@@ -11,4 +11,6 @@ export * from './Items';
 export * from './Runes';
 export * from './Shards';
 export { default as State } from './State';
+export { default as Response } from './Response';
+export { default as Role } from './Role';
 export { default as ValidatedStateResponse } from './ValidatedStateResponse';

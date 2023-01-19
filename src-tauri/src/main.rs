@@ -47,26 +47,31 @@ fn roles() -> Vec<Role<'static>> {
             id: "4",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_top.png",
+            name: "Top",
         },
         Role {
             id: "1",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_jungle.png",
+            name: "Jungle",
         },
         Role {
             id: "5",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_mid.png",
+            name: "Mid",
         },
         Role {
             id: "3",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_bottom.png",
+            name: "Bottom",
         },
         Role {
             id: "2",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_support.png",
+            name: "Support",
         },
     ]
 }
@@ -77,6 +82,7 @@ struct Role<'a> {
     id: &'a str,
     local_path: &'a str,
     url: &'a str,
+    name: &'a str,
 }
 
 /// Generates a list and sends it to the front end

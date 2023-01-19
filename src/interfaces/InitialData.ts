@@ -1,8 +1,9 @@
 import { AutoCompleteOption } from './AutoCompleteOption';
+import Role from './Role';
 
 interface InitialData {
   languageList: AutoCompleteOption<string>[];
-  roleList: AutoCompleteOption<string>[];
+  roleList: Role[];
   rankList: AutoCompleteOption<string>[];
   regionList: AutoCompleteOption<string>[];
   selectedLanguage: string;

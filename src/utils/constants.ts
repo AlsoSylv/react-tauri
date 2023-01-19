@@ -76,6 +76,21 @@ const errors: Record<number, { errorCode: number; error: string; message: string
     error: 'Role Connect Error',
     message: 'Role URL has changed',
   },
+  210: {
+    errorCode: 210,
+    error: 'Region Data Error',
+    message: 'Region contains no data',
+  },
+  211: {
+    errorCode: 211,
+    error: 'Rank Data Error',
+    message: 'Rank contains no data',
+  },
+  212: {
+    errorCode: 212,
+    error: 'Role Data Error',
+    message: 'Rank contains no data',
+  },
   401: {
     errorCode: 401,
     error: 'LCU connect error',

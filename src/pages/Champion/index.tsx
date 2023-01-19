@@ -18,7 +18,7 @@ function Champion() {
   const { champion = '' } = useParams();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [championInfo, setChampionInfo] = useState<ChampionData | null>(null);
   const [url, setUrl] = useState<string | null>(null);
 
@@ -40,20 +40,11 @@ function Champion() {
 
       const newState = { ...state, champion: selectedChampion };
 
-      const stateValidation = validateState(newState);
-
-      if (!stateValidation.isValid) {
-        setError(stateValidation.message);
-        setLoading(false);
-
-        return;
-      }
-
-      console.log(selectedChampion);
+      console.log('selectedChampion', selectedChampion);
 
       const championInfoResponse = await getChampionBuild(newState);
 
-      console.log(championInfoResponse);
+      console.log('championInfoResponse', championInfoResponse);
 
       if (championInfoResponse.completedSuccessfully) {
         const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;
@@ -116,7 +107,7 @@ function Champion() {
               </Grid>
               <Grid xs={12} container columnGap={2} justifyContent="flex-end" alignItems="flex-end">
                 <Grid xs={3}>
-                  <RoleMenu />
+                  <RoleMenu loading={loading} />
                 </Grid>
                 <Grid xs={3}>
                   <RankMenu />

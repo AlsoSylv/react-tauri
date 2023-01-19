@@ -14,6 +14,8 @@ type RunesProps = {
 function Runes(props: RunesProps) {
   const { runes, shards, loading } = props;
 
+  console.log(props);
+
   return (
     <Paper elevation={3} sx={{ padding: '10px', height: '335px', width: '550px' }}>
       {loading ? (

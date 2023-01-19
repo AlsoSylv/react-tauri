@@ -28,6 +28,8 @@ function BasicInfoData(props: { label: string; value: string; loading: boolean; 
 }
 
 function ChampionInformationDisplay({ championInfo, error, loading }: ChampionInformationDisplayProps) {
+  console.log('championInfo', championInfo);
+  console.log('loading', loading);
   return (
     <Grid container xs={12}>
       {error ? (

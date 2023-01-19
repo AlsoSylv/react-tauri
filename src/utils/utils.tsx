@@ -5,42 +5,77 @@ import {
   ChampionInfoResponse,
   State,
   ChampionOptions,
-  ChampionInfo,
   ChampionBuild,
   ValidatedStateResponse,
   AutoCompleteOption,
   InitialData,
   CachedData,
   InvokeAndCacheProps,
+  Response,
 } from 'interfaces';
+import Role from 'interfaces/Role';
 
 import { errors, DEFAULT_CACHE_DURATION } from './constants';
+import InvalidRequestState from './errors';
 
 async function getChampionBuild(state: State): Promise<ChampionInfoResponse> {
   const requestArgs = {
     name: state.champion,
-    role: state.role,
     rank: state.rank,
     region: state.region,
     lang: state.selectedLanguage,
+    ...(state.role ? { role: state.role } : {}),
   };
   try {
-    const [championBuild, championInfo] = await Promise.all([
-      invoke<ChampionBuild>('runes_and_abilities', requestArgs),
-      invoke<ChampionInfo>('champion_info', requestArgs),
-    ]);
+    const championBuild = await invoke<Response<ChampionBuild>>('champion_info', requestArgs);
 
-    return { ...championInfo, ...championBuild, completedSuccessfully: true };
+    const { data, invalidData } = extractDataFromOption(championBuild);
+
+    if (invalidData.length > 0) {
+      throw new InvalidRequestState('The request failed due to the following fields failed by', invalidData);
+    }
+
+    console.log('extractedData', data);
+
+    return { ...data, completedSuccessfully: true };
   } catch (exception) {
-    const parsedNumber = Number(exception);
-    const error = errors[parsedNumber];
-    const errorMessage = error?.message || 'No Data Exists!';
+    console.log(exception);
+    if (exception instanceof InvalidRequestState) {
+      const fieldsString = exception.invalidFields
+        .map(({ errorCode, field }) => `${field}: ${getErrorMessage(errorCode)}`)
+        .join(',\n');
 
-    console.error('Got an error while trying to fetch the champion build for state %o', requestArgs);
-    console.error(error || exception);
+      console.error('Got an error while trying to fetch the champion build for state %o', requestArgs);
+      console.error(fieldsString);
+    } else {
+      console.error('Got an error while trying to fetch the champion build for state %o', requestArgs);
+      console.error(exception);
+    }
 
-    return { message: errorMessage, completedSuccessfully: false };
+    return { message: 'The request failed.', completedSuccessfully: false };
   }
+}
+
+function extractDataFromOption<T>(data: Response<T>) {
+  return Object.entries(data).reduce(
+    (acc, [key, value]) => {
+      if (typeof value === 'object') {
+        if (Object.hasOwn(value, 'Ok')) {
+          acc.data[key as keyof T] = value.Ok;
+        } else {
+          acc.invalidData.push({ field: key, errorCode: value.Err });
+        }
+      }
+
+      return acc;
+    },
+    { data: {} as T, invalidData: [] as { field: string; errorCode: number }[] }
+  );
+}
+
+function getErrorMessage(number: number) {
+  const error = errors[number];
+  return error?.message || 'No Data Exists!';
 }
 
 function getChampionNames(lang: string) {
@@ -81,14 +116,10 @@ function getSystemLanguage() {
 }
 
 function validateState(state: State): ValidatedStateResponse {
-  const { champion, role } = state;
+  const { champion } = state;
 
   if (!champion) {
     return { isValid: false, message: 'Please Enter A Champion Name' };
-  }
-
-  if (role !== 'default' && role === '') {
-    return { isValid: false, message: 'Please Select a Role' };
   }
 
   return { isValid: true, message: '' };
@@ -142,20 +173,24 @@ function getCurrentLanguage(): string {
 
 async function getInitialData(): Promise<InitialData> {
   try {
-    const [roles, tiers, regions, languages] = await Promise.all([
-      invokeAndCache<string[]>({ method: 'roles' }),
-      invokeAndCache<string[]>({ method: 'tiers' }),
-      invokeAndCache<string[]>({ method: 'regions' }),
-      invokeAndCache<string[]>({ method: 'get_languages' }),
-    ]);
+    const languages = await invokeAndCache<string[]>({ method: 'get_languages' });
 
     const systemLanguage = getCurrentLanguage();
     const selectedLanguage = languages.find((language) => fixLanguageCode(systemLanguage) === language) || languages[0];
 
     const languageList = getLanguageList(selectedLanguage, languages);
-    const roleList: AutoCompleteOption<string>[] = roles.map((role) => ({ label: role, value: role }));
-    const rankList: AutoCompleteOption<string>[] = tiers.map((tier) => ({ label: tier, value: tier }));
-    const regionList: AutoCompleteOption<string>[] = regions.map((region) => ({ label: region, value: region }));
+
+    const [roleList, tiers, regions] = await Promise.all([
+      invokeAndCache<Role[]>({ method: 'roles', args: { lang: selectedLanguage } }),
+      invokeAndCache<Record<string, string>>({ method: 'tiers', args: { lang: selectedLanguage } }),
+      invokeAndCache<Record<string, string>>({ method: 'regions', args: { lang: selectedLanguage } }),
+    ]);
+
+    console.log(tiers);
+    console.log(regions);
+
+    const rankList: AutoCompleteOption<string>[] = Object.values(tiers).map((tier) => ({ label: tier, value: tier }));
+    const regionList: AutoCompleteOption<string>[] = Object.values(regions).map((region) => ({ label: region, value: region }));
 
     return { languageList, rankList, roleList, regionList, selectedLanguage };
   } catch (error) {

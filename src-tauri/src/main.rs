@@ -31,7 +31,6 @@ async fn main() {
             regions,
             logic::all_champion_names,
             logic::get_languages,
-            logic::runes_and_abilities,
             logic::champion_info,
             logic::push_runes,
             logic::push_items,

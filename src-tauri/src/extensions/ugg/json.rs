@@ -84,4 +84,13 @@ impl Data {
             Err(err) => Err(err),
         }
     }
+
+    pub async fn no_pos(id: i64, lang: &str) -> Result<String, ErrorMap> {
+        let ugg = UggRequest::new(&id, lang);
+        let role = ugg.default_role().await;
+        match role {
+            Ok(role) => Ok(role),
+            Err(err) => Err(err),
+        }
+    }
 }

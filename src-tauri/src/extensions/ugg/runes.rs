@@ -11,7 +11,7 @@ impl super::Data {
     /// avoid duplication of variables
     pub async fn rune_tuple(
         &self,
-        request: Result<Overview, ErrorMap>,
+        request: &Result<Overview, ErrorMap>,
     ) -> Result<(RuneImages, [i64; 2], Vec<i64>), ErrorMap> {
         match request {
             Ok(json) => {
@@ -46,10 +46,10 @@ impl super::Data {
                         }
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(err.to_owned()),
                 }
             }
-            Err(err) => Err(err),
+            Err(err) => Err(err.to_owned()),
         }
     }
 }

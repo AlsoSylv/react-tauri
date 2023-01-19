@@ -22,8 +22,10 @@ async fn ranking_structure_test() {
 
 #[tokio::test]
 async fn wins_test() {
-    if let Ok(json) = UGGDATA.ranking().await {
-        json.wins.unwrap();
+    if let Ok(json) = UGGDATA.overview().await {
+        let a = json.winrate.unwrap();
+        a.wins.unwrap();
+        a.matches.unwrap();
     } else {
         panic!()
     };

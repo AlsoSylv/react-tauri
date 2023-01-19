@@ -14,7 +14,7 @@ impl super::Data {
     /// without being hardcoded
     pub async fn shard_tuple(
         &self,
-        request: Result<Overview, ErrorMap>,
+        request: &Result<Overview, ErrorMap>,
     ) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
         let community_dragon = CommunityDragon::new(&self.lang);
@@ -34,7 +34,7 @@ impl super::Data {
 
                 match request {
                     Ok(json) => {
-                        let active_shards = json.shards;
+                        let active_shards = &json.shards;
                         match active_shards {
                             Some(active_shards) => {
                                 sort_shards(&mut shards, &active_shards.shards);
@@ -43,7 +43,7 @@ impl super::Data {
                             None => Err(ErrorMap::UGGError(UGGDataError::OverviewConnect)),
                         }
                     }
-                    Err(err) => Err(err),
+                    Err(err) => Err(err.to_owned()),
                 }
             }
             Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),

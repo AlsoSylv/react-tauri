@@ -30,12 +30,7 @@ pub async fn request<T: for<'de> Deserialize<'de>, E>(
     error_two: E,
 ) -> Result<T, E> {
     match client.get(url).send().await {
-        Ok(response) => {
-            let Ok(json) = response.json::<T>().await else {
-                return Err(error_one);
-            };
-            Ok(json)
-        }
+        Ok(response) => response.json::<T>().await.map_err(|_| error_one),
         Err(err) => {
             if err.is_body() {
                 Err(error_one)
@@ -46,12 +41,37 @@ pub async fn request<T: for<'de> Deserialize<'de>, E>(
     }
 }
 
+/// Temple for GraphQL requests that uses generics
+/// And Handles deserialization of the response body
+/// from JSON to a Rust Struct
+///
+/// # Example
+/// ```rs
+/// use crate::templates::gql_request;
+/// use crate::errors;
+///
+/// async fn new_gql_request(&self) {
+///     let request = gql_request::<Value, Value, CommunityDragonError>(
+///         "<query>",
+///         "<vars>",
+///         &self.client,
+///         "<URL>",
+///         errors::CommunityDragonMissing,
+///         errors::CannotConnect,
+///     ).await
+///     match request {
+///         Ok(json) => { ... }
+///         Err(err) => { ... }
+///     }
+/// }
 async fn gql_request<Vars: Serialize, Data: for<'de> Deserialize<'de>, E>(
     query: &str,
     vars: Vars,
     client: &reqwest::Client,
     url: &str,
-) -> Result<Data, reqwest::Error> {
+    error_one: E,
+    error_two: E,
+) -> Result<Data, E> {
     match client
         .post(url)
         .json(&GQLQuery {
@@ -61,14 +81,14 @@ async fn gql_request<Vars: Serialize, Data: for<'de> Deserialize<'de>, E>(
         .send()
         .await
     {
-        Ok(response) => {
-            let json = response.json::<Data>().await;
-            match json {
-                Ok(json) => Ok(json),
-                Err(err) => Err(err),
+        Ok(response) => response.json::<Data>().await.map_err(|_| error_one),
+        Err(err) => {
+            if err.is_body() {
+                Err(error_one)
+            } else {
+                Err(error_two)
             }
         }
-        Err(err) => Err(err),
     }
 }
 

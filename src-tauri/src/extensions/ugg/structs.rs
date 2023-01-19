@@ -218,10 +218,10 @@ pub struct Items {
     pub matches: Option<i64>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Winrate {
-    pub wins: Option<i64>,
-    pub matches: Option<i64>,
+    pub wins: Option<f64>,
+    pub matches: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

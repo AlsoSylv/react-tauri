@@ -271,6 +271,8 @@ impl Passive {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RuneImages {
+    pub tree_one: i64,
+    pub tree_two: i64,
     pub primary_runes: PrimaryTree,
     pub secondary_runes: SecondaryTree,
 }

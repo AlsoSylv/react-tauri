@@ -118,7 +118,7 @@ pub async fn champion_info(
                     spells: spells.map_err(i64::from),
                 })
             }
-        },
+        }
     }
 }
 

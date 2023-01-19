@@ -1,7 +1,7 @@
 mod champs;
 mod items;
 mod runes;
-mod structs;
+pub mod structs;
 mod summoners;
 
 use moka::future::Cache;

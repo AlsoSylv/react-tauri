@@ -5,7 +5,7 @@ mod items;
 /// Package for getting JSON from different rune endpoints
 mod runes;
 /// Structs to desearalize to
-mod structs;
+pub mod structs;
 /// Package for getting JSON from diffferent summoner spell endpoints
 mod summoners;
 

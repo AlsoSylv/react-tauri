@@ -1,12 +1,6 @@
 #![allow(dead_code)]
 /// A list of Data Dragon specific errors with things like connections,
 /// the champion being missing, or Data Dragon being missing
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DataDragonError {
-    ChampMissingError = 103,
-    DataDragonMissing = 104,
-    CannotConnect = 102,
-}
 
 pub trait Errors {
     fn is_connection(&self) -> bool;
@@ -14,20 +8,6 @@ pub trait Errors {
     fn is_missing(&self) -> bool;
 
     fn is_champ_missing(&self) -> bool;
-}
-
-impl Errors for DataDragonError {
-    fn is_connection(&self) -> bool {
-        self == &DataDragonError::CannotConnect
-    }
-
-    fn is_champ_missing(&self) -> bool {
-        self == &DataDragonError::ChampMissingError
-    }
-
-    fn is_missing(&self) -> bool {
-        self == &DataDragonError::DataDragonMissing
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -87,7 +67,7 @@ pub enum LCUResponses {
 /// to pass them all the way down to the final Tauri command
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ErrorMap {
-    DataDragonErrors(DataDragonError),
+    DataDragonErrors(data_dragon::DataDragonError),
     UGGError(UGGDataError),
     LCUResponse(LCUResponses),
     CommunityDragonErrors(CommunityDragonError),

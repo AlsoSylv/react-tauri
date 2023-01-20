@@ -2289,6 +2289,7 @@ dependencies = [
 name = "react-tauri"
 version = "0.0.0"
 dependencies = [
+ "data_dragon",
  "futures",
  "moka",
  "once_cell",

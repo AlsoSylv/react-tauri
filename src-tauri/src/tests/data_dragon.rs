@@ -1,11 +1,11 @@
 #[tokio::test]
 async fn champion_full_test() {
-    use crate::core::data_dragon::DataDragon;
+    use data_dragon::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
         Ok(data_dragon) => {
-            let json = data_dragon.champ_full(String::from("Xayah")).await;
+            let json = data_dragon.champ_full("Xayah").await;
             match json {
                 Ok(json) => {
                     if let Some(id) = json.data["Xayah"]["key"].as_str() {
@@ -23,7 +23,7 @@ async fn champion_full_test() {
 
 #[tokio::test]
 async fn champion_json_test() {
-    use crate::core::data_dragon::DataDragon;
+    use data_dragon::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -42,7 +42,7 @@ async fn champion_json_test() {
 
 #[tokio::test]
 async fn new_test() {
-    use crate::core::data_dragon::DataDragon;
+    use data_dragon::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -56,7 +56,7 @@ async fn new_test() {
 
 #[tokio::test]
 async fn items_test() {
-    use crate::core::data_dragon::DataDragon;
+    use data_dragon::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
@@ -79,12 +79,12 @@ async fn items_test() {
 
 #[tokio::test]
 async fn runes_test() {
-    use crate::core::data_dragon::DataDragon;
+    use data_dragon::DataDragon;
 
     let data_dragon = DataDragon::new(None).await;
     match data_dragon {
         Ok(data_dragon) => {
-            let runes = data_dragon.runes_json().await;
+            let runes = data_dragon.rune_json().await;
             match runes {
                 Ok(json) => {
                     let domination = &json[0];

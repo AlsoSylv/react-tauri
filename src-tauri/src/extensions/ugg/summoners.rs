@@ -1,6 +1,6 @@
 use crate::{
-    core::{community_dragon::CommunityDragon, data_dragon::DataDragon},
-    errors::{ErrorMap, Errors},
+    core::{community_dragon::CommunityDragon},
+    errors::ErrorMap,
     frontend_types::{Spell, SummonerSpellInfo},
 };
 
@@ -8,6 +8,8 @@ use super::{
     structs::{Overview, SummonerSpells},
     Data,
 };
+
+use data_dragon::DataDragon;
 
 impl Data {
     pub async fn summoners(

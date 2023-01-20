@@ -1,11 +1,10 @@
 use crate::core::helpers::champs::get_champ_names;
 use crate::core::lcu::items::push_items_to_client;
-use crate::core::{data_dragon, lcu};
-use crate::errors::{DataDragonError, Errors};
+use crate::core::lcu;
 use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types};
 
-use data_dragon::DataDragon;
+use ::data_dragon::DataDragon;
 use extensions::ugg;
 use frontend_types::ChampionInfo;
 use serde_json::json;
@@ -169,10 +168,10 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
             let langs: Result<Vec<String>, reqwest::Error> = response.json().await;
             match langs {
                 Ok(langs) => Ok(langs),
-                Err(_) => Err(DataDragonError::DataDragonMissing as i64),
+                Err(_) => Err(data_dragon::DataDragonError::DataDragonMissing as i64),
             }
         }
-        Err(_) => Err(DataDragonError::DataDragonMissing as i64),
+        Err(_) => Err(data_dragon::DataDragonError::DataDragonMissing as i64),
     }
 }
 

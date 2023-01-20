@@ -44,6 +44,20 @@ pub enum DataDragonError {
     CannotConnect = 102,
 }
 
+impl DataDragonError {
+    pub fn is_connection(&self) -> bool {
+        self == &DataDragonError::CannotConnect
+    }
+
+    pub fn is_champ_missing(&self) -> bool {
+        self == &DataDragonError::ChampMissingError
+    }
+
+    pub fn is_missing(&self) -> bool {
+        self == &DataDragonError::DataDragonMissing
+    }
+}
+
 async fn request<T: for<'de> Deserialize<'de>, E>(
     url: &str,
     client: &reqwest::Client,

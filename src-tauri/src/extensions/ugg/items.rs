@@ -1,10 +1,10 @@
 use crate::{
-    core::{community_dragon::CommunityDragon, data_dragon},
+    core::community_dragon::CommunityDragon,
     errors,
     frontend_types::{ItemValues, ItemsMap, LCUItemsMap, LCUItemsValue},
 };
 
-use data_dragon::DataDragon;
+use ::data_dragon::DataDragon;
 use errors::ErrorMap;
 
 use super::structs::Overview;

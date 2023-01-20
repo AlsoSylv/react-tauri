@@ -23,6 +23,7 @@ once_cell = { version = "1.16" }
 futures = { version = "0.3" }
 shaco = { git = "https://github.com/AlsoSylv/Shaco", branch = "test" }
 moka = { version = "0.9", features = ["future"] }
+data_dragon = { path = "./data_dragon" }
 
 [features]
 # by default Tauri runs in production mode

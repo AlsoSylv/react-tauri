@@ -1,13 +1,13 @@
 use serde_json::Value;
 
 use crate::{
-    core::{community_dragon::CommunityDragon, data_dragon},
+    core::community_dragon::CommunityDragon,
     errors,
     frontend_types::{AbilitiesMap, AbilitiesValue, Passive},
 };
 
-use data_dragon::DataDragon;
-use errors::{DataDragonError, ErrorMap, UGGDataError};
+use ::data_dragon::{DataDragon, DataDragonError};
+use errors::{ErrorMap, UGGDataError};
 
 use ErrorMap::{DataDragonErrors, UGGError};
 
@@ -26,7 +26,7 @@ impl super::Data {
                 };
 
                 if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {
-                    if let Ok(json) = data_dragon.champ_full(self.name.value.key.clone()).await {
+                    if let Ok(json) = data_dragon.champ_full(&self.name.value.key).await {
                         let champ_json = json.data[&self.name.value.key].clone();
                         let possible_passive = &champ_json["passive"]["image"]["full"];
                         let spells = &champ_json["spells"];

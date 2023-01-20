@@ -1,11 +1,12 @@
 use crate::{
     core::{
         community_dragon::{structs::Style, CommunityDragon},
-        data_dragon::{structs::RuneTree, DataDragon},
     },
-    errors::{CommunityDragonError, ErrorMap, Errors},
+    errors::{CommunityDragonError, ErrorMap},
     frontend_types,
 };
+
+use data_dragon::{DataDragon, types::RuneTree};
 
 use frontend_types::{Active, PrimaryTree, RuneImages, SecondaryTree};
 
@@ -27,7 +28,7 @@ pub async fn all_rune_images(
             let mut tree_one_names = PrimaryTree::new();
             let mut tree_two_names = SecondaryTree::new();
 
-            match data_dragon.runes_json().await {
+            match data_dragon.rune_json().await {
                 Ok(json) => {
                     for rune in json {
                         if rune.id == tree_id_one {

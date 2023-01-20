@@ -1,5 +1,6 @@
-use crate::core::{community_dragon::CommunityDragon, data_dragon::DataDragon};
-use crate::errors::{ErrorMap, Errors};
+use crate::core::community_dragon::CommunityDragon;
+use data_dragon::DataDragon;
+use crate::errors::ErrorMap;
 use crate::frontend_types::ChampionNames;
 
 pub async fn get_champ_names(

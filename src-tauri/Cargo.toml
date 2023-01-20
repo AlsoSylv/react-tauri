@@ -39,3 +39,9 @@ opt-level = "s"
 strip = "symbols"
 rpath = true
 debug = false
+
+[workspace]
+members = [
+    ".",
+    "data_dragon"
+]

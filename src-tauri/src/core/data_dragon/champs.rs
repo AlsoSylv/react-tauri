@@ -37,7 +37,7 @@ impl DataDragon {
             &self.version, &self.language
         );
         let request = request::<ChampJson, DataDragonError>(
-            url.to_owned(),
+            url,
             &self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,

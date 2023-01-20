@@ -24,19 +24,16 @@ pub async fn all_rune_images(
 ) -> Result<RuneImages, ErrorMap> {
     match DataDragon::new(Some(language)).await {
         Ok(data_dragon) => {
-            let request = data_dragon.runes_json().await;
             let mut tree_one_names = PrimaryTree::new();
             let mut tree_two_names = SecondaryTree::new();
-            let mut tree_one_array = tree_one_names.as_array_mut();
-            let mut tree_two_array = tree_two_names.as_array_mut();
 
-            match request {
+            match data_dragon.runes_json().await {
                 Ok(json) => {
                     for rune in json {
                         if rune.id == tree_id_one {
-                            split_trees_data_dragon(0, 4, &rune, &mut tree_one_array)
+                            split_trees_data_dragon(0, 4, &rune, &mut tree_one_names.as_array_mut())
                         } else if rune.id == tree_id_two {
-                            split_trees_data_dragon(1, 4, &rune, &mut tree_two_array)
+                            split_trees_data_dragon(1, 4, &rune, &mut tree_two_names.as_array_mut())
                         }
                     }
                     Ok(RuneImages {
@@ -94,17 +91,15 @@ pub async fn community_dragon_all_rune_images(
 
     let mut tree_one_names = PrimaryTree::new();
     let mut tree_two_names = SecondaryTree::new();
-    let mut tree_one_array = tree_one_names.as_array_mut();
-    let mut tree_two_array = tree_two_names.as_array_mut();
 
     match runes_style {
         Ok(rune_style_json) => match rune {
             Ok(rune_json) => {
                 for rune in rune_style_json.styles.iter() {
                     if rune.id == tree_id_one {
-                        split_trees(0, 4, rune, &rune_json, &mut tree_one_array)
+                        split_trees_community_dragon(0, 4, rune, &rune_json, &mut tree_one_names.as_array_mut())
                     } else if rune.id == tree_id_two {
-                        split_trees(1, 4, rune, &rune_json, &mut tree_two_array)
+                        split_trees_community_dragon(1, 4, rune, &rune_json, &mut tree_two_names.as_array_mut())
                     }
                 }
                 Ok(RuneImages {
@@ -120,7 +115,7 @@ pub async fn community_dragon_all_rune_images(
     }
 }
 
-fn split_trees(
+fn split_trees_community_dragon(
     start: usize,
     end: usize,
     styles: &Style,
@@ -142,26 +137,21 @@ fn split_trees(
 async fn generate_perks(
     community_dragon: &CommunityDragon,
 ) -> Result<Vec<Active>, CommunityDragonError> {
-    let rune = community_dragon.runes().await;
+    let rune = community_dragon.runes().await?;
     let mut runes: Vec<Active> = Vec::new();
-    match rune {
-        Ok(json) => {
-            for details in json {
-                if let Some(path_location) = details.icon_path.find("/v1/") {
-                    runes.push(Active::new(
-                        &details.name,
-                        format!(
-                            "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default{}",
-                            details.icon_path.split_at(path_location).1.to_lowercase()
-                        ),
-                        details.id,
-                        format!("/{0}/{1}.png", details.name, details.name),
-                        &details.long_desc,
-                    ));
-                };
-            }
-            Ok(runes)
-        }
-        Err(err) => Err(err),
+    for details in rune {
+        if let Some(path_location) = details.icon_path.find("/v1/") {
+            runes.push(Active::new(
+                &details.name,
+                format!(
+                    "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default{}",
+                    details.icon_path.split_at(path_location).1.to_lowercase()
+                ),
+                details.id,
+                format!("/{0}/{1}.png", details.name, details.name),
+                &details.long_desc,
+            ));
+        };
     }
+    Ok(runes)
 }

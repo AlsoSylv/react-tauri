@@ -6,8 +6,7 @@ pub async fn get_champ_names(
     lang: &str,
     champions: &mut Vec<ChampionNames>,
 ) -> Result<(), ErrorMap> {
-    let data_dragon = DataDragon::new(Some(lang)).await;
-    match data_dragon {
+    match DataDragon::new(Some(lang)).await {
         Ok(data_dragon) => match data_dragon.champion_json().await {
             Ok(json) => {
                 for (champ_key, champ) in json.data.iter() {
@@ -31,8 +30,7 @@ pub async fn get_champ_names(
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
                 let community_dragon = CommunityDragon::new(lang);
-                let champ_json = community_dragon.champs_basic().await;
-                match champ_json {
+                match community_dragon.champs_basic().await {
                     Ok(json) => {
                         json.iter().for_each(|champ| {
                             if champ.id > 0 {

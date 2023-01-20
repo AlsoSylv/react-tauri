@@ -15,6 +15,27 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl DataDragon {
+    /// Method for getting the champions.json file
+    /// 
+    /// ```rust
+    /// async fn champion_json_test() {
+    ///     use data_dragon::DataDragon;
+    /// 
+    ///     let data_dragon = DataDragon::new(None).await;
+    ///     match data_dragon {
+    ///         Ok(data_dragon) => {
+    ///             let json = data_dragon.champion_json().await;
+    ///             match json {
+    ///                 Ok(json) => {
+    ///                     assert!(json.data["Xayah"].key == String::from("498"))
+    ///                 }
+    ///                 Err(_) => panic!(),
+    ///             }
+    ///         }
+    ///         Err(_) => panic!(),
+    ///     }
+    /// }
+    /// ```
     pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
         let cache = CACHED_CHAMP_JSON.lock().await;
         if let Some(json) = cache.get(&self.language) {

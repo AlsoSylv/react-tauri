@@ -1,15 +1,15 @@
-use moka::future::Cache;
-use once_cell::sync::Lazy;
 use serde::Deserialize;
+use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
+use moka::future::Cache;
 
-#[path = "requests/champs.rs"]
+#[path ="requests/champs.rs"]
 mod champs;
-#[path = "requests/items.rs"]
-mod items;
-#[path = "requests/runes.rs"]
+#[path ="requests/runes.rs"]
 mod runes;
-#[path = "requests/summoners.rs"]
+#[path ="requests/items.rs"]
+mod items;
+#[path ="requests/summoners.rs"]
 mod summoners;
 
 pub mod types;
@@ -23,6 +23,22 @@ pub struct DataDragon {
 }
 
 impl DataDragon {
+    /// Creates a new instance of the DataDragon wrapper
+    /// 
+    /// ```rust
+    /// async fn new_test() {
+    ///     use data_dragon::DataDragon;
+    /// 
+    ///     let data_dragon = DataDragon::new(None).await;
+    ///     match data_dragon {
+    ///         Ok(data_dragon) => {
+    ///             println!("{}", data_dragon.version);
+    ///             assert!(data_dragon.language == String::from("en_US"));
+    ///         }
+    ///         Err(_) => panic!(),
+    ///     }
+    /// }
+    /// ```
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
         let lang = language.unwrap_or("en_US");
         let client = reqwest::Client::new();

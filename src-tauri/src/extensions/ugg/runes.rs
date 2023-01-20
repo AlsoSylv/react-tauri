@@ -44,7 +44,7 @@ impl super::Data {
                                 }
                             });
                         });
-                        
+
                         Ok((all_runes, [*tree_id_one, *tree_id_two], used_rune_ids))
                     }
                     Err(err) => Err(err),

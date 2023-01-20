@@ -517,9 +517,12 @@ dependencies = [
 name = "data_dragon"
 version = "0.1.0"
 dependencies = [
+ "moka",
+ "once_cell",
  "reqwest",
  "serde",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

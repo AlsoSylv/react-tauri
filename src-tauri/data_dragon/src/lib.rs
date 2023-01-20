@@ -1,15 +1,20 @@
+use moka::future::Cache;
+use once_cell::sync::Lazy;
 use serde::Deserialize;
+use tokio::sync::Mutex;
 
-#[path ="requests/champs.rs"]
+#[path = "requests/champs.rs"]
 mod champs;
-#[path ="requests/runes.rs"]
-mod runes;
-#[path ="requests/items.rs"]
+#[path = "requests/items.rs"]
 mod items;
-#[path ="requests/summoners.rs"]
+#[path = "requests/runes.rs"]
+mod runes;
+#[path = "requests/summoners.rs"]
 mod summoners;
 
 pub mod types;
+
+static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
 pub struct DataDragon {
     pub version: String,
@@ -21,6 +26,14 @@ impl DataDragon {
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
         let lang = language.unwrap_or("en_US");
         let client = reqwest::Client::new();
+        let cache = CACHED_VERSION.lock().await;
+        if let Some(version) = cache.get(lang) {
+            return Ok(DataDragon {
+                version,
+                language: lang.to_owned(),
+                client,
+            });
+        }
         let json = request::<Vec<String>, DataDragonError>(
             "https://ddragon.leagueoflegends.com/api/versions.json",
             &client,
@@ -29,6 +42,7 @@ impl DataDragon {
         )
         .await?;
         let version = json[0].clone();
+        cache.insert("version".to_string(), version.clone()).await;
         Ok(DataDragon {
             version,
             language: lang.to_owned(),

@@ -1,5 +1,5 @@
 use crate::{
-    core::{community_dragon::CommunityDragon},
+    core::community_dragon::CommunityDragon,
     errors::ErrorMap,
     frontend_types::{Spell, SummonerSpellInfo},
 };

@@ -1,12 +1,10 @@
 use crate::{
-    core::{
-        community_dragon::{structs::Style, CommunityDragon},
-    },
+    core::community_dragon::{structs::Style, CommunityDragon},
     errors::{CommunityDragonError, ErrorMap},
     frontend_types,
 };
 
-use data_dragon::{DataDragon, types::RuneTree};
+use data_dragon::{types::RuneTree, DataDragon};
 
 use frontend_types::{Active, PrimaryTree, RuneImages, SecondaryTree};
 
@@ -98,9 +96,21 @@ pub async fn community_dragon_all_rune_images(
             Ok(rune_json) => {
                 for rune in rune_style_json.styles.iter() {
                     if rune.id == tree_id_one {
-                        split_trees_community_dragon(0, 4, rune, &rune_json, &mut tree_one_names.as_array_mut())
+                        split_trees_community_dragon(
+                            0,
+                            4,
+                            rune,
+                            &rune_json,
+                            &mut tree_one_names.as_array_mut(),
+                        )
                     } else if rune.id == tree_id_two {
-                        split_trees_community_dragon(1, 4, rune, &rune_json, &mut tree_two_names.as_array_mut())
+                        split_trees_community_dragon(
+                            1,
+                            4,
+                            rune,
+                            &rune_json,
+                            &mut tree_two_names.as_array_mut(),
+                        )
                     }
                 }
                 Ok(RuneImages {

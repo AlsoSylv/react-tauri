@@ -1,6 +1,6 @@
 use crate::core::helpers::champs::get_champ_names;
-use crate::core::lcu::items::push_items_to_client;
 use crate::core::lcu;
+use crate::core::lcu::items::push_items_to_client;
 use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types};
 

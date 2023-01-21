@@ -16,11 +16,11 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
 
 impl DataDragon {
     /// Method for getting the champions.json file
-    /// 
+    ///
     /// ```rust
     /// async fn champion_json_test() {
     ///     use data_dragon::DataDragon;
-    /// 
+    ///
     ///     let data_dragon = DataDragon::new(None).await;
     ///     match data_dragon {
     ///         Ok(data_dragon) => {
@@ -45,7 +45,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
-        let champ_json = request::<ChampJson, DataDragonError>(
+        let champ_json: ChampJson = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,
@@ -96,7 +96,7 @@ impl DataDragon {
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &key
         );
-        let full_json = request::<ChampionFull, DataDragonError>(
+        let full_json: ChampionFull = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

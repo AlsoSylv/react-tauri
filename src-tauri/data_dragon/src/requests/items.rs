@@ -9,16 +9,15 @@ static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
 impl DataDragon {
-
     /// Cached function to get Data Dragons items.json file
-    /// 
+    ///
     /// TODO: Return as a struct, not Value
-    /// 
+    ///
     /// # Example
     /// ```rust
     /// async fn items_test() {
     ///     use data_dragon::DataDragon;
-    /// 
+    ///
     ///     let data_dragon = DataDragon::new(None).await;
     ///     match data_dragon {
     ///         Ok(data_dragon) => {
@@ -47,7 +46,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
             &self.version, &self.language
         );
-        let item_json = request::<Value, DataDragonError>(
+        let item_json: Value = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

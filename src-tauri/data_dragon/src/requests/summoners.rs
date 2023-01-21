@@ -18,7 +18,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
             &self.version, &self.language
         );
-        let summoner_json = request::<Summoners, DataDragonError>(
+        let summoner_json: Summoners = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

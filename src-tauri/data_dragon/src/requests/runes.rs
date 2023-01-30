@@ -44,7 +44,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
             &self.version, &self.language
         );
-        let rune_json = request::<Vec<RuneTree>, DataDragonError>(
+        let rune_json: Vec<RuneTree> = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

@@ -45,7 +45,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
             &self.version, &self.language
         );
-        let champ_json = request::<ChampJson, DataDragonError>(
+        let champ_json: ChampJson = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,
@@ -96,7 +96,7 @@ impl DataDragon {
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
             &self.version, &self.language, &key
         );
-        let full_json = request::<ChampionFull, DataDragonError>(
+        let full_json: ChampionFull = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

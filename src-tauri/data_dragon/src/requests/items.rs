@@ -46,7 +46,7 @@ impl DataDragon {
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
             &self.version, &self.language
         );
-        let item_json = request::<Value, DataDragonError>(
+        let item_json: Value = request(
             &url,
             &self.client,
             DataDragonError::DataDragonMissing,

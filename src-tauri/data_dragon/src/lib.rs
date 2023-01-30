@@ -1,3 +1,8 @@
+use hyper::{
+    client::{connect::Connect, HttpConnector},
+    Client,
+};
+use hyper_tls::HttpsConnector;
 use moka::future::Cache;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -19,7 +24,7 @@ static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::
 pub struct DataDragon {
     pub version: String,
     pub language: String,
-    pub client: reqwest::Client,
+    pub client: Client<HttpsConnector<HttpConnector>>,
 }
 
 impl DataDragon {
@@ -41,7 +46,8 @@ impl DataDragon {
     /// ```
     pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
         let lang = language.unwrap_or("en_US");
-        let client = reqwest::Client::new();
+        let https = HttpsConnector::new();
+        let client = Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
         let cache = CACHED_VERSION.lock().await;
         if let Some(version) = cache.get(lang) {
             return Ok(DataDragon {
@@ -50,7 +56,7 @@ impl DataDragon {
                 client,
             });
         }
-        let json = request::<Vec<String>, DataDragonError>(
+        let json: Vec<String> = request(
             "https://ddragon.leagueoflegends.com/api/versions.json",
             &client,
             DataDragonError::DataDragonMissing,
@@ -88,19 +94,40 @@ impl DataDragonError {
     }
 }
 
-async fn request<T: for<'de> Deserialize<'de>, E>(
+pub async fn request<
+    T: for<'de> Deserialize<'de>,
+    E,
+    U: Connect + Send + Sync + Clone + 'static,
+>(
     url: &str,
-    client: &reqwest::Client,
+    client: &Client<U, hyper::Body>,
     error_one: E,
     error_two: E,
 ) -> Result<T, E> {
-    match client.get(url).send().await {
-        Ok(response) => response.json::<T>().await.map_err(|_| error_one),
+    let uri = url.parse().unwrap();
+    match client.get(uri).await {
+        Ok(mut resp) => {
+            if resp.status().is_client_error() || resp.status().is_server_error() {
+                return Err(error_two);
+            }
+            let body = resp.body_mut();
+            let bytes = hyper::body::to_bytes(body).await;
+            match bytes {
+                Ok(bytes) => {
+                    let json = serde_json::from_slice::<T>(&bytes);
+                    match json {
+                        Ok(json) => Ok(json),
+                        Err(_) => Err(error_one),
+                    }
+                }
+                Err(_) => Err(error_one),
+            }
+        }
         Err(err) => {
-            if err.is_body() {
-                Err(error_one)
-            } else {
+            if err.is_connect() {
                 Err(error_two)
+            } else {
+                Err(error_one)
             }
         }
     }

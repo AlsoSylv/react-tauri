@@ -19,7 +19,11 @@ pub async fn push_runes_to_client(page: Value) -> Result<LCUResponses, LCURespon
                 .await
                 .is_ok()
             {
-                if client.post::<Value, Value>(&pages_endpoint, page).await.is_ok() {
+                if client
+                    .post::<Value, Value>(&pages_endpoint, page)
+                    .await
+                    .is_ok()
+                {
                     Ok(LCUResponses::LCUPushRune)
                 } else {
                     Err(LCUResponses::LCUCreateRune)

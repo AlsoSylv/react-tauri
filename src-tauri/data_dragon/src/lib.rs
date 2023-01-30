@@ -1,15 +1,15 @@
-use serde::Deserialize;
-use once_cell::sync::Lazy;
-use tokio::sync::Mutex;
 use moka::future::Cache;
+use once_cell::sync::Lazy;
+use serde::Deserialize;
+use tokio::sync::Mutex;
 
-#[path ="requests/champs.rs"]
+#[path = "requests/champs.rs"]
 mod champs;
-#[path ="requests/runes.rs"]
-mod runes;
-#[path ="requests/items.rs"]
+#[path = "requests/items.rs"]
 mod items;
-#[path ="requests/summoners.rs"]
+#[path = "requests/runes.rs"]
+mod runes;
+#[path = "requests/summoners.rs"]
 mod summoners;
 
 pub mod types;
@@ -24,11 +24,11 @@ pub struct DataDragon {
 
 impl DataDragon {
     /// Creates a new instance of the DataDragon wrapper
-    /// 
+    ///
     /// ```rust
     /// async fn new_test() {
     ///     use data_dragon::DataDragon;
-    /// 
+    ///
     ///     let data_dragon = DataDragon::new(None).await;
     ///     match data_dragon {
     ///         Ok(data_dragon) => {

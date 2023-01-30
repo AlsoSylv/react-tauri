@@ -16,11 +16,11 @@ static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
 
 impl DataDragon {
     /// Method for getting the champions.json file
-    /// 
+    ///
     /// ```rust
     /// async fn champion_json_test() {
     ///     use data_dragon::DataDragon;
-    /// 
+    ///
     ///     let data_dragon = DataDragon::new(None).await;
     ///     match data_dragon {
     ///         Ok(data_dragon) => {

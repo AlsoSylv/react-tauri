@@ -2,7 +2,7 @@
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
-    pub url: String,
+    pub url: Result<String, i64>,
     pub local_image: String,
     pub win_rate: Result<String, i64>,
     pub pick_rate: Result<String, i64>,

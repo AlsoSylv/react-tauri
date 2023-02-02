@@ -1,5 +1,5 @@
 use crate::{
-    core::community_dragon::CommunityDragon,
+    core::community_dragon::new_community_dragon,
     errors::ErrorMap,
     frontend_types::{Spell, SummonerSpellInfo},
 };
@@ -9,14 +9,12 @@ use super::{
     Data,
 };
 
-use data_dragon::DataDragon;
-
-impl Data {
+impl Data<'_> {
     pub async fn summoners(
         &self,
         request: &Result<Overview, ErrorMap>,
     ) -> Result<SummonerSpellInfo, ErrorMap> {
-        let data_dragon = DataDragon::new(Some(&self.lang)).await;
+        // let data_dragon = DataDragon::new(Some(&self.lang)).await;
         match request {
             Ok(json) => {
                 // spell_info[1] -> Wins with combo
@@ -31,9 +29,9 @@ impl Data {
                 };
                 let winrate = format!("{}%", wins / games);
                 let mut spells = SummonerSpellInfo::new(winrate);
-                match data_dragon {
-                    Ok(data_dragon) => {
-                        let spell_json = data_dragon.summoners_json().await;
+                match self.data_dragon.get_version().await {
+                    Ok(version) => {
+                        let spell_json = self.data_dragon.summoners_json(&version, self.lang).await;
                         match spell_json {
                             Ok(json) => {
                                 for (_, data) in json.data.iter() {
@@ -46,14 +44,14 @@ impl Data {
                                         spells.spell_one = Spell {
                                             name: data.name.clone(),
                                             description: data.description.clone(),
-                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}", data_dragon.version, data.image.full),
+                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}", version, data.image.full),
                                             local_image: format!("{}.png", data.name),
                                         }
                                     } else if spell_two == data.key {
                                         spells.spell_two = Spell {
                                             name: data.name.clone(),
                                             description: data.description.clone(),
-                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}", data_dragon.version, data.image.full),
+                                            url: format!("http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}", version, data.image.full),
                                             local_image: format!("{}.png", data.name),
                                         }
                                     }
@@ -90,7 +88,7 @@ impl Data {
         let Some(spell_array) = &spell_info.spells else {
             panic!()
         };
-        let community_dragon = CommunityDragon::new(&self.lang);
+        let community_dragon = new_community_dragon(self.lang, self.client);
         let summoner_spell_json = community_dragon.summoner_spells().await;
         match summoner_spell_json {
             Ok(json) => {

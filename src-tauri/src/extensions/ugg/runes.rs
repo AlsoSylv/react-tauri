@@ -5,7 +5,7 @@ use frontend_types::RuneImages;
 
 use super::structs::Overview;
 
-impl super::Data {
+impl super::Data<'_> {
     /// Returns runes from the UGG API
     /// this heavily uses mutability to
     /// avoid duplication of variables
@@ -28,7 +28,7 @@ impl super::Data {
                 };
 
                 let all_runes =
-                    helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, &self.lang).await;
+                    helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, self.lang, self.client, self.data_dragon).await;
                 match all_runes {
                     Ok(mut all_runes) => {
                         let mut used_rune_ids = Vec::new();

@@ -4,7 +4,7 @@ use super::structs::{Runes, RunesStyle};
 use super::CommunityDragon;
 use crate::templates::request;
 
-impl CommunityDragon {
+impl CommunityDragon<'_> {
     pub async fn runes(&self) -> Result<Vec<Runes>, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/perks.json", &self.language);
         let request = request::<Vec<Runes>, CommunityDragonError>(

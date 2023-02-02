@@ -22,8 +22,6 @@ pub mod types;
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
 pub struct DataDragon {
-    pub version: String,
-    pub language: String,
     pub client: Client<HttpsConnector<HttpConnector>>,
 }
 
@@ -44,32 +42,31 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
-        let lang = language.unwrap_or("en_US");
+    pub fn new() -> Self {
         let https = HttpsConnector::new();
         let client = Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
+        DataDragon { client }
+    }
+
+    fn lang_default<'a>(&'a self, language: Option<&'a str>) -> &str {
+        language.unwrap_or("en_US")
+    }
+
+    pub async fn get_version<'a>(&'a self) -> Result<String, DataDragonError> {
         let cache = CACHED_VERSION.lock().await;
-        if let Some(version) = cache.get(lang) {
-            return Ok(DataDragon {
-                version,
-                language: lang.to_owned(),
-                client,
-            });
+        if let Some(version) = cache.get("version") {
+            return Ok(version);
         }
         let json: Vec<String> = request(
             "https://ddragon.leagueoflegends.com/api/versions.json",
-            &client,
+            &self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
         let version = json[0].clone();
         cache.insert("version".to_string(), version.clone()).await;
-        Ok(DataDragon {
-            version,
-            language: lang.to_owned(),
-            client,
-        })
+        Ok(version)
     }
 }
 

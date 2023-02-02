@@ -3,7 +3,7 @@ use super::CommunityDragon;
 use crate::errors::CommunityDragonError;
 use crate::templates;
 
-impl CommunityDragon {
+impl CommunityDragon<'_> {
     pub async fn champs_basic(&self) -> Result<Vec<ChampionData>, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champion-summary.json", &self.language);
         let request: Result<Vec<ChampionData>, CommunityDragonError> = templates::request(

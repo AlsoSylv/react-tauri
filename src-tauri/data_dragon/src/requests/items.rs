@@ -37,14 +37,19 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn item_json(&self) -> Result<Value, DataDragonError> {
+    pub async fn item_json(
+        &self,
+        version: &str,
+        language: Option<&str>,
+    ) -> Result<Value, DataDragonError> {
+        let lang = self.lang_default(language);
         let cache = CACHED_ITEM_JSON.lock().await;
-        if let Some(json) = cache.get(&self.language) {
+        if let Some(json) = cache.get(lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
-            &self.version, &self.language
+            version, lang
         );
         let item_json: Value = request(
             &url,
@@ -53,7 +58,7 @@ impl DataDragon {
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache.insert(self.language.clone(), item_json.clone()).await;
+        cache.insert(lang.to_string(), item_json.clone()).await;
         cache.sync();
         Ok(item_json)
     }

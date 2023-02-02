@@ -5,6 +5,7 @@
 
 use std::collections::{BTreeMap, HashMap};
 
+use data_dragon::DataDragon;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -21,10 +22,27 @@ pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
     serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
 });
 
+pub struct AppState {
+    client: reqwest::Client,
+    data_dragon: DataDragon,
+}
+
+impl AppState {
+    fn new() -> Self {
+        let client = reqwest::Client::new();
+        let data_dragon = DataDragon::new();
+        Self {
+            client,
+            data_dragon,
+        }
+    }
+}
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
 async fn main() {
     tauri::Builder::default()
+        .manage(AppState::new())
         .invoke_handler(tauri::generate_handler![
             roles,
             tiers,

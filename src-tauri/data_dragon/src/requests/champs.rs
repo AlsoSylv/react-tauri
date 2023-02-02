@@ -36,14 +36,19 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
+    pub async fn champion_json(
+        &self,
+        version: &str,
+        language: Option<&str>,
+    ) -> Result<ChampJson, DataDragonError> {
+        let lang = self.lang_default(language);
         let cache = CACHED_CHAMP_JSON.lock().await;
-        if let Some(json) = cache.get(&self.language) {
+        if let Some(json) = cache.get(lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
-            &self.version, &self.language
+            version, lang
         );
         let champ_json: ChampJson = request(
             &url,
@@ -52,9 +57,7 @@ impl DataDragon {
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache
-            .insert(self.language.clone(), champ_json.clone())
-            .await;
+        cache.insert(lang.to_string(), champ_json.clone()).await;
         cache.sync();
         Ok(champ_json)
     }
@@ -87,14 +90,20 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn champ_full(&self, key: &str) -> Result<ChampionFull, DataDragonError> {
+    pub async fn champ_full(
+        &self,
+        key: &str,
+        version: &str,
+        language: Option<&str>,
+    ) -> Result<ChampionFull, DataDragonError> {
+        let lang = self.lang_default(language);
         let cache = CACHED_CHAMP_FULL.lock().await;
-        if let Some(json) = cache.get(&(self.language.clone(), key.to_string())) {
+        if let Some(json) = cache.get(&(lang.to_string(), key.to_string())) {
             return Ok(json);
         };
         let url = format!(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
-            &self.version, &self.language, &key
+            version, lang, &key
         );
         let full_json: ChampionFull = request(
             &url,
@@ -104,7 +113,7 @@ impl DataDragon {
         )
         .await?;
         cache
-            .insert((self.language.clone(), key.to_string()), full_json.clone())
+            .insert((lang.to_string(), key.to_string()), full_json.clone())
             .await;
         cache.sync();
         Ok(full_json)

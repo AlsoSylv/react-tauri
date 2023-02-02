@@ -1,5 +1,5 @@
 use crate::{
-    core::community_dragon::{structs::Style, CommunityDragon},
+    core::community_dragon::{structs::Style, CommunityDragon, new_community_dragon},
     errors::{CommunityDragonError, ErrorMap},
     frontend_types,
 };
@@ -19,14 +19,16 @@ use frontend_types::{Active, PrimaryTree, RuneImages, SecondaryTree};
 pub async fn all_rune_images(
     tree_id_one: i64,
     tree_id_two: i64,
-    language: &str,
+    language: Option<&str>,
+    client: &reqwest::Client,
+    data_dragon: &DataDragon
 ) -> Result<RuneImages, ErrorMap> {
-    match DataDragon::new(Some(language)).await {
-        Ok(data_dragon) => {
+    match data_dragon.get_version().await {
+        Ok(version) => {
             let mut tree_one_names = PrimaryTree::new();
             let mut tree_two_names = SecondaryTree::new();
 
-            match data_dragon.rune_json().await {
+            match data_dragon.rune_json(&version, language).await {
                 Ok(json) => {
                     for rune in json {
                         if rune.id == tree_id_one {
@@ -50,7 +52,7 @@ pub async fn all_rune_images(
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
                 let runes =
-                    community_dragon_all_rune_images(tree_id_one, tree_id_two, language).await;
+                    community_dragon_all_rune_images(tree_id_one, tree_id_two, language, client).await;
                 match runes {
                     Ok(runes) => Ok(runes),
                     Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),
@@ -82,9 +84,10 @@ fn split_trees_data_dragon(
 pub async fn community_dragon_all_rune_images(
     tree_id_one: i64,
     tree_id_two: i64,
-    language: &str,
+    language: Option<&str>,
+    client: &reqwest::Client,
 ) -> Result<RuneImages, CommunityDragonError> {
-    let community_dragon = CommunityDragon::new(language);
+    let community_dragon = new_community_dragon(language, client);
     let runes_style = community_dragon.runes_style().await;
     let rune = generate_perks(&community_dragon).await;
 
@@ -146,7 +149,7 @@ fn split_trees_community_dragon(
 }
 
 async fn generate_perks(
-    community_dragon: &CommunityDragon,
+    community_dragon: &CommunityDragon<'_>,
 ) -> Result<Vec<Active>, CommunityDragonError> {
     let rune = community_dragon.runes().await?;
     let mut runes: Vec<Active> = Vec::new();

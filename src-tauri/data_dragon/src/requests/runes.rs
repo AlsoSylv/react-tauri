@@ -35,14 +35,19 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn rune_json(&self) -> Result<Vec<RuneTree>, DataDragonError> {
+    pub async fn rune_json(
+        &self,
+        version: &str,
+        language: Option<&str>,
+    ) -> Result<Vec<RuneTree>, DataDragonError> {
+        let lang = self.lang_default(language);
         let cache = CACHED_RUNE_JSON.lock().await;
-        if let Some(json) = cache.get(&self.language) {
+        if let Some(json) = cache.get(lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
-            &self.version, &self.language
+            version, lang
         );
         let rune_json: Vec<RuneTree> = request(
             &url,
@@ -51,7 +56,7 @@ impl DataDragon {
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache.insert(self.language.clone(), rune_json.clone()).await;
+        cache.insert(lang.to_string(), rune_json.clone()).await;
         cache.sync();
         Ok(rune_json)
     }

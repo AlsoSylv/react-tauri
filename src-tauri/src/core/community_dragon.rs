@@ -26,25 +26,26 @@ mod summoners;
 ///         Err(community_dragon_error: CommunityDragonError) => { ... },
 ///     }
 /// }
-pub struct CommunityDragon {
-    pub language: String,
-    pub client: reqwest::Client,
+pub struct CommunityDragon<'a> {
+    pub language: &'a str,
+    pub client: &'a reqwest::Client,
 }
 
-impl CommunityDragon {
-    /// Creates a new reqwest client for data dragon
-    /// Takes a Riot language and translates it to
-    /// A Community Dragon language, prefered over
-    /// Using a literal struct.
-    pub fn new(lang: &str) -> Self {
-        let client = reqwest::Client::new();
-        let binding = lang.to_lowercase();
-        let language = match lang {
+/// Creates a new reqwest client for data dragon
+/// Takes a Riot language and translates it to
+/// A Community Dragon language, prefered over
+/// Using a literal struct.
+pub fn new_community_dragon<'a>(lang: Option<&'a str>, client: &'a reqwest::Client) -> CommunityDragon<'a> {
+    let language = match lang {
+        Some(lang) => match lang {
             "en_US" => "default",
-            _ => &binding,
-        }
-        .to_owned();
+            _ => {
+                let lang = lang;
+                lang
+            }
+        },
+        None => "default",
+    };
 
-        CommunityDragon { language, client }
-    }
+    CommunityDragon { language, client }
 }

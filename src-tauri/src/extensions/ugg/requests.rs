@@ -21,7 +21,7 @@ static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
 static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
     Lazy::new(|| Mutex::new(Cache::new(10)));
 
-impl structs::UggRequest {
+impl structs::UggRequest<'_> {
     /// Handles making the request to get the default roles for every champ
     /// from the UGG api
     pub async fn default_role(&self) -> Result<String, ErrorMap> {
@@ -150,10 +150,10 @@ impl structs::UggRequest {
 
 /// This returns the ugg lol version, this removes a ton of duplicated code
 async fn lol_version() -> Result<String, ErrorMap> {
-    let data_dragon_version = data_dragon::DataDragon::new(None).await;
-    match data_dragon_version {
-        Ok(data_dragon) => {
-            let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
+    let data_dragon = data_dragon::DataDragon::new();
+    match data_dragon.get_version().await {
+        Ok(version) => {
+            let lol_version: Vec<&str> = version.split('.').collect();
             Ok(format!("{0}_{1}", lol_version[0], lol_version[1]))
         }
         Err(err) => Err(DataDragonErrors(err)),

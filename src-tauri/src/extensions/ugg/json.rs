@@ -3,18 +3,16 @@ use crate::errors;
 use errors::ErrorMap;
 
 use super::{
-    structs::{self, JsonTypes, Overview, Ranking},
+    structs::{new_ugg_request, JsonTypes, Overview, Ranking},
     Data,
 };
 
-use structs::UggRequest;
-
-impl Data {
+impl Data<'_> {
     /// This handles accessing JSON for the champ, specifically for things like it's win rate
     /// this is important because it handles key checking, which will need to get more
     /// intense in the future
     pub async fn ranking(&self) -> Result<Ranking, ErrorMap> {
-        let ugg = UggRequest::new(&self.name.value.id, &self.lang);
+        let ugg = new_ugg_request(&self.name.value.id, &self.client);
         let request = ugg.ranking_json().await;
 
         match request {
@@ -45,7 +43,7 @@ impl Data {
     /// things such as runes and items, this is important because
     /// it handles error catching, which will get more intense
     pub async fn overview(&self) -> Result<Overview, ErrorMap> {
-        let ugg = UggRequest::new(&self.name.value.id, &self.lang);
+        let ugg = new_ugg_request(&self.name.value.id, &self.client);
         let request = ugg.overview_json().await;
 
         match request {
@@ -77,7 +75,7 @@ impl Data {
     }
 
     pub async fn default_pos(&self) -> Result<String, ErrorMap> {
-        let ugg = UggRequest::new(&self.name.value.id, &self.lang);
+        let ugg = new_ugg_request(&self.name.value.id, &self.client);
         let role = ugg.default_role().await;
         match role {
             Ok(role) => Ok(role),
@@ -85,8 +83,8 @@ impl Data {
         }
     }
 
-    pub async fn no_pos(id: i64, lang: &str) -> Result<String, ErrorMap> {
-        let ugg = UggRequest::new(&id, lang);
+    pub async fn no_pos(id: i64, client: &reqwest::Client) -> Result<String, ErrorMap> {
+        let ugg = new_ugg_request(&id, client);
         let role = ugg.default_role().await;
         match role {
             Ok(role) => Ok(role),

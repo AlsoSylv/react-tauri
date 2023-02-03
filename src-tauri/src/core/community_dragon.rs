@@ -31,23 +31,23 @@ pub struct CommunityDragon<'a> {
     pub client: &'a reqwest::Client,
 }
 
-/// Creates a new reqwest client for data dragon
-/// Takes a Riot language and translates it to
-/// A Community Dragon language, prefered over
-/// Using a literal struct.
-pub fn new_community_dragon<'a>(
-    lang: Option<&'a str>,
-    client: &'a reqwest::Client,
-) -> CommunityDragon<'a> {
-    let language = match lang {
-        Some(lang) => match lang {
-            "en_US" => "default",
-            _ => {
-                lang
-            }
-        },
-        None => "default",
-    };
+impl CommunityDragon<'_> {
+    /// Creates a new reqwest client for data dragon
+    /// Takes a Riot language and translates it to
+    /// A Community Dragon language, prefered over
+    /// Using a literal struct.
+    pub fn new<'a>(
+        lang: Option<&'a str>,
+        client: &'a reqwest::Client,
+    ) -> CommunityDragon<'a> {
+        let language = match lang {
+            Some(lang) => match lang {
+                "en_US" => "default",
+                _ => lang,
+            },
+            None => "default",
+        };
 
-    CommunityDragon { language, client }
+        CommunityDragon { language, client }
+    }
 }

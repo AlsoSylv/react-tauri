@@ -25,23 +25,25 @@ pub struct Data<'a> {
     client: &'a reqwest::Client,
 }
 
-/// Returns a new instance of the Data struct
-pub fn data_new<'a>(
-    name: &'a ChampionNames,
-    role: &'a str,
-    rank: &'a str,
-    region: &'a str,
-    lang: Option<&'a str>,
-    data_dragon: &'a DataDragon,
-    client: &'a reqwest::Client,
-) -> Data<'a> {
-    Data {
-        name,
-        role,
-        rank,
-        region,
-        lang,
-        data_dragon,
-        client,
+impl Data<'_> {
+    /// Returns a new instance of the Data struct
+    pub fn new<'a>(
+        name: &'a ChampionNames,
+        role: &'a str,
+        rank: &'a str,
+        region: &'a str,
+        lang: Option<&'a str>,
+        data_dragon: &'a DataDragon,
+        client: &'a reqwest::Client,
+    ) -> Data<'a> {
+        Data {
+            name,
+            role,
+            rank,
+            region,
+            lang,
+            data_dragon,
+            client,
+        }
     }
 }

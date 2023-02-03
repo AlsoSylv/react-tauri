@@ -1,5 +1,5 @@
 use crate::{
-    core::community_dragon::{new_community_dragon, structs::Style, CommunityDragon},
+    core::community_dragon::{structs::Style, CommunityDragon},
     errors::{CommunityDragonError, ErrorMap},
     frontend_types,
 };
@@ -88,7 +88,7 @@ pub async fn community_dragon_all_rune_images(
     language: Option<&str>,
     client: &reqwest::Client,
 ) -> Result<RuneImages, CommunityDragonError> {
-    let community_dragon = new_community_dragon(language, client);
+    let community_dragon = CommunityDragon::new(language, client);
     let runes_style = community_dragon.runes_style().await;
     let rune = generate_perks(&community_dragon).await;
 

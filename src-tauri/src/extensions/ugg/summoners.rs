@@ -1,7 +1,6 @@
 use crate::{
-    core::community_dragon::new_community_dragon,
     errors::ErrorMap,
-    frontend_types::{Spell, SummonerSpellInfo},
+    frontend_types::{Spell, SummonerSpellInfo}, core::community_dragon::CommunityDragon,
 };
 
 use super::{
@@ -88,7 +87,7 @@ impl Data<'_> {
         let Some(spell_array) = &spell_info.spells else {
             panic!()
         };
-        let community_dragon = new_community_dragon(self.lang, self.client);
+        let community_dragon = CommunityDragon::new(self.lang, self.client);
         let summoner_spell_json = community_dragon.summoner_spells().await;
         match summoner_spell_json {
             Ok(json) => {

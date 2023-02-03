@@ -1,7 +1,6 @@
 use crate::{
-    core::community_dragon::new_community_dragon,
     errors,
-    frontend_types::{ItemValues, ItemsMap, LCUItemsMap, LCUItemsValue},
+    frontend_types::{ItemValues, ItemsMap, LCUItemsMap, LCUItemsValue}, core::community_dragon::CommunityDragon,
 };
 
 use errors::ErrorMap;
@@ -112,7 +111,7 @@ async fn community_dragon_items(
     json: &Overview,
     client: &reqwest::Client,
 ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
-    let community_dragon = new_community_dragon(lang, client);
+    let community_dragon = CommunityDragon::new(lang, client);
     let items = community_dragon.item_json().await;
     let mut items_map = ItemsMap::new();
     let items_array = items_map.as_array_mut();

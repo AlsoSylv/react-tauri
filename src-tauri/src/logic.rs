@@ -1,7 +1,6 @@
 use crate::core::helpers::champs::get_champ_names;
 use crate::core::lcu;
 use crate::core::lcu::items::push_items_to_client;
-use crate::extensions::ugg::data_new;
 use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types, AppState};
 
@@ -33,7 +32,7 @@ pub async fn champion_info(
         },
     };
 
-    let data = data_new(
+    let data = Data::new(
         &name,
         &role,
         &rank,
@@ -114,7 +113,7 @@ pub async fn push_runes(
     lang: Option<&str>,
 ) -> Result<i64, i64> {
     let data_dragon = DataDragon::new(&state.hyper_client, lang);
-    let data = data_new(
+    let data = Data::new(
         &name,
         &role,
         &rank,
@@ -191,7 +190,7 @@ pub async fn push_items(
     lang: Option<&str>,
 ) -> Result<i64, i64> {
     let data_dragon = DataDragon::new(&state.hyper_client, lang);
-    let data = data_new(
+    let data = Data::new(
         &name,
         &role,
         &rank,

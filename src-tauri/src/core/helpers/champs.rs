@@ -1,4 +1,4 @@
-use crate::core::community_dragon::new_community_dragon;
+use crate::core::community_dragon::CommunityDragon;
 use crate::errors::ErrorMap;
 use crate::frontend_types::ChampionNames;
 use data_dragon::DataDragon;
@@ -32,7 +32,7 @@ pub async fn get_champ_names(
             if err.is_connection() {
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
-                let community_dragon = new_community_dragon(Some(lang), client);
+                let community_dragon = CommunityDragon::new(Some(lang), client);
                 match community_dragon.champs_basic().await {
                     Ok(json) => {
                         json.iter().for_each(|champ| {

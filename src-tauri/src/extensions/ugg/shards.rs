@@ -1,7 +1,6 @@
 use crate::{
-    core::community_dragon::new_community_dragon,
     errors,
-    frontend_types::{Shard, Shards},
+    frontend_types::{Shard, Shards}, core::community_dragon::CommunityDragon,
 };
 use errors::{ErrorMap, UGGDataError};
 
@@ -17,7 +16,7 @@ impl super::Data<'_> {
         request: &Result<Overview, ErrorMap>,
     ) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
-        let community_dragon = new_community_dragon(self.lang, self.client);
+        let community_dragon = CommunityDragon::new(self.lang, self.client);
         let rune_json = community_dragon.runes().await;
         match rune_json {
             Ok(json) => {

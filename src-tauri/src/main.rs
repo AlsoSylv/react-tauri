@@ -62,7 +62,7 @@ async fn main() {
 
 /// Generates a list and sends it to the front end
 #[tauri::command]
-fn roles(lang: &str) -> Vec<Role<'static>> {
+fn roles(lang: &str) -> Vec<Role<'_>> {
     let roles = get_translatiosn(lang).roles;
     vec![
         Role {

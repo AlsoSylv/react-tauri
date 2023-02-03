@@ -1,9 +1,8 @@
 use serde_json::Value;
 
 use crate::{
-    core::community_dragon::new_community_dragon,
     errors,
-    frontend_types::{AbilitiesMap, AbilitiesValue, Passive},
+    frontend_types::{AbilitiesMap, AbilitiesValue, Passive}, core::community_dragon::CommunityDragon,
 };
 
 use ::data_dragon::DataDragonError;
@@ -127,7 +126,7 @@ async fn community_dragon_abilities(
     abilities_order: &[Value],
     client: &reqwest::Client,
 ) -> Result<AbilitiesMap, ErrorMap> {
-    let community_dragon = new_community_dragon(lang, client);
+    let community_dragon = CommunityDragon::new(lang, client);
     let champ_json = community_dragon.champs_full(id).await;
     match champ_json {
         Ok(json) => {
@@ -137,30 +136,22 @@ async fn community_dragon_abilities(
             ));
             let q = AbilitiesValue::new_cd(
                 &spells[0].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/q",
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/q",),
             );
 
             let w = AbilitiesValue::new_cd(
                 &spells[1].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/w",
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/w",),
             );
 
             let e = AbilitiesValue::new_cd(
                 &spells[2].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/e",
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/e",),
             );
 
             let r = AbilitiesValue::new_cd(
                 &spells[3].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/r",
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/r",),
             );
 
             let mut map = AbilitiesMap {

@@ -3,22 +3,14 @@ use std::ops::Index;
 use serde_json::Value;
 /// Handles making a new reques for the UGG extension, this should be changed
 /// to pass a barrowed reqwest client instead of using an owned reqwest client
-pub struct UggRequest {
+pub struct UggRequest<'a> {
     pub id: i64,
-    pub client: reqwest::Client,
-    pub lang: String,
+    pub client: &'a reqwest::Client,
 }
 
-impl UggRequest {
-    /// Returns a new UggRequest, this also handles spawning the HTTP client
-    pub fn new(id: &i64, lang: &str) -> Self {
-        let client = reqwest::Client::new();
-        UggRequest {
-            id: *id,
-            client,
-            lang: lang.to_string(),
-        }
-    }
+/// Returns a new UggRequest, this also handles spawning the HTTP client
+pub fn new_ugg_request<'a>(id: &i64, client: &'a reqwest::Client) -> UggRequest<'a> {
+    UggRequest { id: *id, client }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

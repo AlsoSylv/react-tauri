@@ -21,13 +21,12 @@ pub mod types;
 
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
-pub struct DataDragon {
-    pub version: String,
-    pub language: String,
-    pub client: Client<HttpsConnector<HttpConnector>>,
+pub struct DataDragon<'a> {
+    pub client: &'a Client<HttpsConnector<HttpConnector>>,
+    lang: &'a str,
 }
 
-impl DataDragon {
+impl DataDragon<'_> {
     /// Creates a new instance of the DataDragon wrapper
     ///
     /// ```rust
@@ -44,32 +43,29 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn new(language: Option<&str>) -> Result<Self, DataDragonError> {
+    pub fn new<'a>(
+        client: &'a Client<HttpsConnector<HttpConnector>>,
+        language: Option<&'a str>,
+    ) -> DataDragon<'a> {
         let lang = language.unwrap_or("en_US");
-        let https = HttpsConnector::new();
-        let client = Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
+        DataDragon { client, lang }
+    }
+
+    pub async fn get_version<'a>(&'a self) -> Result<String, DataDragonError> {
         let cache = CACHED_VERSION.lock().await;
-        if let Some(version) = cache.get(lang) {
-            return Ok(DataDragon {
-                version,
-                language: lang.to_owned(),
-                client,
-            });
+        if let Some(version) = cache.get("version") {
+            return Ok(version);
         }
         let json: Vec<String> = request(
             "https://ddragon.leagueoflegends.com/api/versions.json",
-            &client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
         let version = json[0].clone();
         cache.insert("version".to_string(), version.clone()).await;
-        Ok(DataDragon {
-            version,
-            language: lang.to_owned(),
-            client,
-        })
+        Ok(version)
     }
 }
 

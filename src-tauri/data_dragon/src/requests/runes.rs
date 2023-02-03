@@ -7,7 +7,7 @@ use tokio::sync::Mutex;
 static CACHED_RUNE_JSON: Lazy<Mutex<Cache<String, Vec<RuneTree>>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl DataDragon {
+impl DataDragon<'_> {
     /// Cached method to get the runesReforged.json from data dragon
     ///
     /// ```rust
@@ -35,23 +35,23 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn rune_json(&self) -> Result<Vec<RuneTree>, DataDragonError> {
+    pub async fn rune_json(&self, version: &str) -> Result<Vec<RuneTree>, DataDragonError> {
         let cache = CACHED_RUNE_JSON.lock().await;
-        if let Some(json) = cache.get(&self.language) {
+        if let Some(json) = cache.get(self.lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
-            &self.version, &self.language
+            version, self.lang
         );
         let rune_json: Vec<RuneTree> = request(
             &url,
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache.insert(self.language.clone(), rune_json.clone()).await;
+        cache.insert(self.lang.to_string(), rune_json.clone()).await;
         cache.sync();
         Ok(rune_json)
     }

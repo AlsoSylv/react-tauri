@@ -14,7 +14,7 @@ static CACHED_CHAMP_JSON: Lazy<Mutex<Cache<String, ChampJson>>> =
 static CACHED_CHAMP_FULL: Lazy<Mutex<Cache<(String, String), ChampionFull>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl DataDragon {
+impl DataDragon<'_> {
     /// Method for getting the champions.json file
     ///
     /// ```rust
@@ -36,24 +36,24 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn champion_json(&self) -> Result<ChampJson, DataDragonError> {
+    pub async fn champion_json(&self, version: &str) -> Result<ChampJson, DataDragonError> {
         let cache = CACHED_CHAMP_JSON.lock().await;
-        if let Some(json) = cache.get(&self.language) {
+        if let Some(json) = cache.get(self.lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json",
-            &self.version, &self.language
+            version, self.lang
         );
         let champ_json: ChampJson = request(
             &url,
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
         cache
-            .insert(self.language.clone(), champ_json.clone())
+            .insert(self.lang.to_string(), champ_json.clone())
             .await;
         cache.sync();
         Ok(champ_json)
@@ -87,24 +87,28 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn champ_full(&self, key: &str) -> Result<ChampionFull, DataDragonError> {
+    pub async fn champ_full(
+        &self,
+        key: &str,
+        version: &str,
+    ) -> Result<ChampionFull, DataDragonError> {
         let cache = CACHED_CHAMP_FULL.lock().await;
-        if let Some(json) = cache.get(&(self.language.clone(), key.to_string())) {
+        if let Some(json) = cache.get(&(self.lang.to_string(), key.to_string())) {
             return Ok(json);
         };
         let url = format!(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json",
-            &self.version, &self.language, &key
+            version, self.lang, &key
         );
         let full_json: ChampionFull = request(
             &url,
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
         cache
-            .insert((self.language.clone(), key.to_string()), full_json.clone())
+            .insert((self.lang.to_string(), key.to_string()), full_json.clone())
             .await;
         cache.sync();
         Ok(full_json)

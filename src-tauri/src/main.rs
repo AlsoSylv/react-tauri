@@ -5,6 +5,8 @@
 
 use std::collections::{BTreeMap, HashMap};
 
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -21,10 +23,29 @@ pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
     serde_json::from_str::<HashMap<String, Translations>>(json).unwrap()
 });
 
+pub struct AppState {
+    client: reqwest::Client,
+    hyper_client: hyper::Client<HttpsConnector<HttpConnector>>,
+}
+
+impl AppState {
+    fn new() -> Self {
+        let client = reqwest::Client::new();
+        let https = HttpsConnector::new();
+        let hyper_client =
+            hyper::Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
+        Self {
+            client,
+            hyper_client,
+        }
+    }
+}
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tokio::main]
 async fn main() {
     tauri::Builder::default()
+        .manage(AppState::new())
         .invoke_handler(tauri::generate_handler![
             roles,
             tiers,

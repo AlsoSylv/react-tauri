@@ -1,5 +1,5 @@
 use crate::{
-    core::community_dragon::CommunityDragon,
+    core::community_dragon::new_community_dragon,
     errors,
     frontend_types::{Shard, Shards},
 };
@@ -7,7 +7,7 @@ use errors::{ErrorMap, UGGDataError};
 
 use super::structs::Overview;
 
-impl super::Data {
+impl super::Data<'_> {
     /// Returns stat shards from the UGG API
     ///
     /// This requires Community Dragon to work
@@ -17,7 +17,7 @@ impl super::Data {
         request: &Result<Overview, ErrorMap>,
     ) -> Result<Shards, ErrorMap> {
         let mut shards = new_shards();
-        let community_dragon = CommunityDragon::new(&self.lang);
+        let community_dragon = new_community_dragon(self.lang, self.client);
         let rune_json = community_dragon.runes().await;
         match rune_json {
             Ok(json) => {

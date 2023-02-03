@@ -1,4 +1,4 @@
-use crate::core::community_dragon::CommunityDragon;
+use crate::core::community_dragon::new_community_dragon;
 use crate::errors::ErrorMap;
 use crate::frontend_types::ChampionNames;
 use data_dragon::DataDragon;
@@ -6,9 +6,11 @@ use data_dragon::DataDragon;
 pub async fn get_champ_names(
     lang: &str,
     champions: &mut Vec<ChampionNames>,
+    client: &reqwest::Client,
+    data_dragon: &DataDragon<'_>,
 ) -> Result<(), ErrorMap> {
-    match DataDragon::new(Some(lang)).await {
-        Ok(data_dragon) => match data_dragon.champion_json().await {
+    match data_dragon.get_version().await {
+        Ok(version) => match data_dragon.champion_json(&version).await {
             Ok(json) => {
                 for (champ_key, champ) in json.data.iter() {
                     if let Ok(id) = champ.key.parse::<i64>() {
@@ -16,7 +18,7 @@ pub async fn get_champ_names(
                             &champ.name,
                             champ_key,
                             id,
-                            Some(&data_dragon.version),
+                            Some(&version),
                         ));
                     } else {
                         unreachable!()
@@ -30,7 +32,7 @@ pub async fn get_champ_names(
             if err.is_connection() {
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
-                let community_dragon = CommunityDragon::new(lang);
+                let community_dragon = new_community_dragon(Some(lang), client);
                 match community_dragon.champs_basic().await {
                     Ok(json) => {
                         json.iter().for_each(|champ| {

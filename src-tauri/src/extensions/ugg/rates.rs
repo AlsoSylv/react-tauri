@@ -4,7 +4,7 @@ use errors::{ErrorMap, UGGDataError};
 
 use super::structs::{Overview, Ranking};
 
-impl super::Data {
+impl super::Data<'_> {
     // The format is used here to get an exact result from the floating point math
 
     /// Returns the win rate from the UGG API, errors if it is None
@@ -99,7 +99,7 @@ impl super::Data {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
-                Ok(format!("{} / {}", rank, total_rank))
+                Ok(format!("{rank} / {total_rank}"))
             }
             Err(err) => Err(err.to_owned()),
         }

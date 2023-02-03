@@ -1,15 +1,14 @@
 use crate::{
-    core::community_dragon::CommunityDragon,
+    core::community_dragon::new_community_dragon,
     errors,
     frontend_types::{ItemValues, ItemsMap, LCUItemsMap, LCUItemsValue},
 };
 
-use ::data_dragon::DataDragon;
 use errors::ErrorMap;
 
 use super::structs::Overview;
 
-impl super::Data {
+impl super::Data<'_> {
     /// Returns items from the UGG API these can be empty
     pub async fn items(
         &self,
@@ -17,8 +16,8 @@ impl super::Data {
     ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
         match request {
             Ok(json) => {
-                if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {
-                    if let Ok(items) = data_dragon.item_json().await {
+                if let Ok(version) = &self.data_dragon.get_version().await {
+                    if let Ok(items) = &self.data_dragon.item_json(version).await {
                         let mut items_map = ItemsMap::new();
                         let mut lcu_items_map = LCUItemsMap::new();
                         let lcu_items_array = lcu_items_map.as_array_mut();
@@ -39,7 +38,7 @@ impl super::Data {
                                 };
                                 let url = format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/item/{}",
-                                    &data_dragon.version, &image
+                                    &version, &image
                                 );
                                 // TODO: We can get the specific win rates of each of these sets rather easily
                                 let ugg_start_core =
@@ -97,10 +96,10 @@ impl super::Data {
                             unreachable!()
                         }
                     } else {
-                        community_dragon_items(&self.lang, json).await
+                        community_dragon_items(self.lang, json, self.client).await
                     }
                 } else {
-                    community_dragon_items(&self.lang, json).await
+                    community_dragon_items(self.lang, json, self.client).await
                 }
             }
             Err(err) => Err(err.to_owned()),
@@ -109,10 +108,11 @@ impl super::Data {
 }
 
 async fn community_dragon_items(
-    lang: &str,
+    lang: Option<&str>,
     json: &Overview,
+    client: &reqwest::Client,
 ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
-    let community_dragon = CommunityDragon::new(lang);
+    let community_dragon = new_community_dragon(lang, client);
     let items = community_dragon.item_json().await;
     let mut items_map = ItemsMap::new();
     let items_array = items_map.as_array_mut();

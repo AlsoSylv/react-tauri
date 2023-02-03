@@ -1,5 +1,5 @@
+use irelia::rest;
 use serde_json::Value;
-use shaco::rest;
 
 use crate::errors::LCUResponses;
 
@@ -7,24 +7,23 @@ use crate::errors::LCUResponses;
 ///
 /// Requires JSON as an argument
 pub async fn push_runes_to_client(page: Value) -> Result<LCUResponses, LCUResponses> {
-    let pages_endpoint = String::from("/lol-perks/v1/pages");
-    if let Ok(client) = rest::RESTClient::new() {
-        if client
-            .put(pages_endpoint.clone(), page.clone())
-            .await
-            .is_ok()
-        {
-            Ok(LCUResponses::LCUPushRune)
-        } else if let Ok(response) = client.get("/lol-perks/v1/currentpage".to_string()).await {
+    let pages_endpoint = "/lol-perks/v1/pages";
+    if let Ok(client) = rest::LCUClient::new() {
+        if let Ok(response) = client.get::<Value>("/lol-perks/v1/currentpage").await {
+            let response = response.unwrap();
             let Some(id) = &response["id"].as_i64() else {
                 panic!();
             };
             if client
-                .delete(format!("{0}/{1}", pages_endpoint, id))
+                .delete::<Value>(&format!("/lol-perks/v1/page/{id}"))
                 .await
                 .is_ok()
             {
-                if client.put(pages_endpoint, page).await.is_ok() {
+                if client
+                    .post::<Value, Value>(pages_endpoint, page)
+                    .await
+                    .is_ok()
+                {
                     Ok(LCUResponses::LCUPushRune)
                 } else {
                     Err(LCUResponses::LCUCreateRune)

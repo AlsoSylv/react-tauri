@@ -3,18 +3,18 @@ use hyper::{
     Client,
 };
 use hyper_tls::HttpsConnector;
-use serde::Deserialize;
-use once_cell::sync::Lazy;
-use tokio::sync::Mutex;
 use moka::future::Cache;
+use once_cell::sync::Lazy;
+use serde::Deserialize;
+use tokio::sync::Mutex;
 
-#[path ="requests/champs.rs"]
+#[path = "requests/champs.rs"]
 mod champs;
-#[path ="requests/runes.rs"]
-mod runes;
-#[path ="requests/items.rs"]
+#[path = "requests/items.rs"]
 mod items;
-#[path ="requests/summoners.rs"]
+#[path = "requests/runes.rs"]
+mod runes;
+#[path = "requests/summoners.rs"]
 mod summoners;
 
 pub mod types;
@@ -29,11 +29,11 @@ pub struct DataDragon {
 
 impl DataDragon {
     /// Creates a new instance of the DataDragon wrapper
-    /// 
+    ///
     /// ```rust
     /// async fn new_test() {
     ///     use data_dragon::DataDragon;
-    /// 
+    ///
     ///     let data_dragon = DataDragon::new(None).await;
     ///     match data_dragon {
     ///         Ok(data_dragon) => {
@@ -73,7 +73,7 @@ impl DataDragon {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub enum DataDragonError {
     ChampMissingError = 103,
     DataDragonMissing = 104,
@@ -96,7 +96,7 @@ impl DataDragonError {
 
 pub async fn request<
     T: for<'de> Deserialize<'de>,
-    E,
+    E: Copy,
     U: Connect + Send + Sync + Clone + 'static,
 >(
     url: &str,
@@ -110,18 +110,11 @@ pub async fn request<
             if resp.status().is_client_error() || resp.status().is_server_error() {
                 return Err(error_two);
             }
-            let body = resp.body_mut();
-            let bytes = hyper::body::to_bytes(body).await;
-            match bytes {
-                Ok(bytes) => {
-                    let json = serde_json::from_slice::<T>(&bytes);
-                    match json {
-                        Ok(json) => Ok(json),
-                        Err(_) => Err(error_one),
-                    }
-                }
-                Err(_) => Err(error_one),
-            }
+            hyper::body::to_bytes(resp.body_mut())
+                .await
+                .map_or(Err(error_one), |bytes| {
+                    serde_json::from_slice::<T>(&bytes).map_or(Err(error_one), |json| Ok(json))
+                })
         }
         Err(err) => {
             if err.is_connect() {

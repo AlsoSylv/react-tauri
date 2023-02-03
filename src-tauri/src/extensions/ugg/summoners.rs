@@ -31,7 +31,7 @@ impl Data<'_> {
                 let mut spells = SummonerSpellInfo::new(winrate);
                 match self.data_dragon.get_version().await {
                     Ok(version) => {
-                        let spell_json = self.data_dragon.summoners_json(&version, self.lang).await;
+                        let spell_json = self.data_dragon.summoners_json(&version).await;
                         match spell_json {
                             Ok(json) => {
                                 for (_, data) in json.data.iter() {

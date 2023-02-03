@@ -17,7 +17,7 @@ impl super::Data<'_> {
         match request {
             Ok(json) => {
                 if let Ok(version) = &self.data_dragon.get_version().await {
-                    if let Ok(items) = &self.data_dragon.item_json(version, self.lang).await {
+                    if let Ok(items) = &self.data_dragon.item_json(version).await {
                         let mut items_map = ItemsMap::new();
                         let mut lcu_items_map = LCUItemsMap::new();
                         let lcu_items_array = lcu_items_map.as_array_mut();
@@ -110,7 +110,7 @@ impl super::Data<'_> {
 async fn community_dragon_items(
     lang: Option<&str>,
     json: &Overview,
-    client: &reqwest::Client
+    client: &reqwest::Client,
 ) -> Result<(ItemsMap, LCUItemsMap), ErrorMap> {
     let community_dragon = new_community_dragon(lang, client);
     let items = community_dragon.item_json().await;

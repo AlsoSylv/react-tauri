@@ -5,7 +5,8 @@
 
 use std::collections::{BTreeMap, HashMap};
 
-use data_dragon::DataDragon;
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use once_cell::sync::Lazy;
 
 mod core;
@@ -24,16 +25,18 @@ pub static TRANSLATIONS: Lazy<HashMap<String, Translations>> = Lazy::new(|| {
 
 pub struct AppState {
     client: reqwest::Client,
-    data_dragon: DataDragon,
+    hyper_client: hyper::Client<HttpsConnector<HttpConnector>>,
 }
 
 impl AppState {
     fn new() -> Self {
         let client = reqwest::Client::new();
-        let data_dragon = DataDragon::new();
+        let https = HttpsConnector::new();
+        let hyper_client =
+            hyper::Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
         Self {
             client,
-            data_dragon,
+            hyper_client,
         }
     }
 }

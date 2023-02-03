@@ -8,7 +8,7 @@ impl CommunityDragon<'_> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champion-summary.json", &self.language);
         let request: Result<Vec<ChampionData>, CommunityDragonError> = templates::request(
             url,
-            &self.client,
+            self.client,
             CommunityDragonError::CommunityDragonMissing,
             CommunityDragonError::CannotConnect,
         )
@@ -21,10 +21,9 @@ impl CommunityDragon<'_> {
 
     pub async fn champs_full(&self, id: i64) -> Result<ChampFull, CommunityDragonError> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/champions/{}.json", &self.language, id);
-        println!("{}", url);
         let request: Result<ChampFull, CommunityDragonError> = templates::request(
             url,
-            &self.client,
+            self.client,
             CommunityDragonError::CommunityDragonMissing,
             CommunityDragonError::CannotConnect,
         )

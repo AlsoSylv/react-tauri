@@ -16,21 +16,21 @@ mod summoners;
 /// this handles things like getting champ winrates, pickrates, etc, and
 /// should be used in order to reduce the amount of boilerplate garbage
 pub struct Data<'a> {
-    pub name: ChampionNames,
-    pub role: String,
-    pub rank: String,
-    pub region: String,
+    name: &'a ChampionNames,
+    role: &'a str,
+    rank: &'a str,
+    region: &'a str,
     pub lang: Option<&'a str>,
-    data_dragon: &'a DataDragon,
+    data_dragon: &'a DataDragon<'a>,
     client: &'a reqwest::Client,
 }
 
 /// Returns a new instance of the Data struct
 pub fn data_new<'a>(
-    name: ChampionNames,
-    role: String,
-    rank: String,
-    region: String,
+    name: &'a ChampionNames,
+    role: &'a str,
+    rank: &'a str,
+    region: &'a str,
     lang: Option<&'a str>,
     data_dragon: &'a DataDragon,
     client: &'a reqwest::Client,

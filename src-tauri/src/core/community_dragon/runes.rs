@@ -9,7 +9,7 @@ impl CommunityDragon<'_> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/perks.json", &self.language);
         let request = request::<Vec<Runes>, CommunityDragonError>(
             url,
-            &self.client,
+            self.client,
             CommunityDragonError::CommunityDragonMissing,
             CommunityDragonError::CannotConnect,
         )
@@ -24,7 +24,7 @@ impl CommunityDragon<'_> {
         let url = format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/{}/v1/perkstyles.json", &self.language);
         let request = request::<RunesStyle, CommunityDragonError>(
             url,
-            &self.client,
+            self.client,
             CommunityDragonError::CommunityDragonMissing,
             CommunityDragonError::CannotConnect,
         )

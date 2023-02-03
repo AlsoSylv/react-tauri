@@ -21,11 +21,12 @@ pub mod types;
 
 static CACHED_VERSION: Lazy<Mutex<Cache<String, String>>> = Lazy::new(|| Mutex::new(Cache::new(1)));
 
-pub struct DataDragon {
-    pub client: Client<HttpsConnector<HttpConnector>>,
+pub struct DataDragon<'a> {
+    pub client: &'a Client<HttpsConnector<HttpConnector>>,
+    lang: &'a str,
 }
 
-impl DataDragon {
+impl DataDragon<'_> {
     /// Creates a new instance of the DataDragon wrapper
     ///
     /// ```rust
@@ -42,14 +43,12 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub fn new() -> Self {
-        let https = HttpsConnector::new();
-        let client = Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https);
-        DataDragon { client }
-    }
-
-    fn lang_default<'a>(&'a self, language: Option<&'a str>) -> &str {
-        language.unwrap_or("en_US")
+    pub fn new<'a>(
+        client: &'a Client<HttpsConnector<HttpConnector>>,
+        language: Option<&'a str>,
+    ) -> DataDragon<'a> {
+        let lang = language.unwrap_or("en_US");
+        DataDragon { client, lang }
     }
 
     pub async fn get_version<'a>(&'a self) -> Result<String, DataDragonError> {
@@ -59,7 +58,7 @@ impl DataDragon {
         }
         let json: Vec<String> = request(
             "https://ddragon.leagueoflegends.com/api/versions.json",
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )

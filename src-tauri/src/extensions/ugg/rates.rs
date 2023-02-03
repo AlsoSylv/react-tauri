@@ -99,7 +99,7 @@ impl super::Data<'_> {
                     return Err(ErrorMap::UGGError(UGGDataError::RateError));
                 };
 
-                Ok(format!("{} / {}", rank, total_rank))
+                Ok(format!("{rank} / {total_rank}"))
             }
             Err(err) => Err(err.to_owned()),
         }

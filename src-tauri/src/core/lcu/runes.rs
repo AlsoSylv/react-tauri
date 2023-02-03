@@ -15,12 +15,12 @@ pub async fn push_runes_to_client(page: Value) -> Result<LCUResponses, LCURespon
                 panic!();
             };
             if client
-                .delete::<Value>(&format!("/lol-perks/v1/page/{}", id))
+                .delete::<Value>(&format!("/lol-perks/v1/page/{id}"))
                 .await
                 .is_ok()
             {
                 if client
-                    .post::<Value, Value>(&pages_endpoint, page)
+                    .post::<Value, Value>(pages_endpoint, page)
                     .await
                     .is_ok()
                 {

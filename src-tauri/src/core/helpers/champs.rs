@@ -7,10 +7,10 @@ pub async fn get_champ_names(
     lang: &str,
     champions: &mut Vec<ChampionNames>,
     client: &reqwest::Client,
-    data_dragon: &DataDragon
+    data_dragon: &DataDragon<'_>,
 ) -> Result<(), ErrorMap> {
     match data_dragon.get_version().await {
-        Ok(version) => match data_dragon.champion_json(&version, Some(lang)).await {
+        Ok(version) => match data_dragon.champion_json(&version).await {
             Ok(json) => {
                 for (champ_key, champ) in json.data.iter() {
                     if let Ok(id) = champ.key.parse::<i64>() {
@@ -32,7 +32,7 @@ pub async fn get_champ_names(
             if err.is_connection() {
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
-                let community_dragon = new_community_dragon(Some(&lang), client);
+                let community_dragon = new_community_dragon(Some(lang), client);
                 match community_dragon.champs_basic().await {
                     Ok(json) => {
                         json.iter().for_each(|champ| {

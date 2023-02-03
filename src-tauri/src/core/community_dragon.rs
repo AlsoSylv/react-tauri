@@ -35,12 +35,14 @@ pub struct CommunityDragon<'a> {
 /// Takes a Riot language and translates it to
 /// A Community Dragon language, prefered over
 /// Using a literal struct.
-pub fn new_community_dragon<'a>(lang: Option<&'a str>, client: &'a reqwest::Client) -> CommunityDragon<'a> {
+pub fn new_community_dragon<'a>(
+    lang: Option<&'a str>,
+    client: &'a reqwest::Client,
+) -> CommunityDragon<'a> {
     let language = match lang {
         Some(lang) => match lang {
             "en_US" => "default",
             _ => {
-                let lang = lang;
                 lang
             }
         },

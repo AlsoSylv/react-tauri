@@ -8,7 +8,7 @@ use tokio::sync::Mutex;
 static CACHED_ITEM_JSON: Lazy<Mutex<Cache<String, Value>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl DataDragon {
+impl DataDragon<'_> {
     /// Cached function to get Data Dragons items.json file
     ///
     /// TODO: Return as a struct, not Value
@@ -37,28 +37,23 @@ impl DataDragon {
     ///     }
     /// }
     /// ```
-    pub async fn item_json(
-        &self,
-        version: &str,
-        language: Option<&str>,
-    ) -> Result<Value, DataDragonError> {
-        let lang = self.lang_default(language);
+    pub async fn item_json(&self, version: &str) -> Result<Value, DataDragonError> {
         let cache = CACHED_ITEM_JSON.lock().await;
-        if let Some(json) = cache.get(lang) {
+        if let Some(json) = cache.get(self.lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json",
-            version, lang
+            version, self.lang
         );
         let item_json: Value = request(
             &url,
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache.insert(lang.to_string(), item_json.clone()).await;
+        cache.insert(self.lang.to_string(), item_json.clone()).await;
         cache.sync();
         Ok(item_json)
     }

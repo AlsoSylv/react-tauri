@@ -1,5 +1,5 @@
 use crate::{
-    core::community_dragon::{structs::Style, CommunityDragon, new_community_dragon},
+    core::community_dragon::{new_community_dragon, structs::Style, CommunityDragon},
     errors::{CommunityDragonError, ErrorMap},
     frontend_types,
 };
@@ -21,14 +21,14 @@ pub async fn all_rune_images(
     tree_id_two: i64,
     language: Option<&str>,
     client: &reqwest::Client,
-    data_dragon: &DataDragon
+    data_dragon: &DataDragon<'_>,
 ) -> Result<RuneImages, ErrorMap> {
     match data_dragon.get_version().await {
         Ok(version) => {
             let mut tree_one_names = PrimaryTree::new();
             let mut tree_two_names = SecondaryTree::new();
 
-            match data_dragon.rune_json(&version, language).await {
+            match data_dragon.rune_json(&version).await {
                 Ok(json) => {
                     for rune in json {
                         if rune.id == tree_id_one {
@@ -52,7 +52,8 @@ pub async fn all_rune_images(
                 Err(ErrorMap::DataDragonErrors(err))
             } else {
                 let runes =
-                    community_dragon_all_rune_images(tree_id_one, tree_id_two, language, client).await;
+                    community_dragon_all_rune_images(tree_id_one, tree_id_two, language, client)
+                        .await;
                 match runes {
                     Ok(runes) => Ok(runes),
                     Err(err) => Err(ErrorMap::CommunityDragonErrors(err)),

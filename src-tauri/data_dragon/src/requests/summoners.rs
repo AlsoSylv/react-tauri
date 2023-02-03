@@ -8,29 +8,26 @@ use once_cell::sync::Lazy;
 static CACHED_SUMMONERS_JSON: Lazy<Mutex<Cache<String, Summoners>>> =
     Lazy::new(|| Mutex::new(Cache::new(3)));
 
-impl DataDragon {
-    pub async fn summoners_json(
-        &self,
-        version: &str,
-        language: Option<&str>,
-    ) -> Result<Summoners, DataDragonError> {
-        let lang = self.lang_default(language);
+impl DataDragon<'_> {
+    pub async fn summoners_json(&self, version: &str) -> Result<Summoners, DataDragonError> {
         let cache = CACHED_SUMMONERS_JSON.lock().await;
-        if let Some(json) = cache.get(lang) {
+        if let Some(json) = cache.get(self.lang) {
             return Ok(json);
         };
         let url = format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
-            version, lang
+            version, self.lang
         );
         let summoner_json: Summoners = request(
             &url,
-            &self.client,
+            self.client,
             DataDragonError::DataDragonMissing,
             DataDragonError::CannotConnect,
         )
         .await?;
-        cache.insert(lang.to_string(), summoner_json.clone()).await;
+        cache
+            .insert(self.lang.to_string(), summoner_json.clone())
+            .await;
         cache.sync();
         Ok(summoner_json)
     }

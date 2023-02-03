@@ -5,6 +5,7 @@ use crate::extensions::ugg::data_new;
 use crate::frontend_types::ChampionNames;
 use crate::{extensions, frontend_types, AppState};
 
+use data_dragon::DataDragon;
 use extensions::ugg;
 use frontend_types::ChampionInfo;
 use serde_json::json;
@@ -21,23 +22,24 @@ pub async fn champion_info(
     role: Option<String>,
     rank: String,
     region: String,
-    lang: String,
+    lang: Option<&str>,
 ) -> Result<ChampionInfo, i64> {
+    let data_dragon = DataDragon::new(&state.hyper_client, lang);
     let role: String = match role {
         Some(role) => role,
-        None => match Data::no_pos(name.value.id, &state.client).await {
+        None => match Data::no_pos(name.value.id, &state.client, &data_dragon).await {
             Ok(role) => role,
             Err(err) => return Err(i64::from(err)),
         },
     };
 
     let data = data_new(
-        name.clone(),
-        role,
-        rank,
-        region,
-        Some(&lang),
-        &state.data_dragon,
+        &name,
+        &role,
+        &rank,
+        &region,
+        lang,
+        &data_dragon,
         &state.client,
     );
 
@@ -70,7 +72,7 @@ pub async fn champion_info(
 
     let local_image = format!("/{0}/{0}.png", &name.value.key);
 
-    let url = match &state.data_dragon.get_version().await {
+    let url = match &data_dragon.get_version().await {
         Ok(version) => Ok(format!(
             "https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png",
             &version, &name.value.key
@@ -109,15 +111,16 @@ pub async fn push_runes(
     role: String,
     rank: String,
     region: String,
-    lang: String,
+    lang: Option<&str>,
 ) -> Result<i64, i64> {
+    let data_dragon = DataDragon::new(&state.hyper_client, lang);
     let data = data_new(
-        name.clone(),
-        role.clone(),
-        rank,
-        region,
-        Some(&lang),
-        &state.data_dragon,
+        &name,
+        &role,
+        &rank,
+        &region,
+        lang,
+        &data_dragon,
         &state.client,
     );
     let overview = data.overview().await;
@@ -166,9 +169,13 @@ pub async fn get_languages() -> Result<Vec<String>, i64> {
 /// Generates a list of all champion names, IDs, Keys, URLs, and a local image
 /// that is used by the front end in order to generate a selection list
 #[tauri::command]
-pub async fn all_champion_names(state: State<'_, AppState>, lang: &str) -> Result<Vec<ChampionNames>, i64> {
+pub async fn all_champion_names(
+    state: State<'_, AppState>,
+    lang: &str,
+) -> Result<Vec<ChampionNames>, i64> {
+    let data_dragon = DataDragon::new(&state.hyper_client, Some(lang));
     let mut champions = Vec::new();
-    match get_champ_names(lang, &mut champions, &state.client, &state.data_dragon).await {
+    match get_champ_names(lang, &mut champions, &state.client, &data_dragon).await {
         Ok(()) => Ok(champions),
         Err(err) => Err(i64::from(err)),
     }
@@ -181,15 +188,16 @@ pub async fn push_items(
     role: String,
     rank: String,
     region: String,
-    lang: String,
+    lang: Option<&str>,
 ) -> Result<i64, i64> {
+    let data_dragon = DataDragon::new(&state.hyper_client, lang);
     let data = data_new(
-        name.clone(),
-        role.clone(),
-        rank,
-        region,
-        Some(&lang),
-        &state.data_dragon,
+        &name,
+        &role,
+        &rank,
+        &region,
+        lang,
+        &data_dragon,
         &state.client,
     );
     let overview = data.overview().await;

@@ -27,8 +27,14 @@ impl super::Data<'_> {
                     return Err(ErrorMap::UGGError(UGGDataError::MatchesError));
                 };
 
-                let all_runes =
-                    helpers::runes::all_rune_images(*tree_id_one, *tree_id_two, self.lang, self.client, self.data_dragon).await;
+                let all_runes = helpers::runes::all_rune_images(
+                    *tree_id_one,
+                    *tree_id_two,
+                    self.lang,
+                    self.client,
+                    self.data_dragon,
+                )
+                .await;
                 match all_runes {
                     Ok(mut all_runes) => {
                         let mut used_rune_ids = Vec::new();

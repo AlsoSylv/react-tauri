@@ -70,35 +70,30 @@ fn roles(lang: &str) -> Vec<Role<'_>> {
             id: "4",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_top.png",
-            name: "Top",
         },
         Role {
             name: roles.jungle,
             id: "1",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_jungle.png",
-            name: "Jungle",
         },
         Role {
             name: roles.mid,
             id: "5",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_mid.png",
-            name: "Mid",
         },
         Role {
             name: roles.adc,
             id: "3",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_bottom.png",
-            name: "Bottom",
         },
         Role {
             name: roles.supp,
             id: "2",
             local_path: "",
             url: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-career-stats/global/default/position_support.png",
-            name: "Support",
         },
     ]
 }
@@ -106,11 +101,10 @@ fn roles(lang: &str) -> Vec<Role<'_>> {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Role<'a> {
-    name: String,
     id: &'a str,
     local_path: &'a str,
     url: &'a str,
-    name: &'a str,
+    name: String,
 }
 
 /// Generates a list and sends it to the front end

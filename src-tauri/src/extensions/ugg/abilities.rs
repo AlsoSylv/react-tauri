@@ -1,19 +1,18 @@
 use serde_json::Value;
 
 use crate::{
-    core::{community_dragon::CommunityDragon, data_dragon},
     errors,
-    frontend_types::{AbilitiesMap, AbilitiesValue, Passive},
+    frontend_types::{AbilitiesMap, AbilitiesValue, Passive}, core::community_dragon::CommunityDragon,
 };
 
-use data_dragon::DataDragon;
-use errors::{DataDragonError, ErrorMap, UGGDataError};
+use ::data_dragon::DataDragonError;
+use errors::{ErrorMap, UGGDataError};
 
 use ErrorMap::{DataDragonErrors, UGGError};
 
 use super::structs::Overview;
 
-impl super::Data {
+impl super::Data<'_> {
     /// Returns abilities from the UGG API
     pub async fn abilities(
         &self,
@@ -25,9 +24,13 @@ impl super::Data {
                     return Err(UGGError(UGGDataError::NoAbilityOrder))
                 };
 
-                if let Ok(data_dragon) = DataDragon::new(Some(&self.lang)).await {
-                    if let Ok(json) = data_dragon.champ_full(self.name.value.key.clone()).await {
-                        let champ_json = json.data[&self.name.value.key].clone();
+                if let Ok(version) = self.data_dragon.get_version().await {
+                    if let Ok(json) = self
+                        .data_dragon
+                        .champ_full(&self.name.value.key, &version)
+                        .await
+                    {
+                        let champ_json = &json.data[&self.name.value.key];
                         let possible_passive = &champ_json["passive"]["image"]["full"];
                         let spells = &champ_json["spells"];
                         let Some(passive) = possible_passive.as_str() else {
@@ -50,7 +53,7 @@ impl super::Data {
                                 passive,
                                 format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/passive/{}",
-                                    &data_dragon.version, &passive
+                                    &version, &passive
                                 ),
                             ),
 
@@ -59,7 +62,7 @@ impl super::Data {
                                 q_image,
                                 format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
-                                    &data_dragon.version, &q_image
+                                    &version, &q_image
                                 ),
                             ),
 
@@ -68,7 +71,7 @@ impl super::Data {
                                 w_image,
                                 format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
-                                    &data_dragon.version, &w_image
+                                    &version, &w_image
                                 ),
                             ),
 
@@ -77,7 +80,7 @@ impl super::Data {
                                 e_image,
                                 format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
-                                    &data_dragon.version, &e_image
+                                    &version, &e_image
                                 ),
                             ),
 
@@ -86,7 +89,7 @@ impl super::Data {
                                 r_image,
                                 format!(
                                     "http://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}",
-                                    &data_dragon.version, &r_image
+                                    &version, &r_image
                                 ),
                             ),
                         };
@@ -94,12 +97,22 @@ impl super::Data {
                         split_abilities(&mut abilities.as_array_mut(), abilities_order);
                         Ok(abilities)
                     } else {
-                        community_dragon_abilities(&self.lang, self.name.value.id, abilities_order)
-                            .await
+                        community_dragon_abilities(
+                            self.lang,
+                            self.name.value.id,
+                            abilities_order,
+                            self.client,
+                        )
+                        .await
                     }
                 } else {
-                    community_dragon_abilities(&self.lang, self.name.value.id, abilities_order)
-                        .await
+                    community_dragon_abilities(
+                        self.lang,
+                        self.name.value.id,
+                        abilities_order,
+                        self.client,
+                    )
+                    .await
                 }
             }
             Err(err) => Err(err.to_owned()),
@@ -108,49 +121,37 @@ impl super::Data {
 }
 
 async fn community_dragon_abilities(
-    lang: &str,
+    lang: Option<&str>,
     id: i64,
     abilities_order: &[Value],
+    client: &reqwest::Client,
 ) -> Result<AbilitiesMap, ErrorMap> {
-    let community_dragon = CommunityDragon::new(lang);
+    let community_dragon = CommunityDragon::new(lang, client);
     let champ_json = community_dragon.champs_full(id).await;
     match champ_json {
         Ok(json) => {
             let spells = json.spells;
             let passive = Passive::new_cd(format!(
-                "https://cdn.communitydragon.org/latest/champion/{}/ability-icon/p",
-                id
+                "https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/p",
             ));
             let q = AbilitiesValue::new_cd(
                 &spells[0].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{}/ability-icon/q",
-                    id
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/q",),
             );
 
             let w = AbilitiesValue::new_cd(
                 &spells[1].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{}/ability-icon/w",
-                    id
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/w",),
             );
 
             let e = AbilitiesValue::new_cd(
                 &spells[2].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{}/ability-icon/e",
-                    id
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/e",),
             );
 
             let r = AbilitiesValue::new_cd(
                 &spells[3].name.to_uppercase(),
-                format!(
-                    "https://cdn.communitydragon.org/latest/champion/{}/ability-icon/r",
-                    id
-                ),
+                format!("https://cdn.communitydragon.org/latest/champion/{id}/ability-icon/r",),
             );
 
             let mut map = AbilitiesMap {

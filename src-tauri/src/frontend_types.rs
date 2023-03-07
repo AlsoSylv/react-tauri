@@ -2,7 +2,7 @@
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChampionInfo {
-    pub url: String,
+    pub url: Result<String, i64>,
     pub local_image: String,
     pub win_rate: Result<String, i64>,
     pub pick_rate: Result<String, i64>,
@@ -271,6 +271,8 @@ impl Passive {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RuneImages {
+    pub tree_one: i64,
+    pub tree_two: i64,
     pub primary_runes: PrimaryTree,
     pub secondary_runes: SecondaryTree,
 }
@@ -403,8 +405,8 @@ pub struct ChampionNames {
 impl ChampionNames {
     pub fn new(label: &str, key: &str, id: i64, version: Option<&str>) -> Self {
         let url = match version {
-            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png", version, key),
-            None => format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/{}.png", id),
+            Some(version) => format!("https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{key}.png"),
+            None => format!("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/{id}.png"),
         };
         ChampionNames {
             label: label.to_owned(),
@@ -413,7 +415,7 @@ impl ChampionNames {
                 id,
             },
             url: Some(url),
-            local_image: Some(format!("/{0}/{0}.png", key)),
+            local_image: Some(format!("/{key}/{key}.png")),
         }
     }
 }

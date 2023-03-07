@@ -5,7 +5,7 @@ mod items;
 /// Package for getting JSON from different rune endpoints
 mod runes;
 /// Structs to desearalize to
-mod structs;
+pub mod structs;
 /// Package for getting JSON from diffferent summoner spell endpoints
 mod summoners;
 
@@ -26,24 +26,27 @@ mod summoners;
 ///         Err(community_dragon_error: CommunityDragonError) => { ... },
 ///     }
 /// }
-pub struct CommunityDragon {
-    pub language: String,
-    pub client: reqwest::Client,
+pub struct CommunityDragon<'a> {
+    pub language: &'a str,
+    pub client: &'a reqwest::Client,
 }
 
-impl CommunityDragon {
+impl CommunityDragon<'_> {
     /// Creates a new reqwest client for data dragon
     /// Takes a Riot language and translates it to
     /// A Community Dragon language, prefered over
     /// Using a literal struct.
-    pub fn new(lang: &str) -> Self {
-        let client = reqwest::Client::new();
-        let binding = lang.to_lowercase();
+    pub fn new<'a>(
+        lang: Option<&'a str>,
+        client: &'a reqwest::Client,
+    ) -> CommunityDragon<'a> {
         let language = match lang {
-            "en_US" => "default",
-            _ => &binding,
-        }
-        .to_owned();
+            Some(lang) => match lang {
+                "en_US" => "default",
+                _ => lang,
+            },
+            None => "default",
+        };
 
         CommunityDragon { language, client }
     }

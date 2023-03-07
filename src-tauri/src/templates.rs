@@ -76,7 +76,7 @@ async fn gql_request<Vars: Serialize, Data: for<'de> Deserialize<'de>, E>(
         .post(url)
         .json(&GQLQuery {
             variables: vars,
-            query: query.to_string(),
+            query: query,
         })
         .send()
         .await
@@ -94,7 +94,7 @@ async fn gql_request<Vars: Serialize, Data: for<'de> Deserialize<'de>, E>(
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-struct GQLQuery<T> {
+struct GQLQuery<'a, T> {
     variables: T,
-    query: String,
+    query: &'a str,
 }

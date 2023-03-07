@@ -1,8 +1,7 @@
-use std::collections::{BTreeMap, HashMap};
-
-// use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use std::collections::{BTreeMap, HashMap};
 
 /// Serialize `runesReforged.json` to a struct
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -120,7 +119,7 @@ pub struct ChampionFull {
     pub type_field: String,
     pub format: String,
     pub version: String,
-    pub data: Value,
+    pub data: HashMap<String, Value>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

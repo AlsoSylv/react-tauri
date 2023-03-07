@@ -1,14 +1,30 @@
+use data_dragon::DataDragon;
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use once_cell::sync::Lazy;
 
 use crate::{extensions::ugg::Data, frontend_types::ChampionNames};
 
+static HYPERCLIENT: Lazy<hyper::Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
+    let https = HttpsConnector::new();
+    hyper::Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https)
+});
+
+static DATADRAGON: Lazy<DataDragon> = Lazy::new(|| DataDragon::new(&HYPERCLIENT, None));
+
+static CLIENT: Lazy<reqwest::Client> = Lazy::new(reqwest::Client::new);
+
+static NAME: Lazy<ChampionNames> = Lazy::new(|| ChampionNames::new("", "", 498, None));
+
 static UGGDATA: Lazy<Data> = Lazy::new(|| {
     Data::new(
-        ChampionNames::new("", "", 498, None),
-        "3".to_owned(),
-        "Platinum Plus".to_owned(),
-        "World".to_owned(),
-        "en_US".to_owned(),
+        &NAME,
+        "3",
+        "Platinum Plus",
+        "World",
+        Some("en_US"),
+        &DATADRAGON,
+        &CLIENT,
     )
 });
 
@@ -16,7 +32,7 @@ static UGGDATA: Lazy<Data> = Lazy::new(|| {
 async fn champ_basic_test() {
     use crate::core::community_dragon::CommunityDragon;
 
-    let community_dragon = CommunityDragon::new("en_US");
+    let community_dragon = CommunityDragon::new(Some("en_US"), &CLIENT);
     if let Ok(champ_basic) = community_dragon.champs_basic().await {
         assert!(champ_basic[0].id == -1);
         assert!(champ_basic[1].id == 1);
@@ -29,7 +45,7 @@ async fn champ_basic_test() {
 async fn champ_full_test() {
     use crate::core::community_dragon::CommunityDragon;
 
-    let community_dragon = CommunityDragon::new("en_US");
+    let community_dragon = CommunityDragon::new(Some("en_US"), &CLIENT);
     if let Ok(champ_full) = community_dragon.champs_full(498).await {
         assert!(champ_full.name == "Xayah");
         assert!(champ_full.key == "Xayah");
@@ -42,7 +58,7 @@ async fn champ_full_test() {
 async fn runes_test() {
     use crate::core::community_dragon::CommunityDragon;
 
-    let community_dragon = CommunityDragon::new("en_US");
+    let community_dragon = CommunityDragon::new(Some("en_US"), &CLIENT);
     if let Ok(runes) = community_dragon.runes().await {
         runes.iter().for_each(|rune| {
             if rune.id < 5000 {
@@ -58,7 +74,7 @@ async fn runes_test() {
 async fn runes_style_test() {
     use crate::core::community_dragon::CommunityDragon;
 
-    let community_dragon = CommunityDragon::new("en_US");
+    let community_dragon = CommunityDragon::new(Some("en_US"), &CLIENT);
     if let Ok(runes) = community_dragon.runes_style().await {
         assert!(runes.schema_version == 2);
         assert!(runes.styles[0].id == 8400);
@@ -72,7 +88,7 @@ async fn runes_style_test() {
 async fn sort_test() {
     use crate::core::helpers::runes::community_dragon_all_rune_images;
 
-    if let Ok(mut runes) = community_dragon_all_rune_images(8100, 8300, "en_US").await {
+    if let Ok(mut runes) = community_dragon_all_rune_images(8100, 8300, Some("en_US"), &CLIENT).await {
         let mut slots = runes.as_array_mut();
         let mut used = Vec::new();
         let mut counter = 0;
@@ -100,10 +116,9 @@ async fn sort_test() {
 async fn community_dragon_item_test() {
     use crate::core::community_dragon::CommunityDragon;
     use crate::{frontend_types::ItemValues, frontend_types::ItemsMap};
-    let lang = "en_US";
 
     if let Ok(json) = UGGDATA.overview().await {
-        let community_dragon = CommunityDragon::new(lang);
+        let community_dragon = CommunityDragon::new(Some("en_US"), &CLIENT);
         let items = community_dragon.item_json().await;
         let mut items_map = ItemsMap::new();
         let items_array = items_map.as_array_mut();

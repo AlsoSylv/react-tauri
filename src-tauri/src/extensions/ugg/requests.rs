@@ -1,10 +1,11 @@
+use data_dragon::DataDragon;
 use moka::future::{Cache, ConcurrentCacheExt};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 use crate::templates::request;
-use crate::{core::data_dragon, errors, extensions};
+use crate::{errors, extensions};
 
 use errors::{ErrorMap, UGGDataError};
 use extensions::ugg::structs;
@@ -21,10 +22,10 @@ static CACHED_OVERIEW_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
 static CACHED_RANKING_REQUEST: Lazy<Mutex<Cache<i64, Regions>>> =
     Lazy::new(|| Mutex::new(Cache::new(10)));
 
-impl structs::UggRequest {
+impl structs::UggRequest<'_> {
     /// Handles making the request to get the default roles for every champ
     /// from the UGG api
-    pub async fn default_role(&self) -> Result<String, ErrorMap> {
+    pub async fn default_role(&self, data_dragon: &DataDragon<'_>) -> Result<String, ErrorMap> {
         let mut cache = CACHED_DEFAULT_ROLE.lock().await;
         if let Some(role) = cache.get(&self.id.to_string()) {
             let role = role[0].to_string();
@@ -34,7 +35,7 @@ impl structs::UggRequest {
         let stat_version = "1.5";
         let role_version = "1.5.0";
         let base_role_url = "https://stats2.u.gg/lol";
-        let lol_version = lol_version().await;
+        let lol_version = lol_version(data_dragon).await;
         let client = &self.client;
         match lol_version {
             Ok(ugg_lol_version) => {
@@ -69,7 +70,7 @@ impl structs::UggRequest {
     ///
     /// UPDATE: This is actually an easy drop in with the current system, but this is not offered to all champions.
     /// Further investigation is needed into finding out which champs this is offered for automatically
-    pub async fn overview_json(&self) -> Result<Regions, ErrorMap> {
+    pub async fn overview_json(&self, data_dragon: &DataDragon<'_>) -> Result<Regions, ErrorMap> {
         let cache = CACHED_OVERIEW_REQUEST.lock().await;
         if let Some(overview) = cache.get(&self.id) {
             return Ok(overview);
@@ -79,7 +80,7 @@ impl structs::UggRequest {
         let overview_version = "1.5.0";
         let base_overview_url = "https://stats2.u.gg/lol";
         let game_mode = "ranked_solo_5x5";
-        let lol_version = lol_version().await;
+        let lol_version = lol_version(data_dragon).await;
         let client = &self.client;
 
         match lol_version {
@@ -109,7 +110,7 @@ impl structs::UggRequest {
 
     /// This handles making the request for the UGG ranking JSON for specific champs
     /// this contians things like pickrate, winrate, banrate, and matchups
-    pub async fn ranking_json(&self) -> Result<Regions, ErrorMap> {
+    pub async fn ranking_json(&self, data_dragon: &DataDragon<'_>) -> Result<Regions, ErrorMap> {
         let cache = CACHED_RANKING_REQUEST.lock().await;
         if let Some(ranking) = cache.get(&self.id) {
             return Ok(ranking);
@@ -120,7 +121,7 @@ impl structs::UggRequest {
         let base_overview_url = "https://stats2.u.gg/lol";
         let game_mode = "ranked_solo_5x5";
 
-        let lol_version = lol_version().await;
+        let lol_version = lol_version(data_dragon).await;
         let client = &self.client;
 
         match lol_version {
@@ -149,11 +150,10 @@ impl structs::UggRequest {
 }
 
 /// This returns the ugg lol version, this removes a ton of duplicated code
-async fn lol_version() -> Result<String, ErrorMap> {
-    let data_dragon_version = data_dragon::DataDragon::new(None).await;
-    match data_dragon_version {
-        Ok(data_dragon) => {
-            let lol_version: Vec<&str> = data_dragon.version.split('.').collect();
+async fn lol_version(data_dragon: &DataDragon<'_>) -> Result<String, ErrorMap> {
+    match data_dragon.get_version().await {
+        Ok(version) => {
+            let lol_version: Vec<&str> = version.split('.').collect();
             Ok(format!("{0}_{1}", lol_version[0], lol_version[1]))
         }
         Err(err) => Err(DataDragonErrors(err)),

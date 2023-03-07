@@ -1,14 +1,30 @@
+use data_dragon::DataDragon;
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use once_cell::sync::Lazy;
 
 use crate::{extensions::ugg::Data, frontend_types::ChampionNames};
 
+static HYPERCLIENT: Lazy<hyper::Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
+    let https = HttpsConnector::new();
+    hyper::Client::builder().build::<HttpsConnector<HttpConnector>, hyper::Body>(https)
+});
+
+static DATADRAGON: Lazy<DataDragon> = Lazy::new(|| DataDragon::new(&HYPERCLIENT, None));
+
+static CLIENT: Lazy<reqwest::Client> = Lazy::new(reqwest::Client::new);
+
+static NAME: Lazy<ChampionNames> = Lazy::new(|| ChampionNames::new("", "", 498, None));
+
 static UGGDATA: Lazy<Data> = Lazy::new(|| {
     Data::new(
-        ChampionNames::new("", "", 498, None),
-        "3".to_owned(),
-        "Platinum Plus".to_owned(),
-        "World".to_owned(),
-        "en_US".to_owned(),
+        &NAME,
+        "3",
+        "Platinum Plus",
+        "World",
+        Some("en_US"),
+        &DATADRAGON,
+        &CLIENT,
     )
 });
 
@@ -159,7 +175,7 @@ async fn shards_test() {
 async fn sort_test() {
     use crate::core::helpers::runes::all_rune_images;
 
-    if let Ok(mut runes) = all_rune_images(8100, 8300, "en_US").await {
+    if let Ok(mut runes) = all_rune_images(8100, 8300, Some("en_US"), &CLIENT, &DATADRAGON).await {
         let mut slots = runes.as_array_mut();
         let mut used = Vec::new();
         let mut counter = 0;

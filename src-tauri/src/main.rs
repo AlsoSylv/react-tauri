@@ -101,10 +101,10 @@ fn roles(lang: &str) -> Vec<Role<'_>> {
 #[derive(Default, Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Role<'a> {
-    name: String,
     id: &'a str,
     local_path: &'a str,
     url: &'a str,
+    name: String,
 }
 
 /// Generates a list and sends it to the front end

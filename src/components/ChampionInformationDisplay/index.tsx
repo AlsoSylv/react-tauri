@@ -1,97 +1,80 @@
-import { useEffect, useState } from 'react';
-
-import { Alert, Box, Unstable_Grid2 as Grid, Typography, Avatar } from '@mui/material';
+import { Alert, Unstable_Grid2 as Grid, Box, Divider, Skeleton } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 import Runes from 'components/Runes';
-import { useGlobalContext } from 'context/global';
 import type { ChampionData } from 'interfaces';
-import { getChampionBuild, validateState } from 'utils/utils';
+import { colorByPercentage } from 'utils/theme';
 
-function ChampionInformationDisplay() {
-  const { state } = useGlobalContext();
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [championInfo, setChampionInfo] = useState<ChampionData | null>(null);
-  const [url, setUrl] = useState<string | null>(null);
+interface ChampionInformationDisplayProps {
+  championInfo: ChampionData | null;
+  error: string;
+  loading: boolean;
+}
 
-  useEffect(() => {
-    const handleGetChampionInformation = async () => {
-      setError('');
-      setChampionInfo(null);
-      setLoading(true);
-      setUrl(null);
-
-      const stateValidation = validateState(state);
-
-      if (!stateValidation.isValid) {
-        setError(stateValidation.message);
-        setLoading(false);
-
-        return;
-      }
-
-      const championInfoResponse = await getChampionBuild(state);
-
-      console.log(championInfoResponse);
-
-      if (championInfoResponse.completedSuccessfully) {
-        const { completedSuccessfully: _, ...restChampionInfo } = championInfoResponse;
-        setChampionInfo(restChampionInfo);
-        setUrl(`../champions${championInfoResponse?.localImage}`);
-      } else {
-        setError(championInfoResponse.message);
-      }
-
-      setLoading(false);
-    };
-
-    handleGetChampionInformation();
-  }, [state]);
+function BasicInfoData(props: { label: string; value: string; loading: boolean; color?: string }) {
+  const { label, value, loading, color } = props;
 
   return (
-    <Box id="get-runes">
-      <Grid container spacing={2}>
-        <Grid xs>
-          <Grid container spacing={2}>
-            {error ? (
-              <Grid xs={12}>
-                <Alert color="error">{error}</Alert>
-              </Grid>
-            ) : (
-              <>
-                <Grid container sx={{ display: 'flex' }}>
-                  <Grid xs={1}>
-                    <Avatar
-                      src={url || ''}
-                      alt={state.champion?.label}
-                      imgProps={{ onError: () => setUrl(championInfo?.url || '') }}
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" alignSelf="center" sx={{ fontWeight: 'bold', ...(color && { color }) }}>
+        {loading ? <Skeleton width="4rem" animation="wave" /> : value}
+      </Typography>
+      <Typography variant="body2" alignSelf="center" display="flex">
+        {label}
+      </Typography>
+    </Box>
+  );
+}
+
+function ChampionInformationDisplay({ championInfo, error, loading }: ChampionInformationDisplayProps) {
+  console.log('championInfo', championInfo);
+  console.log('loading', loading);
+  return (
+    <Grid container xs={12}>
+      {error ? (
+        <Grid xs={12}>
+          <Alert color="error">{error}</Alert>
+        </Grid>
+      ) : (
+        <>
+          <Grid xs={8.5} gap={4}>
+            <Runes runes={championInfo?.runes} shards={championInfo?.shards} loading={loading || !championInfo} />
+          </Grid>
+          <Grid xs={3.5}>
+            <Paper elevation={3} sx={{ padding: '20px' }}>
+              <Typography variant="body1" sx={{ fontWeight: 500, fontSize: '1.2rem' }} alignSelf="center" gutterBottom>
+                Stats Summary
+              </Typography>
+              <Box>
+                <Grid container xs={12} justifyContent="space-evenly">
+                  <Grid xs="auto">
+                    <BasicInfoData
+                      value={championInfo?.winRate || ''}
+                      label="Win Rate"
+                      loading={loading}
+                      color={colorByPercentage(championInfo?.winRate || '')}
                     />
                   </Grid>
-                  <Grid xs={3}>
-                    <Typography variant="body1" alignSelf="center">
-                      Champion Win Rate: {championInfo?.winRate}
-                    </Typography>
+                  <Grid xs="auto">
+                    <Divider variant="fullWidth" orientation="vertical" />
                   </Grid>
-                  <Grid xs={3}>
-                    <Typography variant="body1" alignSelf="center">
-                      Champion Pick Rate: {championInfo?.pickRate}
-                    </Typography>
+                  <Grid xs="auto">
+                    <BasicInfoData value={championInfo?.pickRate || ''} label="Pick Rate" loading={loading} />
                   </Grid>
-                  <Grid xs={3}>
-                    <Typography variant="body1" alignSelf="center">
-                      Champion Ban Rate: {championInfo?.banRate}
-                    </Typography>
+                  <Grid xs="auto">
+                    <Divider variant="fullWidth" orientation="vertical" />
+                  </Grid>
+                  <Grid xs="auto">
+                    <BasicInfoData value={championInfo?.banRate || ''} label="Ban Rate" loading={loading} />
                   </Grid>
                 </Grid>
-                <Grid xs={12}>
-                  <Runes runes={championInfo?.runes} shards={championInfo?.shards} loading={loading || !championInfo} />
-                </Grid>
-              </>
-            )}
+              </Box>
+            </Paper>
           </Grid>
-        </Grid>
-      </Grid>
-    </Box>
+        </>
+      )}
+    </Grid>
   );
 }
 

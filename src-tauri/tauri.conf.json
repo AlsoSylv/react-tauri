@@ -55,11 +55,13 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
         "title": "react-tauri",
-        "width": 800
+        "fullscreen": false,
+        "resizable": true,
+        "height": 900,
+        "width": 1600,
+        "minHeight": 768,
+        "minWidth": 1366
       }
     ]
   }

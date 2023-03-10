@@ -28,7 +28,7 @@ function RegionMenu() {
         disableClearable
         options={regionList}
         onChange={handleChangeRank}
-        renderInput={(params) => <TextField {...params} label="Select a region" />}
+        renderInput={(params) => <TextField {...params} label="Select a region" size="small" />}
       />
     </Box>
   );

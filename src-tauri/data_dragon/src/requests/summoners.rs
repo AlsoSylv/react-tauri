@@ -15,7 +15,7 @@ impl DataDragon<'_> {
             return Ok(json);
         };
         let url = format!(
-            "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/runesReforged.json",
+            "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json",
             version, self.lang
         );
         let summoner_json: Summoners = request(
